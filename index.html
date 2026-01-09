@@ -3,1265 +3,1029 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Report Operasional</title>
+    <title>Daily Report Tim</title>
     
-    <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23392061%22/><text x=%2250%22 y=%2275%22 font-family=%22sans-serif%22 font-weight=%22900%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22%23E71B78%22>a</text></svg>">
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (UI Modern) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
-                    colors: { 
-                        brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' },
-                        surface: '#f8fafc'
-                    },
-                    boxShadow: {
-                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                        'glow': '0 0 15px rgba(99, 102, 241, 0.3)'
-                    }
-                }
-            }
-        }
-    </script>
     
-    <!-- Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    <!-- Font Awesome (Ikon) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Chart.js (Grafik Dashboard) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Font (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        body { 
-            background-color: #f1f5f9; 
-            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-attachment: fixed;
-        }
-        .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); }
-        .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
-        .nav-link { position: relative; color: #64748b; transition: all 0.3s ease; border-radius: 12px; }
-        .nav-link:hover { color: #4f46e5; background-color: rgba(99, 102, 241, 0.1); }
-        .nav-link.active-tab { color: #fff; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
-        .hidden-section { display: none !important; }
-        .fade-in { animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .loader { border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 2px solid #fff; width: 18px; height: 18px; animation: spin 0.8s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        .sticky-col { position: sticky; left: 0; background-color: #fff; z-index: 20; box-shadow: 4px 0 10px -4px rgba(0,0,0,0.1); }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .sidebar-active { background-color: #e5e7eb; color: #1d4ed8; border-right: 3px solid #1d4ed8; }
+        .hidden { display: none !important; }
+        
+        /* Table Input Style */
+        .input-cell { min-width: 80px; }
+        .input-cell input { width: 100%; text-align: center; border: 1px solid #e5e7eb; border-radius: 4px; padding: 6px; font-size: 0.95rem; }
+        .input-cell input:focus { outline: none; border-color: #2563eb; ring: 2px; }
+        .total-cell input { background-color: #eff6ff; font-weight: bold; color: #1e40af; }
+
+        /* Hapus Tombol Spinner */
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
-        .table-input { transition: all 0.2s; border: 1px solid transparent; background: transparent; }
-        .table-input:focus { background: white; border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); }
-        .table-input:hover { background: rgba(248, 250, 252, 0.8); }
-        .tab-bg { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .type-radio:checked + label { background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: white; border-color: transparent; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
-        .type-radio:checked + label i { color: white; }
+
+        /* Login Tabs */
+        .login-tab-active { border-bottom: 2px solid #2563eb; color: #2563eb; font-weight: 600; }
+        .login-tab-inactive { color: #6b7280; border-bottom: 2px solid transparent; }
+
+        /* Toggle Switch Style */
+        .toggle-checkbox:checked { right: 0; border-color: #68D391; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #68D391; }
+        
+        /* SLA Colors (Background) */
+        .bg-sla-red { background-color: #fee2e2; color: #991b1b; }
+        .bg-sla-yellow { background-color: #fef3c7; color: #92400e; }
+        .bg-sla-green { background-color: #d1fae5; color: #065f46; }
     </style>
 </head>
-<body class="text-slate-800 antialiased min-h-screen flex flex-col font-sans">
+<body>
 
-    <!-- LOGIN SECTION -->
-    <div id="section-login" class="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
-        <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-600/30 rounded-full blur-[100px]"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-600/30 rounded-full blur-[100px]"></div>
-
-        <div class="relative max-w-sm w-full glass-panel rounded-3xl shadow-2xl overflow-hidden transform transition-all hover:scale-[1.005] duration-300">
-            <div class="bg-gradient-to-br from-brand-600 to-brand-900 px-8 pt-12 pb-10 text-center text-white relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10 mb-6 shadow-inner backdrop-blur-md ring-1 ring-white/20">
-                    <i class="fa-solid fa-chart-pie text-4xl text-white drop-shadow-md"></i>
+    <!-- --- HALAMAN LOGIN --- -->
+    <div id="login-page" class="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm border border-gray-100 relative overflow-hidden">
+            <div class="text-center mb-6">
+                <div class="bg-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-600/30">
+                    <i class="fa-solid fa-file-signature text-white text-2xl"></i>
                 </div>
-                <h2 class="font-bold text-3xl tracking-tight" id="login-app-title">Ops Report</h2>
-                <p class="text-brand-100 text-sm mt-2 font-medium tracking-wide">Dashboard Operasional Terpadu coi</p>
+                <h2 class="text-2xl font-bold text-gray-800">Daily Report</h2>
             </div>
-            
-            <div class="px-8 pt-8 pb-8">
-                <div class="flex p-1.5 bg-slate-100 rounded-xl relative mb-8 border border-slate-200">
-                    <div id="login-tab-bg" class="absolute top-1.5 left-1.5 w-[calc(50%-6px)] h-[calc(100%-12px)] bg-white rounded-lg shadow-sm tab-bg"></div>
-                    <button onclick="switchLoginMode('user')" id="tab-user" class="flex-1 relative z-10 py-2.5 text-sm font-bold text-brand-600 transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-users text-xs"></i> Tim Ops</button>
-                    <button onclick="switchLoginMode('admin')" id="tab-admin" class="flex-1 relative z-10 py-2.5 text-sm font-bold text-slate-400 transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-shield-halved text-xs"></i> Admin</button>
+            <div class="flex mb-6 border-b border-gray-200">
+                <button onclick="switchLoginTab('user')" id="tab-login-user" class="flex-1 pb-2 text-center text-sm transition login-tab-active">Login Tim</button>
+                <button onclick="switchLoginTab('admin')" id="tab-login-admin" class="flex-1 pb-2 text-center text-sm transition login-tab-inactive">Super Admin</button>
+            </div>
+            <form id="login-form" class="space-y-5">
+                <input type="hidden" id="login-type" value="user">
+                <div id="login-intro-text" class="text-xs text-gray-500 text-center bg-gray-50 p-2 rounded border border-gray-100">Untuk Leader & Coordinator</div>
+                <div id="username-container">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <input type="text" id="username" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="Username" required>
                 </div>
-
-                <form id="loginForm" class="space-y-5">
-                    <div id="login-error" class="hidden bg-red-50 border-l-4 border-red-500 text-red-700 p-3 rounded-lg text-xs mb-2 animate-pulse shadow-sm font-medium flex items-center gap-2"><i class="fa-solid fa-circle-exclamation"></i> <span>Error message</span></div>
-                    
-                    <div id="field-username" class="space-y-1.5 transition-all duration-300">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Username ID</label>
-                        <div class="relative group">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-600 transition-colors">
-                                <i class="fa-solid fa-user"></i>
-                            </div>
-                            <input type="text" id="login-username" required class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-sm bg-slate-50/50 focus:bg-white" placeholder="Masukkan ID User">
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Password</label>
-                        <div class="relative group">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-600 transition-colors">
-                                <i class="fa-solid fa-lock"></i>
-                            </div>
-                            <input type="password" id="login-password" required class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-sm bg-slate-50/50 focus:bg-white" placeholder="••••••••">
-                        </div>
-                    </div>
-
-                    <button type="submit" id="btn-login" class="w-full bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-500 hover:to-brand-600 text-white font-bold py-4 px-4 rounded-xl shadow-lg shadow-brand-500/30 transition-all duration-200 transform hover:-translate-y-1 flex justify-center items-center group mt-6 active:scale-95">
-                        <span id="btn-login-text" class="mr-2">Masuk Aplikasi</span>
-                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                        <span id="login-loader" class="loader ml-3 hidden"></span>
-                    </button>
-                </form>
-            </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="password" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="Password" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg transition duration-200 flex justify-center items-center gap-2">
+                    <span>Masuk</span> <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+            <div id="login-error" class="mt-4 text-center text-red-500 text-sm hidden bg-red-50 p-2 rounded border border-red-100"></div>
         </div>
-        <p class="absolute bottom-6 text-slate-400 text-xs font-medium">System v2.0 &bull; Secure Connection</p>
     </div>
 
-    <!-- MAIN APP LAYOUT -->
-    <div id="app-layout" class="hidden-section flex-1 flex flex-col transition-opacity duration-500">
-        <nav class="glass-header sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-20 items-center">
-                    <div class="flex items-center gap-4">
-                        <div class="bg-gradient-to-tr from-brand-600 to-purple-600 w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-500/20 transform hover:rotate-12 transition-transform duration-300">
-                            <i class="fa-solid fa-truck-fast"></i>
-                        </div>
-                        <div class="leading-tight">
-                            <h1 class="font-extrabold text-lg text-slate-800 tracking-tight" id="nav-app-title">Ops Report</h1>
-                            <div class="flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest" id="nav-user-role">ONLINE</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center gap-2 sm:gap-3 bg-slate-100/50 p-1.5 rounded-2xl border border-slate-200/50 backdrop-blur-sm overflow-x-auto">
-                        <button id="nav-dashboard" onclick="switchTab('dashboard')" class="nav-link px-4 py-2 text-sm font-semibold flex items-center gap-2 active-tab"><i class="fa-solid fa-chart-pie"></i> <span class="hidden sm:inline">Data</span></button>
-                        <button id="nav-form" onclick="switchTab('form')" class="nav-link px-4 py-2 text-sm font-semibold flex items-center gap-2"><i class="fa-solid fa-pen-to-square"></i> <span class="hidden sm:inline">Input</span></button>
-                        <button id="nav-recap" onclick="switchTab('recap')" class="nav-link px-4 py-2 text-sm font-semibold flex items-center gap-2"><i class="fa-solid fa-table-list"></i> <span class="hidden sm:inline">Rekapan</span></button>
-                        <button id="nav-settings" onclick="switchTab('settings')" class="hidden-section nav-link px-4 py-2 text-sm font-semibold flex items-center gap-2"><i class="fa-solid fa-sliders"></i> <span class="hidden sm:inline">Config</span></button>
-                    </div>
-
-                    <button onclick="handleLogout()" class="group flex items-center justify-center w-10 h-10 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all ml-2" title="Keluar">
-                        <i class="fa-solid fa-power-off text-lg group-hover:scale-110 transition-transform"></i>
+    <!-- --- HALAMAN UTAMA --- -->
+    <div id="main-app" class="hidden min-h-screen flex flex-col md:flex-row">
+        
+        <!-- Sidebar -->
+        <aside class="w-full md:w-64 bg-white border-r border-gray-200 flex-shrink-0">
+            <div class="p-6 border-b border-gray-100 flex items-center gap-3">
+                <div class="bg-blue-600 w-8 h-8 rounded-lg flex items-center justify-center text-white">
+                    <i class="fa-solid fa-file-signature text-sm"></i>
+                </div>
+                <h1 class="text-xl font-bold text-gray-800 tracking-tight">TeamReport</h1>
+            </div>
+            <div class="p-4">
+                <nav class="space-y-1">
+                    <button onclick="showTab('dashboard')" id="nav-dashboard" class="w-full text-left px-4 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition flex items-center gap-3 font-medium sidebar-active">
+                        <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+                    </button>
+                    <button onclick="showTab('reports')" id="nav-reports" class="w-full text-left px-4 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition flex items-center gap-3 font-medium">
+                        <i class="fa-solid fa-list-check w-5"></i> Laporan & Input
+                    </button>
+                </nav>
+                <div id="admin-menu" class="mt-6 hidden">
+                    <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-2 px-2">Admin Area</p>
+                    <button onclick="showTab('settings')" id="nav-settings" class="w-full text-left px-4 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition flex items-center gap-3 font-medium">
+                        <i class="fa-solid fa-users-gear w-5"></i> Settings User
                     </button>
                 </div>
             </div>
-        </nav>
-
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-            <!-- Welcome Banner -->
-            <div id="welcome-banner" class="hidden-section fade-in relative overflow-hidden rounded-3xl bg-slate-900 text-white shadow-2xl shadow-slate-900/20 mb-8 p-8 md:p-10 group">
-                <div class="absolute top-0 right-0 w-[300px] h-[300px] bg-gradient-to-br from-brand-500 to-purple-600 rounded-full blur-[80px] opacity-40 group-hover:opacity-60 transition-opacity duration-500 translate-x-1/3 -translate-y-1/3"></div>
-                <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+            <div class="mt-auto p-4 border-t border-gray-100">
+                <div class="flex items-center gap-3 mb-4 px-2">
+                    <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500"><i class="fa-solid fa-user"></i></div>
                     <div>
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="bg-white/10 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-white/10 text-brand-200" id="banner-date">Date</span>
-                        </div>
-                        <h2 class="text-3xl md:text-5xl font-bold tracking-tight mb-2">Hello, <span id="banner-name" class="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300">User</span></h2>
-                        <p class="text-slate-400 text-sm max-w-lg">Selamat datang kembali di dashboard operasional. Cek performa hari ini.</p>
-                    </div>
-                    <div class="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl px-5 py-3 flex items-center gap-4">
-                        <div class="text-right">
-                            <p class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Role Access</p>
-                            <p class="text-base font-bold text-white tracking-wide" id="banner-role">USER</p>
-                        </div>
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-purple-500 flex items-center justify-center text-white shadow-lg"><i class="fa-solid fa-user-astronaut"></i></div>
+                        <p id="user-display-name" class="text-sm font-semibold text-gray-800">User</p>
+                        <p id="user-display-role" class="text-xs text-gray-500 capitalize">Role</p>
                     </div>
                 </div>
+                <button onclick="logout()" class="w-full border border-red-200 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
             </div>
+        </aside>
 
-            <!-- DASHBOARD SECTION -->
-            <div id="section-dashboard" class="hidden-section space-y-8 fade-in">
-                <div class="glass-panel p-6 rounded-3xl shadow-soft">
-                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><div class="bg-brand-50 text-brand-600 p-2 rounded-lg"><i class="fa-solid fa-filter"></i></div> Filter Data Dashboard</h3>
-                        <button onclick="resetFilters()" class="text-xs font-bold text-slate-500 hover:text-brand-600 hover:bg-brand-50 px-4 py-2 rounded-xl transition-colors border border-dashed border-slate-300 hover:border-brand-200">Reset Filter</button>
+        <!-- Content Area -->
+        <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+            
+            <!-- 1. DASHBOARD TAB -->
+            <div id="tab-dashboard" class="space-y-6 animate-fade-in">
+                <header class="flex justify-between items-end mb-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
+                        <p class="text-sm text-gray-500">Halo, <span id="dashboard-greeting-name" class="font-semibold">User</span>! Berikut performa tim Anda.</p>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                        <div class="group"><label class="text-[10px] font-bold text-slate-400 mb-1 block uppercase">Dari</label><input type="date" id="filter-date-start" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-3 px-3 focus:ring-brand-500 group-hover:border-brand-300 transition-colors"></div>
-                        <div class="group"><label class="text-[10px] font-bold text-slate-400 mb-1 block uppercase">Sampai</label><input type="date" id="filter-date-end" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-3 px-3 focus:ring-brand-500 group-hover:border-brand-300 transition-colors"></div>
-                        <div class="group"><label class="text-[10px] font-bold text-slate-400 mb-1 block uppercase">Staging</label><select id="filter-staging" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-3 px-3 focus:ring-brand-500 group-hover:border-brand-300 transition-colors"><option value="">Semua Staging</option></select></div>
-                        <div class="group"><label class="text-[10px] font-bold text-slate-400 mb-1 block uppercase">Service</label>
-                            <select id="filter-service" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-3 px-3 focus:ring-brand-500 group-hover:border-brand-300 transition-colors">
-                                <option value="">Semua Service</option>
-                                <option value="REG">REG</option><option value="ECO">ECO</option><option value="ND">ND</option><option value="SDS">SD/SDS</option><option value="BIG">BIG</option>
-                            </select>
+                </header>
+
+                <!-- 1. FILTER SECTION -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Rentang Tanggal</label>
+                        <div class="flex gap-2">
+                            <input type="date" id="dash-date-start" class="w-full border rounded p-2 text-sm bg-gray-50">
+                            <span class="self-center text-gray-400">-</span>
+                            <input type="date" id="dash-date-end" class="w-full border rounded p-2 text-sm bg-gray-50">
                         </div>
-                        <div class="group"><label class="text-[10px] font-bold text-slate-400 mb-1 block uppercase">Tipe</label>
-                            <select id="filter-type" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-3 px-3 focus:ring-brand-500 group-hover:border-brand-300 transition-colors">
-                                <option value="">Semua Tipe</option><option value="Delivery">Delivery</option><option value="Pickup">Pickup</option>
-                            </select>
-                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Kode SS</label>
+                        <select id="dash-filter-ss" class="w-full border rounded p-2 text-sm bg-gray-50"><option value="all">Semua SS</option></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Service</label>
+                        <select id="dash-filter-service" class="w-full border rounded p-2 text-sm bg-gray-50">
+                            <option value="all">Semua Service</option>
+                            <option value="REG">REG</option><option value="ECO">ECO</option><option value="ND">ND</option><option value="SD/SDS">SD/SDS</option><option value="BIG">BIG</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Tipe</label>
+                        <select id="dash-filter-type" class="w-full border rounded p-2 text-sm bg-gray-50">
+                            <option value="all">Semua Tipe</option><option value="delivery">Delivery</option><option value="pickup">Pickup</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-5">
-                    <div class="glass-panel p-5 rounded-3xl shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 border-t-4 border-t-brand-500">
-                        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fa-solid fa-box text-6xl text-brand-600"></i></div>
-                        <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">Total Paket</p>
-                        <p class="text-3xl font-extrabold text-slate-800" id="kpi-total">0</p>
+                <!-- 2 & 3. GRAFIK PERFORMA (Normal Order / Chronological) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Grafik Tahunan (Bulanan) -->
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="text-sm font-bold text-gray-700 mb-4 uppercase flex items-center gap-2"><i class="fa-regular fa-calendar"></i> Performa Tahunan</h3>
+                        <div class="h-64 w-full"><canvas id="chartAnnual"></canvas></div>
                     </div>
-                    <div class="glass-panel p-5 rounded-3xl shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 border-t-4 border-t-emerald-500">
-                         <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fa-solid fa-check-circle text-6xl text-emerald-600"></i></div>
-                        <div class="flex justify-between items-start mb-2">
-                             <p class="text-xs text-emerald-600 font-bold uppercase tracking-wider">Success (OK)</p>
-                             <span class="text-[10px] font-bold text-white bg-emerald-500 px-2 py-0.5 rounded-full shadow-lg shadow-emerald-500/40" id="kpi-ok-pct">0%</span>
-                        </div>
-                        <p class="text-3xl font-extrabold text-slate-800" id="kpi-ok">0</p>
-                    </div>
-                    <div class="glass-panel p-5 rounded-3xl shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 border-t-4 border-t-amber-400">
-                         <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fa-solid fa-stopwatch text-6xl text-amber-500"></i></div>
-                        <p class="text-xs text-amber-600 font-bold uppercase tracking-wider mb-2">In Progress</p>
-                        <p class="text-3xl font-extrabold text-slate-800" id="kpi-pending">0</p>
-                    </div>
-                    <div class="glass-panel p-5 rounded-3xl shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 border-t-4 border-t-rose-500">
-                        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fa-solid fa-circle-xmark text-6xl text-rose-500"></i></div>
-                        <p class="text-xs text-rose-600 font-bold uppercase tracking-wider mb-2">Missed / Fail</p>
-                        <p class="text-3xl font-extrabold text-slate-800" id="kpi-missed">0</p>
-                    </div>
-                    <div class="glass-panel p-5 rounded-3xl shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 border-t-4 border-t-slate-500">
-                        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fa-solid fa-triangle-exclamation text-6xl text-slate-500"></i></div>
-                        <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">Claim</p>
-                        <p class="text-3xl font-extrabold text-slate-800" id="kpi-claim">0</p>
+                    <!-- Grafik 30 Hari (Harian) -->
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="text-sm font-bold text-gray-700 mb-4 uppercase flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left"></i> 30 Hari Terakhir</h3>
+                        <div class="h-64 w-full"><canvas id="chartMonthly"></canvas></div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-6">
-                    <div class="glass-panel p-6 rounded-3xl shadow-soft">
-                         <div class="flex items-center justify-between mb-6">
-                            <div>
-                                <h3 class="text-base font-bold text-slate-800">Performa Tahunan</h3>
-                                <p class="text-[10px] text-slate-400">Total vs Success Rate (%)</p>
-                            </div>
-                            <div class="bg-indigo-50 text-indigo-600 w-8 h-8 flex items-center justify-center rounded-lg"><i class="fa-solid fa-calendar"></i></div>
-                        </div>
-                        <div class="relative h-72"><canvas id="chartAnnual"></canvas></div>
-                    </div>
-                    <div class="glass-panel p-6 rounded-3xl shadow-soft">
-                         <div class="flex items-center justify-between mb-6">
-                            <div>
-                                <h3 class="text-base font-bold text-slate-800">Tren Harian (30 Hari)</h3>
-                                <p class="text-[10px] text-slate-400">Monitoring harian realtime</p>
-                            </div>
-                            <div class="bg-blue-50 text-blue-600 w-8 h-8 flex items-center justify-center rounded-lg"><i class="fa-solid fa-chart-column"></i></div>
-                        </div>
-                        <div class="relative h-72"><canvas id="chartDaily"></canvas></div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    <div class="glass-panel rounded-3xl shadow-soft overflow-hidden flex flex-col h-auto">
-                        <div class="px-6 py-4 bg-white/50 border-b border-slate-100 backdrop-blur-sm">
-                            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-warehouse text-brand-500"></i> Staging Breakdown</h3>
-                        </div>
-                        <div class="overflow-auto flex-1 p-2 custom-scrollbar">
-                            <table class="min-w-full">
-                                <thead class="bg-slate-50/80 sticky top-0 z-10"><tr class="text-slate-400 text-[10px] uppercase"><th class="px-4 py-3 text-left rounded-l-lg">Kode SS/PIC</th><th class="px-2 text-center">Total</th><th class="px-2 text-center text-green-600">OK</th><th class="px-2 text-center">%</th><th class="px-2 text-center text-yellow-600">Prg</th><th class="px-2 text-center text-orange-600">Miss Hr</th><th class="px-2 text-center text-red-600">Mis</th><th class="px-2 text-center rounded-r-lg">Clm</th></tr></thead>
-                                <tbody id="staging-breakdown-body" class="text-xs font-medium divide-y divide-slate-50"></tbody>
+                <!-- 4. BREAKDOWN TABLES (Sorted by Volume) - SWAPPED POSITION -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Kiri: Staging Breakdown (Swapped) -->
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <h3 class="text-sm font-bold text-gray-700 mb-4 uppercase border-b pb-2">Staging Breakdown (Tim)</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left">
+                                <thead class="bg-gray-50 text-gray-600 font-semibold border-b">
+                                    <tr>
+                                        <th class="p-2">Kode SS / PIC</th>
+                                        <th class="p-2 text-right">Total</th>
+                                        <th class="p-2 text-right">OK</th>
+                                        <th class="p-2 text-center">%OK</th>
+                                        <th class="p-2 text-right">Inprog</th>
+                                        <th class="p-2 text-right">MBH</th>
+                                        <th class="p-2 text-right">Miss</th>
+                                        <th class="p-2 text-right claim-col">Claim</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="body-breakdown-staging"></tbody>
                             </table>
                         </div>
                     </div>
-                    <div class="glass-panel rounded-3xl shadow-soft overflow-hidden flex flex-col h-auto">
-                        <div class="px-6 py-4 bg-white/50 border-b border-slate-100 backdrop-blur-sm">
-                            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-truck-ramp-box text-blue-500"></i> Service Breakdown</h3>
-                        </div>
-                        <div class="overflow-auto flex-1 p-2 custom-scrollbar">
-                            <table class="min-w-full">
-                                <thead class="bg-slate-50/80 sticky top-0 z-10"><tr class="text-slate-400 text-[10px] uppercase"><th class="px-4 py-3 text-left rounded-l-lg">Service</th><th class="px-2 text-center">Total</th><th class="px-2 text-center text-green-600">OK</th><th class="px-2 text-center">%</th><th class="px-2 text-center text-yellow-600">Prg</th><th class="px-2 text-center text-orange-600">Miss Hr</th><th class="px-2 text-center text-red-600">Mis</th><th class="px-2 text-center rounded-r-lg">Clm</th></tr></thead>
-                                <tbody id="service-breakdown-body" class="text-xs font-medium divide-y divide-slate-50"></tbody>
+
+                    <!-- Kanan: Service Breakdown (Swapped) -->
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <h3 class="text-sm font-bold text-gray-700 mb-4 uppercase border-b pb-2">Service Breakdown</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left">
+                                <thead class="bg-gray-50 text-gray-600 font-semibold border-b">
+                                    <tr>
+                                        <th class="p-2">Service</th>
+                                        <th class="p-2 text-right">Total</th>
+                                        <th class="p-2 text-right">OK</th>
+                                        <th class="p-2 text-center">%OK</th>
+                                        <th class="p-2 text-right">Inprog</th>
+                                        <th class="p-2 text-right">MBH</th>
+                                        <th class="p-2 text-right">Miss</th>
+                                        <th class="p-2 text-right claim-col">Claim</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="body-breakdown-service"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <div class="glass-panel rounded-3xl shadow-soft overflow-hidden mb-8">
-                    <div class="px-6 py-4 bg-white/50 border-b border-slate-100 flex justify-between items-center">
-                        <h3 class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-comments text-amber-500"></i> Rekapan Feedback</h3>
-                        <button onclick="downloadCSV()" class="text-[10px] font-bold bg-white border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-brand-600 transition-colors flex items-center gap-2 shadow-sm"><i class="fa-solid fa-download"></i> Export CSV</button>
-                    </div>
-                    <div class="overflow-x-auto max-h-96 custom-scrollbar p-2">
-                        <table class="min-w-full divide-y divide-slate-100 text-xs">
-                            <thead class="bg-slate-50 sticky top-0 shadow-sm z-10">
-                                <tr class="text-slate-500 uppercase">
-                                    <th class="px-6 py-3 text-left w-1/2 rounded-l-lg">Internal (Total & Feedback)</th>
-                                    <th class="px-6 py-3 text-left w-1/2 rounded-r-lg">External (Total & Feedback)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="feedback-recap-body" class="divide-y divide-slate-50"></tbody>
-                        </table>
+                <!-- 5. FEEDBACK RECAP -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-sm font-bold text-gray-700 mb-4 uppercase border-b pb-2">Rekapan Feedback</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Internal -->
+                        <div>
+                            <div class="flex justify-between items-center mb-3 bg-blue-50 p-3 rounded-lg border border-blue-100">
+                                <span class="font-bold text-blue-800">TOTAL INTERNAL</span>
+                                <span class="font-bold text-xl text-blue-600" id="feedback-total-int">0</span>
+                            </div>
+                            <ul class="text-sm space-y-2 max-h-64 overflow-y-auto" id="feedback-list-int"></ul>
+                        </div>
+                        <!-- External -->
+                        <div>
+                            <div class="flex justify-between items-center mb-3 bg-orange-50 p-3 rounded-lg border border-orange-100">
+                                <span class="font-bold text-orange-800">TOTAL EXTERNAL</span>
+                                <span class="font-bold text-xl text-orange-600" id="feedback-total-ext">0</span>
+                            </div>
+                            <ul class="text-sm space-y-2 max-h-64 overflow-y-auto" id="feedback-list-ext"></ul>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- INPUT SECTION -->
-            <div id="section-form" class="hidden-section max-w-6xl mx-auto space-y-6 fade-in">
-                <div class="glass-panel rounded-3xl shadow-soft overflow-hidden">
-                    <div class="px-8 py-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/50">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-brand-600 flex items-center justify-center text-xl"><i class="fa-solid fa-clipboard-list"></i></div>
-                            <div>
-                                <h2 class="text-slate-800 font-bold text-xl" id="input-form-title">Input Laporan Harian</h2>
-                                <p class="text-slate-500 text-xs">Pastikan data valid sebelum submit.</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                             <div class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-4 py-2 rounded-xl uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-layer-group"></i> Bulk Mode</div>
-                        </div>
+            <!-- 2. REPORTS TAB -->
+            <div id="tab-reports" class="space-y-6 hidden animate-fade-in">
+                <header><h2 class="text-2xl font-bold text-gray-800">Input Daily Report</h2></header>
+                
+                <!-- Form Input -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div id="edit-mode-indicator" class="hidden mb-4 bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg flex justify-between items-center">
+                        <span class="font-medium"><i class="fa-solid fa-pen-to-square mr-2"></i> Mode Edit Laporan</span>
+                        <button onclick="cancelEditMode()" class="text-sm bg-white border border-yellow-300 px-3 py-1 rounded hover:bg-yellow-100">Batal Edit</button>
                     </div>
-                    
-                    <form id="reportForm" class="p-4 sm:p-8 space-y-8" onkeydown="return event.key != 'Enter';">
-                        <input type="hidden" id="edit-doc-id">
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 p-6 bg-slate-50/80 rounded-2xl border border-slate-200/60">
-                            <div class="space-y-2">
-                                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Tanggal Laporan</label>
-                                <div class="relative">
-                                    <input type="date" id="input-date" required class="w-full rounded-xl border-slate-200 text-sm py-2.5 px-3 shadow-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all hover:bg-white bg-white">
-                                </div>
+                    <form id="report-form">
+                        <input type="hidden" id="report-id-hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div><label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label><input type="date" id="input-date" class="w-full px-4 py-2 border rounded-lg" required></div>
+                            <div><label class="block text-sm font-medium text-gray-700 mb-1">Tipe</label><select id="input-type" onchange="renderInputTable()" class="w-full px-4 py-2 border rounded-lg"><option value="delivery">Delivery</option><option value="pickup">Pickup</option></select></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                            <!-- Admin Dropdown (Fix: Added ID container check in JS) -->
+                            <div id="admin-user-select-container" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Anggota Tim</label>
+                                <select id="input-admin-select-user" onchange="updateReporterInfo()" class="w-full px-4 py-2 border rounded-lg"><option value="">-- Pilih User --</option></select>
                             </div>
-                            <div class="space-y-2">
-                                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Tipe Operasi</label>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div class="relative">
-                                        <input type="radio" name="input-type" id="type-delivery" value="Delivery" class="peer hidden type-radio" checked onchange="handleTypeChange('Delivery')">
-                                        <label for="type-delivery" class="flex flex-col items-center justify-center p-2 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-all h-full text-slate-600">
-                                            <i class="fa-solid fa-truck-fast text-lg mb-1"></i>
-                                            <span class="text-[10px] font-bold uppercase">Delivery</span>
-                                            <span class="text-[9px] text-slate-400">Pengantaran</span>
-                                        </label>
-                                    </div>
-                                    <div class="relative">
-                                        <input type="radio" name="input-type" id="type-pickup" value="Pickup" class="peer hidden type-radio" onchange="handleTypeChange('Pickup')">
-                                        <label for="type-pickup" class="flex flex-col items-center justify-center p-2 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-all h-full text-slate-600">
-                                            <i class="fa-solid fa-hand-holding-box text-lg mb-1"></i>
-                                            <span class="text-[10px] font-bold uppercase">Pickup</span>
-                                            <span class="text-[9px] text-slate-400">Penjemputan</span>
-                                        </label>
-                                    </div>
-                                    <input type="hidden" id="input-type-val" value="Delivery">
-                                </div>
-                            </div>
-                            <div class="lg:col-span-2 space-y-2" id="identity-container">
-                                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Identitas Penginput</label>
-                                <div id="user-identity-view" class="w-full rounded-xl bg-white border border-slate-200 text-sm py-2.5 px-4 text-slate-700 font-medium flex items-center shadow-sm h-[60px]">
-                                    <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center mr-3 text-xs"><i class="fa-solid fa-user"></i></div>
-                                    <div class="flex flex-col">
-                                        <span class="text-[10px] text-slate-400 uppercase font-bold">Logged in as</span>
-                                        <span id="display-identity" class="truncate font-bold">Loading...</span>
-                                    </div>
-                                    <input type="hidden" id="input-staging-user">
-                                    <input type="hidden" id="input-area-user">
-                                    <input type="hidden" id="input-leader-user">
-                                </div>
-                                <div id="admin-identity-view" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3 h-[60px]">
-                                    <select id="input-staging-admin" onchange="autoFillAdminData()" class="w-full rounded-xl border-slate-200 text-sm focus:ring-brand-500 shadow-sm"><option value="">Pilih Staging...</option></select>
-                                    <input type="text" id="input-area-admin" readonly class="w-full rounded-xl border-slate-200 text-sm bg-slate-100 text-slate-500 shadow-sm px-3" placeholder="Area">
-                                    <input type="text" id="input-leader-admin" readonly class="w-full rounded-xl border-slate-200 text-sm bg-slate-100 text-slate-500 shadow-sm px-3" placeholder="Leader">
-                                </div>
+                            <div id="leader-user-info" class="md:col-span-2 grid grid-cols-2 gap-6">
+                                <div><label class="block text-sm font-medium text-gray-700 mb-1">Nama PIC</label><input type="text" id="input-pic-name" class="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-600" readonly><input type="hidden" id="input-pic-id"></div>
+                                <div><label class="block text-sm font-medium text-gray-700 mb-1">Kode SS</label><input type="text" id="input-kode-ss" class="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-600" readonly></div>
                             </div>
                         </div>
-
-                        <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white">
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-slate-100">
-                                    <thead>
-                                        <tr class="bg-slate-50/80 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider text-center">
-                                            <th class="sticky-col px-4 py-4 text-left w-24 border-r border-slate-200 bg-slate-50">Service</th>
-                                            <th class="px-2 py-4 min-w-[80px] text-slate-700">Total</th> 
-                                            <th class="px-2 py-4 min-w-[80px] text-green-600 bg-green-50/30">OK</th>
-                                            <th class="px-2 py-4 min-w-[80px] text-yellow-600">Prog</th>
-                                            <th class="px-2 py-4 min-w-[80px] text-orange-600">Miss Hr</th>
-                                            <th class="px-2 py-4 min-w-[80px] text-red-600">Miss</th>
-                                            <th class="px-2 py-4 min-w-[80px] text-slate-600 col-claim">Claim</th>
-                                            <th class="px-2 py-4 min-w-[90px] border-l border-slate-100">Int Pkg</th>
-                                            <th class="px-2 py-4 min-w-[180px]">Feedback Int</th>
-                                            <th class="px-2 py-4 min-w-[90px] border-l border-slate-100">Ext Pkg</th>
-                                            <th class="px-2 py-4 min-w-[180px]">Feedback Ext</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="bulk-input-body" class="bg-white divide-y divide-slate-50 text-sm font-medium"></tbody>
-                                </table>
-                            </div>
+                        <div class="overflow-x-auto mb-6">
+                            <table class="w-full border-collapse border border-gray-200 text-sm"><thead id="table-header" class="bg-gray-100 text-gray-600 font-semibold text-center"></thead><tbody id="table-body"></tbody></table>
                         </div>
-
-                        <div class="flex justify-between pt-4">
-                            <button type="button" onclick="cancelEdit()" id="btn-cancel-edit" class="hidden px-6 py-3 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-colors">Batal Edit</button>
-                            <button type="button" onclick="confirmSubmitReport()" id="btn-submit" class="bg-slate-900 hover:bg-black text-white font-bold py-4 px-8 rounded-xl shadow-xl shadow-slate-900/20 transition-all transform hover:-translate-y-1 active:scale-95 flex items-center gap-3 group ml-auto">
-                                <i class="fa-solid fa-paper-plane group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
-                                <span id="btn-text">Kirim Laporan</span>
-                                <span id="btn-loader" class="loader ml-2 hidden border-white border-t-transparent w-4 h-4 border-2"></span>
-                            </button>
+                        <div class="flex justify-end pt-4 border-t">
+                            <button type="submit" id="btn-submit-report" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-8 rounded-lg transition"><i class="fa-solid fa-paper-plane"></i> <span id="btn-submit-text">Simpan Laporan</span></button>
                         </div>
                     </form>
                 </div>
-            </div>
 
-            <!-- REKAPAN SECTION -->
-            <div id="section-recap" class="hidden-section max-w-7xl mx-auto space-y-6 fade-in">
-                <div class="glass-panel rounded-3xl shadow-soft overflow-hidden">
-                    <div class="px-8 py-6 border-b border-slate-100">
-                         <h2 class="text-slate-800 font-bold text-xl flex items-center gap-3"><i class="fa-solid fa-table-list text-brand-600"></i> Rekapan Input Anda</h2>
-                         <p class="text-slate-500 text-xs mt-1">Gunakan kode Token Harian untuk mengedit data yang sudah terkirim.</p>
+                <!-- Table History -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mt-8">
+                    <div class="p-6 border-b border-gray-100 flex items-center gap-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Riwayat Laporan</h3>
+                        <select id="filter-user" class="text-sm border-gray-300 border rounded-lg px-3 py-2"><option value="all">Semua Anggota</option></select>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-100 text-sm">
-                            <thead class="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase">
+                        <table class="w-full text-left border-collapse"><thead class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider"><tr><th class="p-4 border-b font-semibold w-24">Tanggal</th><th class="p-4 border-b font-semibold">Identitas</th><th class="p-4 border-b font-semibold">Tipe</th><th class="p-4 border-b font-semibold">Rincian Volume</th><th class="p-4 border-b font-semibold text-right">Int/Ext</th><th class="p-4 border-b font-semibold text-center w-24">Aksi</th></tr></thead><tbody id="reports-table-body" class="text-sm divide-y divide-gray-100"></tbody></table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. SETTINGS TAB (Admin Only) -->
+            <div id="tab-settings" class="space-y-6 hidden animate-fade-in">
+                <header class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold text-gray-800">Pengaturan Tim</h2></header>
+                <!-- Security -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-blue-600"></i> Pengaturan Keamanan</h3>
+                    <div class="flex flex-col sm:flex-row gap-4 items-end">
+                        <div class="w-full sm:w-1/2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Kode Otorisasi (Admin Code)</label>
+                            <input type="text" id="setting-admin-code" class="w-full px-4 py-2 border rounded-lg font-mono tracking-wider font-bold" placeholder="Contoh: 123456">
+                        </div>
+                        <button onclick="saveGlobalSettings()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium">Simpan Kode</button>
+                    </div>
+                </div>
+                <!-- User List -->
+                <header class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-800">Daftar Anggota</h3>
+                    <button onclick="prepareAddUser()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium"><i class="fa-solid fa-plus"></i> Tambah User</button>
+                </header>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 text-gray-600 text-xs uppercase">
                                 <tr>
-                                    <th class="px-6 py-4 text-left">Tanggal</th>
-                                    <th class="px-4 py-4 text-left">Staging</th>
-                                    <th class="px-4 py-4 text-left">Tipe</th>
-                                    <th class="px-4 py-4 text-left">Service</th>
-                                    <th class="px-4 py-4 text-center">Total</th>
-                                    <th class="px-4 py-4 text-center text-green-600">OK</th>
-                                    <th class="px-4 py-4 text-center text-blue-600">% SLA</th>
-                                    <th class="px-4 py-4 text-center">Miss Hr</th>
-                                    <th class="px-4 py-4 text-center">Miss</th>
-                                    <th class="px-4 py-4 text-center">Claim</th>
-                                    <th class="px-4 py-4 text-center">Aksi</th>
+                                    <th class="p-4 border-b">Nama PIC</th>
+                                    <th class="p-4 border-b">Username</th>
+                                    <th class="p-4 border-b">Kode SS</th>
+                                    <th class="p-4 border-b">Role</th>
+                                    <th class="p-4 border-b text-center">Status</th>
+                                    <th class="p-4 border-b text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="recap-body" class="divide-y divide-slate-50 bg-white"></tbody>
+                            <tbody id="users-table-body" class="text-sm divide-y divide-gray-100">
+                                <!-- Loading State Row -->
+                                <tr><td colspan="6" class="p-8 text-center text-gray-400 italic">Sedang memuat data anggota...</td></tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+        </main>
+    </div>
 
-            <!-- SETTINGS SECTION -->
-            <div id="section-settings" class="hidden-section space-y-8 fade-in">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-panel rounded-3xl shadow-soft p-8 flex flex-col justify-between border-l-4 border-l-brand-600">
-                        <div class="space-y-2 mb-4">
-                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-heading text-brand-600"></i> Judul Aplikasi</h3>
-                            <p class="text-slate-400 text-xs">Ubah nama yang tampil di dashboard dan login page.</p>
-                            <input type="text" id="setting-app-title" class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500" placeholder="Contoh: OPS REPORT JABAR">
-                        </div>
-                        <button onclick="saveAppSetting()" class="bg-slate-800 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-slate-900 transition shadow-lg shadow-slate-500/20 flex items-center gap-2 w-max"><i class="fa-solid fa-floppy-disk"></i> Simpan Judul</button>
+    <!-- Modals -->
+    <div id="modal-add-user" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6"><h3 id="modal-title" class="text-xl font-bold">Tambah Anggota</h3><button onclick="closeAddUserModal()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button></div>
+            <form id="add-user-form" class="space-y-4">
+                <input type="hidden" id="edit-user-id" value="">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Status / Role</label>
+                        <select id="new-role" onchange="toggleFormFields()" class="w-full px-4 py-2 border rounded-lg"><option value="leader">Leader</option><option value="coordinator">Coordinator</option></select>
                     </div>
-
-                    <div class="glass-panel rounded-3xl shadow-soft p-8 flex flex-col justify-between border-l-4 border-l-amber-500">
-                        <div class="space-y-2 mb-4">
-                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-key text-amber-500"></i> Kode Token Harian</h3>
-                            <p class="text-slate-400 text-xs">Kode ini digunakan user untuk otorisasi Edit Data.</p>
-                            <input type="text" id="setting-daily-code" class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-amber-500 font-mono text-center tracking-widest font-bold text-amber-600" placeholder="Masukkan Kode Hari Ini">
-                        </div>
-                        <button onclick="saveDailyCode()" class="bg-amber-500 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-amber-600 transition shadow-lg shadow-amber-500/20 flex items-center gap-2 w-max"><i class="fa-solid fa-check-circle"></i> Update Token</button>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Status Akun</label>
+                        <select id="new-account-status" class="w-full px-4 py-2 border rounded-lg"><option value="active">Aktif</option><option value="inactive">Non-Aktif</option></select>
                     </div>
                 </div>
-
-                <div class="glass-panel rounded-3xl shadow-soft p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                             <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-users-gear text-brand-600"></i> Manajemen User</h3>
-                             <p class="text-slate-400 text-xs">Tambah atau edit akses tim.</p>
-                        </div>
-                        <button onclick="openUserModal()" class="bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-emerald-600 flex items-center shadow-lg shadow-emerald-500/20 transition-all transform hover:-translate-y-0.5"><i class="fa-solid fa-plus mr-2"></i> Tambah User</button>
-                    </div>
-                    <div class="overflow-x-auto rounded-2xl border border-slate-100">
-                        <table class="min-w-full divide-y divide-slate-100 text-sm">
-                            <thead><tr class="bg-slate-50 text-slate-500 uppercase text-xs font-bold"><th class="px-6 py-3 text-left">Username</th><th class="px-4 py-3 text-left">Area</th><th class="px-4 py-3 text-left">Staging</th><th class="px-4 py-3 text-left">Leader</th><th class="px-4 py-3 text-center">Role</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
-                            <tbody id="user-list-body" class="divide-y divide-slate-50 bg-white"></tbody>
-                        </table>
-                    </div>
+                <div><label class="block text-sm font-medium mb-1">Nama PIC</label><input type="text" id="new-name" class="w-full px-4 py-2 border rounded-lg" required></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm font-medium mb-1">Username</label><input type="text" id="new-username" class="w-full px-4 py-2 border rounded-lg" required></div>
+                    <div><label class="block text-sm font-medium mb-1">Password</label><input type="text" id="new-password" class="w-full px-4 py-2 border rounded-lg" required></div>
                 </div>
-            </div>
-
-            <!-- Toast -->
-            <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl transform translate-y-40 transition-all duration-300 z-[80] flex items-center gap-4 hidden border border-slate-700/50 backdrop-blur-md">
-                <div id="toast-icon" class="text-blue-400 text-xl"><i class="fa-solid fa-circle-info"></i></div>
-                <div><p id="toast-msg" class="font-medium text-sm">Notification</p></div>
-            </div>
-
-            <!-- Auth Modal -->
-            <div id="admin-auth-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
-                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center transform scale-100 transition-all">
-                    <div class="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-amber-600 text-2xl"><i class="fa-solid fa-lock"></i></div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-2">Restricted Access</h3>
-                    <p class="text-sm text-slate-500 mb-6">Masukkan <b>Kode Token Harian</b> untuk mengedit data ini.</p>
-                    <input type="password" id="auth-daily-token" class="w-full rounded-xl border-slate-300 text-sm py-3 px-4 focus:ring-amber-500 mb-5 text-center font-mono tracking-widest" placeholder="Kode Token">
-                    <div class="flex gap-3">
-                        <button onclick="document.getElementById('admin-auth-modal').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200">Batal</button>
-                        <button onclick="verifyTokenAndEdit()" class="flex-1 bg-amber-500 text-white font-bold py-3 rounded-xl hover:bg-amber-600 shadow-lg shadow-amber-500/30">Buka Kunci</button>
-                    </div>
+                <div id="leader-fields" class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm font-medium mb-1">Kode SS</label><input type="text" id="new-kode-ss" class="w-full px-4 py-2 border rounded-lg"></div>
+                    <div><label class="block text-sm font-medium mb-1">Kota</label><input type="text" id="new-kota" class="w-full px-4 py-2 border rounded-lg"></div>
                 </div>
-            </div>
+                <div class="pt-4"><button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg">Simpan Data</button></div>
+            </form>
+        </div>
+    </div>
 
-            <!-- Setup Admin Modal -->
-            <div id="setup-admin-modal" class="fixed inset-0 bg-slate-900/80 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden p-8 text-center">
-                    <div class="w-16 h-16 bg-brand-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-brand-600 text-2xl shadow-inner"><i class="fa-solid fa-key"></i></div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-2">Setup Password Admin</h3>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Ini adalah akses pertama Anda. Amankan akun Administrator dengan password baru.</p>
-                    <input type="password" id="setup-new-pass" class="w-full rounded-xl border-slate-300 text-sm py-3 px-4 focus:ring-brand-500 mb-5" placeholder="Password Baru (Min. 6 Karakter)">
-                    <button onclick="saveAdminFirstTime()" id="btn-save-setup" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-brand-500/30">Simpan & Masuk</button>
-                </div>
-            </div>
+    <!-- Modal Auth & Confirm -->
+    <div id="modal-auth-code" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-center">
+            <div class="w-14 h-14 bg-yellow-100 rounded-full mx-auto mb-4 flex items-center justify-center"><i class="fa-solid fa-lock text-yellow-600 text-2xl"></i></div>
+            <h3 class="text-xl font-bold mb-2">Butuh Izin Admin</h3><input type="password" id="auth-code-input" class="w-full border rounded-lg px-4 py-2 mb-4 text-center tracking-widest text-lg" placeholder="Kode Admin">
+            <div class="flex gap-3"><button onclick="closeAuthModal()" class="flex-1 px-4 py-2 border rounded-lg">Batal</button><button onclick="verifyAuthCode()" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">Verifikasi</button></div>
+        </div>
+    </div>
+    <div id="modal-confirm-delete" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center"><i class="fa-solid fa-triangle-exclamation text-red-500 text-2xl"></i></div>
+            <h3 class="text-xl font-bold mb-2">Konfirmasi Hapus</h3><p id="delete-confirmation-text" class="text-sm mb-6"></p>
+            <div class="flex gap-3"><button onclick="closeDeleteModal()" class="flex-1 px-4 py-2 border rounded-lg">Batal</button><button onclick="executeDelete()" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-bold">Hapus</button></div>
+        </div>
+    </div>
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
 
-            <!-- User Modal -->
-            <div id="userModal" class="fixed inset-0 bg-slate-900/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
-                <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300" id="userModalContent">
-                    <div class="bg-slate-900 px-8 py-6 flex justify-between items-center text-white">
-                        <div>
-                            <h3 class="font-bold text-lg" id="modalTitle">Tambah User</h3>
-                            <p class="text-slate-400 text-xs mt-0.5">Isi detail kredensial user baru.</p>
-                        </div>
-                        <button onclick="closeUserModal()" class="hover:text-red-300 transition-colors bg-white/10 w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/20"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-                    <form id="userForm" class="p-8 space-y-5" onsubmit="event.preventDefault();">
-                        <input type="hidden" id="edit-user-id">
-                        <div class="grid grid-cols-2 gap-5">
-                            <div class="space-y-1.5">
-                                <label class="text-[10px] font-bold text-slate-500 uppercase">Username</label>
-                                <input type="text" id="modal-username" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[10px] font-bold text-slate-500 uppercase">Password</label>
-                                <input type="text" id="modal-password" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white" placeholder="Min 6 char">
-                            </div>
-                        </div>
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase">Role Akses</label>
-                            <div class="relative">
-                                <select id="modal-role" class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 appearance-none">
-                                    <option value="user">User (Input Only)</option>
-                                    <option value="admin">Admin (Full Access)</option>
-                                </select>
-                                 <div class="absolute right-3 top-3.5 text-slate-400 pointer-events-none"><i class="fa-solid fa-chevron-down text-xs"></i></div>
-                            </div>
-                        </div>
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase">Area / Kota</label>
-                            <input type="text" id="modal-area" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
-                        </div>
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase">Nama Staging</label>
-                            <input type="text" id="modal-staging" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
-                        </div>
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase">Nama Leader (PIC)</label>
-                            <input type="text" id="modal-leader" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
-                        </div>
-                        
-                        <div class="pt-6 flex justify-end gap-3 border-t border-slate-100 mt-2">
-                            <button type="button" onclick="closeUserModal()" class="px-6 py-3 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-colors">Batal</button>
-                            <button type="button" onclick="saveUser()" class="px-8 py-3 rounded-xl text-sm font-bold text-white bg-slate-900 hover:bg-black shadow-lg shadow-slate-900/20 transition-all transform hover:-translate-y-0.5">Simpan Data</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot, deleteDoc, updateDoc, doc, getDoc, setDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-            <!-- JAVASCRIPT LOGIC -->
-            <script type="module">
-                import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-                import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-                import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, where, orderBy, serverTimestamp, setDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // CONFIG
+        const firebaseConfig = { apiKey: "AIzaSyAqbDeVLDBRDEIfi4RliLMC-3Qrwh8p96k", authDomain: "logsheet-5r.firebaseapp.com", projectId: "logsheet-5r", storageBucket: "logsheet-5r.firebasestorage.app", messagingSenderId: "358725557740", appId: "1:358725557740:web:664cca8d2ae984221ff4c9" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-                const SERVICES = ['REG', 'ECO', 'ND', 'SDS', 'BIG'];
-                const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
+        // STATE
+        let currentUser = null, allReports = [], allUsers = [], chartAnnual = null, chartMonthly = null;
+        let pendingAction = null, targetId = null, currentAdminCode = "123456";
+        const ROW_LABELS = ['REG', 'ECO', 'ND', 'SD/SDS', 'BIG'];
+        let reportsUnsubscribe = null;
+        let usersUnsubscribe = null;
+
+        // HELPER: NOTIFICATION
+        function showNotification(msg, type='success') {
+            const div = document.createElement('div');
+            div.className = `${type==='success'?'bg-green-600':'bg-red-600'} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-10 opacity-0`;
+            div.innerHTML = `<i class="fa-solid ${type==='success'?'fa-check-circle':'fa-circle-exclamation'}"></i> <span>${msg}</span>`;
+            document.getElementById('toast-container').appendChild(div);
+            requestAnimationFrame(()=>div.classList.remove('translate-y-10','opacity-0'));
+            setTimeout(()=>{div.classList.add('opacity-0','translate-y-2');setTimeout(()=>div.remove(),300)},3000);
+        }
+        window.showNotification = showNotification;
+
+        // AUTH & INIT
+        window.switchLoginTab = (type) => {
+            document.getElementById('login-type').value = type;
+            const uInput = document.getElementById('username-container');
+            const btns = {user: document.getElementById('tab-login-user'), admin: document.getElementById('tab-login-admin')};
+            if(type==='admin') {
+                btns.admin.className = "flex-1 pb-2 text-center text-sm transition login-tab-active";
+                btns.user.className = "flex-1 pb-2 text-center text-sm transition login-tab-inactive";
+                uInput.classList.add('hidden'); document.getElementById('username').value='admin';
+                document.getElementById('login-intro-text').textContent = "Khusus Super Admin (Dev/Pemilik)";
+            } else {
+                btns.user.className = "flex-1 pb-2 text-center text-sm transition login-tab-active";
+                btns.admin.className = "flex-1 pb-2 text-center text-sm transition login-tab-inactive";
+                uInput.classList.remove('hidden'); if(document.getElementById('username').value==='admin') document.getElementById('username').value='';
+                document.getElementById('login-intro-text').textContent = "Untuk Leader & Coordinator";
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const type = document.getElementById('login-type').value;
+            const u = document.getElementById('username').value.trim().toLowerCase();
+            const p = document.getElementById('password').value.trim();
+            const errEl = document.getElementById('login-error');
+            
+            try {
+                await signInAnonymously(auth);
+                const q = query(collection(db, 'users'), where("username", "==", u));
+                const snap = await getDocs(q);
                 
-                window.appState = {
-                    app: null, auth: null, db: null,
-                    sessionUser: null, appProfile: null,
-                    unsubscribeReports: null, unsubscribeUsers: null, unsubscribeSettings: null,
-                    reportsData: [], appId: 'default-app-id',
-                    stagingMap: {},
-                    loginMode: 'user',
-                    pendingEditId: null,
-                    dailyAuthCode: 'OPS2025' // Default fallback
-                };
-
-                // --- GLOBAL FUNCTIONS EXPORTED TO WINDOW (MUST BE FIRST) ---
-                window.setTextSafe = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
-                
-                window.formatNumberInput = (el) => {
-                    let val = el.value.replace(/\./g, '').replace(/[^0-9]/g, '');
-                    if(val) el.value = new Intl.NumberFormat('id-ID').format(val);
-                    else el.value = '';
-                };
-
-                window.getRawValue = (elId) => {
-                    const el = document.getElementById(elId);
-                    if(!el || !el.value) return 0;
-                    return parseInt(el.value.replace(/\./g, ''), 10) || 0;
-                };
-
-                window.showToast = (msg, err=false) => { 
-                    const t = document.getElementById('toast'); 
-                    document.getElementById('toast-msg').innerText = msg; 
-                    t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-2xl shadow-2xl z-[90] flex items-center gap-4 border backdrop-blur-md transition-all duration-300 transform translate-y-0 ${err?'bg-red-900/90 border-red-700':'bg-slate-900/90 border-slate-700'} text-white`; 
-                    t.classList.remove('hidden'); 
-                    setTimeout(()=> {
-                         t.classList.add('translate-y-40');
-                         setTimeout(() => t.classList.add('hidden'), 300);
-                    }, 3000); 
-                };
-
-                // --- UI HANDLERS (MISSING RESTORED) ---
-                window.switchLoginMode = (mode) => {
-                    window.appState.loginMode = mode;
-                    const tabBg = document.getElementById('login-tab-bg');
-                    const tabUser = document.getElementById('tab-user');
-                    const tabAdmin = document.getElementById('tab-admin');
-                    const fieldUser = document.getElementById('field-username');
-                    const btnText = document.getElementById('btn-login-text');
-
-                    if(mode === 'user') {
-                        tabBg.style.transform = 'translateX(0)';
-                        tabUser.classList.replace('text-slate-400', 'text-brand-600');
-                        tabAdmin.classList.replace('text-brand-600', 'text-slate-400');
-                        fieldUser.classList.remove('hidden', 'opacity-0', 'h-0'); fieldUser.classList.add('opacity-100', 'h-auto');
-                        document.getElementById('login-username').required = true; btnText.innerText = "Masuk Aplikasi";
-                    } else {
-                        tabBg.style.transform = 'translateX(100%)';
-                        tabUser.classList.replace('text-brand-600', 'text-slate-400');
-                        tabAdmin.classList.replace('text-slate-400', 'text-brand-600');
-                        fieldUser.classList.remove('opacity-100', 'h-auto'); fieldUser.classList.add('opacity-0', 'h-0');
-                        setTimeout(() => fieldUser.classList.add('hidden'), 300);
-                        document.getElementById('login-username').required = false; btnText.innerText = "Masuk Admin";
-                    }
-                };
-
-                window.handleLogout = () => {
-                    if(window.appState.unsubscribeReports) window.appState.unsubscribeReports();
-                    if(window.appState.unsubscribeUsers) window.appState.unsubscribeUsers();
-                    if(window.appState.unsubscribeSettings) window.appState.unsubscribeSettings();
-                    window.appState.appProfile = null;
-                    document.getElementById('reportForm').reset();
-                    window.cancelEdit();
-                    document.getElementById('app-layout').classList.add('hidden-section');
-                    document.getElementById('section-login').classList.remove('hidden');
-                    document.getElementById('section-login').style.display = 'flex';
-                    document.getElementById('login-username').value = '';
-                    document.getElementById('login-password').value = '';
-                    window.switchLoginMode('user');
-                };
-
-                window.switchTab = (tabName) => {
-                    if(tabName === 'settings' && window.appState.appProfile?.role !== 'admin') {
-                        window.showToast("Akses hanya untuk Admin!", true);
-                        return;
-                    }
-
-                    ['form', 'dashboard', 'settings', 'recap'].forEach(t => {
-                        const sec = document.getElementById(`section-${t}`);
-                        const btn = document.getElementById(`nav-${t}`);
-                        if(t === tabName) {
-                            sec.classList.remove('hidden-section');
-                            if(btn) btn.classList.add('active-tab'); 
-                            if(tabName === 'dashboard') {
-                                document.getElementById('welcome-banner').classList.remove('hidden-section');
-                                updateDashboard();
-                            } else if(tabName === 'recap') {
-                                document.getElementById('welcome-banner').classList.add('hidden-section');
-                                updateRecapTable();
-                            } else {
-                                document.getElementById('welcome-banner').classList.add('hidden-section');
-                            }
-                        } else {
-                            sec.classList.add('hidden-section');
-                            if(btn) btn.classList.remove('active-tab'); 
-                        }
-                    });
-                };
-
-                window.resetFilters = () => { ['filter-date-start', 'filter-date-end', 'filter-staging', 'filter-service', 'filter-type'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; }); window.updateDashboard(); };
-                window.calcTotal = (svc) => { const ok = window.getRawValue(`input-${svc}-ok`); const prog = window.getRawValue(`input-${svc}-prog`); const missHr = window.getRawValue(`input-${svc}-miss-hr`); const miss = window.getRawValue(`input-${svc}-miss`); const claim = window.getRawValue(`input-${svc}-claim`); const total = ok + prog + missHr + miss + claim; document.getElementById(`input-${svc}-total`).value = total > 0 ? new Intl.NumberFormat('id-ID').format(total) : ''; };
-                window.autoFillAdminData = () => {
-                    const staging = document.getElementById('input-staging-admin').value; const areaIn = document.getElementById('input-area-admin'); const leaderIn = document.getElementById('input-leader-admin');
-                    if(staging && window.appState.stagingMap && window.appState.stagingMap[staging]) { const info = window.appState.stagingMap[staging]; areaIn.value = info.area; leaderIn.value = info.leader; } else { areaIn.value = ''; leaderIn.value = ''; }
-                };
-                window.openUserModal = (id = null, uName = '', uPass = '', uArea = '', uStg = '', uLead = '', uRole = 'user') => {
-                    document.getElementById('userModal').classList.remove('hidden'); const content = document.getElementById('userModalContent'); content.classList.remove('scale-95'); content.classList.add('scale-100');
-                    document.getElementById('edit-user-id').value = id || ''; document.getElementById('modalTitle').innerText = id ? 'Edit User' : 'Tambah User'; document.getElementById('modal-username').value = uName; document.getElementById('modal-username').disabled = !!id; document.getElementById('modal-password').value = uPass; document.getElementById('modal-area').value = uArea; document.getElementById('modal-staging').value = uStg; document.getElementById('modal-leader').value = uLead; document.getElementById('modal-role').value = uRole;
-                };
-                window.closeUserModal = () => { const content = document.getElementById('userModalContent'); content.classList.remove('scale-100'); content.classList.add('scale-95'); setTimeout(() => { document.getElementById('userModal').classList.add('hidden'); document.getElementById('userForm').reset(); }, 200); };
-                window.deleteUser = async (id) => { 
-                    window.showConfirm("Hapus User?", "Tindakan ini tidak dapat dibatalkan.", async () => {
-                        await deleteDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users', id)); window.showToast("User dihapus."); 
-                    });
-                };
-                window.editUser = (id, uname, pass, area, stg, lead, role) => { window.openUserModal(id, uname, pass, area, stg, lead, role); };
-                
-                window.saveAdminFirstTime = async () => {
-                    const newPass = document.getElementById('setup-new-pass').value;
-                    if(newPass.length < 6) return window.showToast("Password minimal 6 karakter", true);
-                    const btn = document.getElementById('btn-save-setup'); btn.disabled = true; btn.innerText = "Menyimpan...";
-                    try {
-                        const colRef = collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users');
-                        const qAdmin = query(colRef, where("role", "==", "admin"));
-                        const snap = await getDocs(qAdmin);
-                        let profile = { username: 'admin', role: 'admin', name: 'Administrator', area: 'HQ', staging: 'HQ', leader: 'SuperAdmin', password: newPass, createdAt: serverTimestamp() };
-                        if (!snap.empty) { const docId = snap.docs[0].id; await updateDoc(doc(colRef, docId), { password: newPass }); profile = { ...snap.docs[0].data(), id: docId, password: newPass, role: 'admin' }; } 
-                        else { const ref = await addDoc(colRef, profile); profile.id = ref.id; }
-                        window.appState.appProfile = profile;
-                        document.getElementById('setup-admin-modal').classList.add('hidden');
+                if(!snap.empty) {
+                    const data = snap.docs[0].data();
+                    if(data.password !== p) throw new Error("Password salah.");
+                    if(data.status === 'inactive') throw new Error("Akun ini non-aktif.");
+                    if(type === 'admin' && u !== 'admin') throw new Error("Bukan akun Super Admin.");
+                    if(type === 'user' && u === 'admin') throw new Error("Gunakan tab Super Admin.");
+                    
+                    currentUser = { id: snap.docs[0].id, ...data };
+                    finishLogin();
+                } else {
+                    if(type==='admin' && u==='admin' && p==='TAB123') {
+                        const newAdm = {name:"Super Admin", username:"admin", password:"TAB123", role:"coordinator", status:"active", createdAt:serverTimestamp()};
+                        const ref = await addDoc(collection(db,'users'), newAdm);
+                        currentUser = {id:ref.id, ...newAdm};
                         finishLogin();
-                        switchTab('settings');
-                        window.showToast("Password berhasil dibuat. Selamat Datang!");
-                    } catch(e) { console.error(e); window.showToast("Gagal menyimpan password", true); btn.disabled = false; btn.innerText = "Simpan Password"; }
-                };
-
-                // --- HELPER FUNCTION DEFINITIONS (INTERNAL & EXTERNAL) ---
-                function generateBulkTable() {
-                    const tbody = document.getElementById('bulk-input-body'); 
-                    if (!tbody) return;
-                    tbody.innerHTML = '';
-                    SERVICES.forEach(svc => {
-                        const row = document.createElement('tr'); row.className = "hover:bg-slate-50 transition-colors group";
-                        const fmt = `onkeyup="formatNumberInput(this); calcTotal('${svc}')"`;
-                        let displaySvc = svc === 'SDS' ? 'SD/SDS' : svc;
-                        row.innerHTML = `
-                            <td class="sticky-col px-4 py-4 font-bold text-slate-700 bg-white border-r border-slate-100 shadow-sm z-10 text-xs">${displaySvc}</td>
-                            <td class="p-2"><input type="text" id="input-${svc}-total" readonly class="w-full min-w-[60px] rounded-lg border-slate-200 text-center font-bold bg-slate-100 py-2.5 text-xs text-slate-600 focus:ring-0" placeholder="0"></td>
-                            <td class="p-2"><input type="text" id="input-${svc}-ok" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-green-700 py-2.5 text-xs placeholder-green-200/50" placeholder="0"></td>
-                            <td class="p-2"><input type="text" id="input-${svc}-prog" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-yellow-700 py-2.5 text-xs placeholder-yellow-200/50" placeholder="0"></td>
-                            <td class="p-2"><input type="text" id="input-${svc}-miss-hr" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-orange-700 py-2.5 text-xs placeholder-orange-200/50" placeholder="0"></td>
-                            <td class="p-2"><input type="text" id="input-${svc}-miss" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-red-700 py-2.5 text-xs placeholder-red-200/50" placeholder="0"></td>
-                            <td class="p-2 col-claim input-claim-cell"><input type="text" id="input-${svc}-claim" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-slate-600 py-2.5 text-xs placeholder-slate-300" placeholder="0"></td>
-                            <td class="p-2 border-l border-slate-100"><input type="text" id="input-${svc}-int" onkeyup="formatNumberInput(this)" class="table-input w-full min-w-[50px] rounded-lg text-center text-xs py-2.5 placeholder-slate-300" placeholder="0"></td>
-                            <td class="p-2"><input type="text" id="input-${svc}-fb-int" class="table-input w-full min-w-[140px] rounded-lg text-xs py-2.5 px-2 placeholder-slate-300" placeholder="F/B Int..."></td>
-                            <td class="p-2 border-l border-slate-100"><input type="text" id="input-${svc}-ext" onkeyup="formatNumberInput(this)" class="table-input w-full min-w-[50px] rounded-lg text-center text-xs py-2.5 placeholder-slate-300" placeholder="0"></td>
-                            <td class="p-2"><input type="text" id="input-${svc}-fb-ext" class="table-input w-full min-w-[140px] rounded-lg text-xs py-2.5 px-2 placeholder-slate-300" placeholder="F/B Ext..."></td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                };
-                // Expose to window if needed (not strictly needed for internal calls, but safe)
-                window.generateBulkTable = generateBulkTable;
-
-                // --- MISSING FUNCTIONS RESTORED ---
-                window.setupSettingsListener = function() {
-                    const docRef = doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config');
-                    window.appState.unsubscribeSettings = onSnapshot(docRef, (docSnap) => {
-                        if (docSnap.exists()) {
-                            const data = docSnap.data();
-                            if(data.appTitle) { 
-                                window.setTextSafe('login-app-title', data.appTitle);
-                                window.setTextSafe('nav-app-title', data.appTitle);
-                                const settingTitle = document.getElementById('setting-app-title'); if(settingTitle) settingTitle.value = data.appTitle;
-                            }
-                            if(data.dailyAuthCode) {
-                                window.appState.dailyAuthCode = data.dailyAuthCode;
-                                const settingCode = document.getElementById('setting-daily-code'); if(settingCode) settingCode.value = data.dailyAuthCode;
-                            }
-                        }
-                    });
-                };
-
-                window.saveAppSetting = async () => { const title = document.getElementById('setting-app-title').value; if(!title) return; await setDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config'), { appTitle: title }, { merge: true }); window.showToast("Judul tersimpan!"); };
-                window.saveDailyCode = async () => { const code = document.getElementById('setting-daily-code').value; if(!code) return; await setDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config'), { dailyAuthCode: code }, { merge: true }); window.showToast("Token Harian tersimpan!"); };
-
-                window.setupAdminListener = function() {
-                    const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), orderBy('createdAt', 'desc'));
-                    window.appState.unsubscribeUsers = onSnapshot(q, (snap) => {
-                        const tbody = document.getElementById('user-list-body'); tbody.innerHTML = ''; window.appState.stagingMap = {}; 
-                        const selectStg = document.getElementById('input-staging-admin');
-                        if(selectStg) {
-                            const currentVal = selectStg.value; selectStg.innerHTML = '<option value="">Pilih Staging...</option>'; const uniqueStagings = [];
-                            snap.forEach(d => {
-                                const u = d.data();
-                                if(u.staging) { window.appState.stagingMap[u.staging] = { area: u.area, leader: u.leader }; if(!uniqueStagings.includes(u.staging)) uniqueStagings.push(u.staging); }
-                                const roleBadge = u.role === 'admin' ? '<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-[10px] font-bold">ADMIN</span>' : '<span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-[10px] font-bold">USER</span>';
-                                tbody.innerHTML += `<tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none"><td class="px-6 py-3 font-medium text-slate-700">${u.username}</td><td class="px-4 py-3 text-slate-500">${u.area}</td><td class="px-4 py-3 text-slate-500">${u.staging}</td><td class="px-4 py-3 text-slate-500">${u.leader}</td><td class="px-4 py-3 text-center">${roleBadge}</td><td class="px-4 py-3 text-center flex justify-center gap-2"><button onclick="editUser('${d.id}', '${u.username}', '${u.password}', '${u.area}', '${u.staging}', '${u.leader}', '${u.role}')" class="text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition-colors"><i class="fa-solid fa-pen"></i></button><button onclick="deleteUser('${d.id}')" class="text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-                            });
-                            uniqueStagings.sort().forEach(s => { const opt = document.createElement('option'); opt.value = s; opt.text = s; selectStg.add(opt); });
-                            if(uniqueStagings.includes(currentVal)) selectStg.value = currentVal;
-                        }
-                    });
-                };
-
-                window.setupReportListener = function() {
-                    const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports'), orderBy('date', 'desc'));
-                    window.appState.unsubscribeReports = onSnapshot(q, (snap) => {
-                        window.appState.reportsData = []; snap.forEach(d => window.appState.reportsData.push({id: d.id, ...d.data()}));
-                        const s = new Set(window.appState.reportsData.map(r=>r.staging).filter(Boolean)); const el = document.getElementById('filter-staging');
-                        if(el) { const curr = el.value; el.innerHTML='<option value="">Semua Staging</option>'; [...s].sort().forEach(x=>{ const o=document.createElement('option'); o.value=x; o.text=x; el.add(o); }); el.value = curr; }
-                        if(window.updateDashboard) window.updateDashboard();
-                        if(window.updateRecapTable) window.updateRecapTable();
-                    });
-                };
-
-                window.updateRecapTable = () => {
-                     const d = window.appState.reportsData;
-                     const tbody = document.getElementById('recap-body');
-                     if(!tbody) return;
-                     tbody.innerHTML = '';
-                     
-                     const currUser = window.appState.appProfile;
-                     let filtered = d;
-                     if(currUser && currUser.role !== 'admin') {
-                         filtered = d.filter(r => r.username === currUser.username);
-                     }
-
-                     if(filtered.length === 0) {
-                         tbody.innerHTML = '<tr><td colspan="11" class="p-4 text-center text-slate-400 text-xs">Belum ada data input.</td></tr>';
-                         return;
-                     }
-
-                     filtered.forEach(r => {
-                         const m = r.metrics;
-                         const slaRaw = m.total ? ((m.ok / m.total) * 100) : 0;
-                         const slaPct = slaRaw.toFixed(1) + '%';
-                         const slaColor = slaRaw >= 95 ? 'text-green-600' : (slaRaw >= 93 ? 'text-yellow-600' : 'text-red-600');
-                         const claimVal = r.type === 'Pickup' ? '-' : (m.claim || 0);
-                         const missedHr = m.missedByHour || 0;
-
-                         tbody.innerHTML += `
-                            <tr class="hover:bg-slate-50 transition-colors border-b border-slate-50">
-                                <td class="px-6 py-4 font-bold text-slate-700">${r.date}</td>
-                                <td class="px-4 py-4 text-slate-500">${r.staging}</td>
-                                <td class="px-4 py-4 text-slate-500"><span class="bg-slate-100 px-2 py-1 rounded text-[10px] uppercase font-bold">${r.type}</span></td>
-                                <td class="px-4 py-4 text-slate-500 font-bold">${r.service}</td>
-                                <td class="px-4 py-4 text-center font-bold text-slate-800">${m.total}</td>
-                                <td class="px-4 py-4 text-center text-green-600">${m.ok}</td>
-                                <td class="px-4 py-4 text-center font-bold ${slaColor}">${slaPct}</td>
-                                <td class="px-4 py-4 text-center text-orange-600">${missedHr}</td>
-                                <td class="px-4 py-4 text-center text-red-600">${m.missed}</td>
-                                <td class="px-4 py-4 text-center text-slate-500">${claimVal}</td>
-                                <td class="px-4 py-4 text-center">
-                                    <button onclick="promptEdit('${r.id}')" class="text-xs font-bold text-white bg-slate-800 px-3 py-1.5 rounded-lg hover:bg-brand-600 transition-colors shadow-sm"><i class="fa-solid fa-lock mr-1"></i> Edit</button>
-                                </td>
-                            </tr>
-                         `;
-                     });
-                };
-
-                window.updateDashboard = () => {
-                     const d = window.appState.reportsData; if(!d) return;
-                     const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
-                     if (!document.getElementById('filter-date-start')) return;
-                    const fStart = getVal('filter-date-start'); const fEnd = getVal('filter-date-end'); const fStaging = getVal('filter-staging'); const fService = getVal('filter-service'); const fType = getVal('filter-type');
-                    const filtered = d.filter(r => {
-                        const rd = new Date(r.date);
-                        if(fStart && rd < new Date(fStart)) return false; if(fEnd && rd > new Date(fEnd)) return false; if(fStaging && r.staging!==fStaging) return false; if(fService && r.service!==fService) return false; if(fType && r.type!==fType) return false; return true;
-                    });
-                    let tot=0, ok=0, prg=0, mis=0, clm=0;
-                    const stgMap={}, svcMap={}, fbMapInt={}, fbMapExt={};
-                    
-                    filtered.forEach(r => {
-                        const m = r.metrics; tot+=m.total; ok+=m.ok; prg+=m.progress; mis+=m.missed; clm+=(m.claim||0);
-                        const mh = m.missedByHour || 0;
-                        
-                        const s = r.staging||'Unk'; if(!stgMap[s]) stgMap[s]={t:0,o:0,p:0,m:0,c:0,mh:0, l:r.leader||'-'}; stgMap[s].t+=m.total; stgMap[s].o+=m.ok; stgMap[s].p+=m.progress; stgMap[s].m+=m.missed; stgMap[s].c+=(m.claim||0); stgMap[s].mh+=mh;
-                        const sv = r.service||'Oth'; if(!svcMap[sv]) svcMap[sv]={t:0,o:0,p:0,m:0,c:0,mh:0}; svcMap[sv].t+=m.total; svcMap[sv].o+=m.ok; svcMap[sv].p+=m.progress; svcMap[sv].m+=m.missed; svcMap[sv].c+=(m.claim||0); svcMap[sv].mh+=mh;
-                        
-                        // Group Feedback Logic
-                        if(m.feedbackIn && m.feedbackIn.trim() !== '') {
-                            const msg = m.feedbackIn.trim().toUpperCase();
-                            if(!fbMapInt[msg]) fbMapInt[msg] = 0;
-                            fbMapInt[msg] += (m.internalPkg || 0);
-                        }
-                        if(m.feedbackExt && m.feedbackExt.trim() !== '') {
-                            const msg = m.feedbackExt.trim().toUpperCase();
-                            if(!fbMapExt[msg]) fbMapExt[msg] = 0;
-                            fbMapExt[msg] += (m.externalPkg || 0);
-                        }
-                    });
-
-                    const fmt = n => n.toLocaleString();
-                    window.setTextSafe('kpi-total', fmt(tot)); window.setTextSafe('kpi-ok', fmt(ok)); window.setTextSafe('kpi-ok-pct', tot?((ok/tot)*100).toFixed(1)+'%':'0%'); window.setTextSafe('kpi-pending', fmt(prg)); window.setTextSafe('kpi-missed', fmt(mis)); window.setTextSafe('kpi-claim', fmt(clm));
-                    const getColorClass = (val, typeFilter) => {
-                        if (typeFilter === 'Pickup') { if (val < 93) return 'text-red-600 bg-red-50'; if (val <= 95) return 'text-yellow-600 bg-yellow-50'; return 'text-green-600 bg-green-50'; } 
-                        else { if (val < 95) return 'text-red-600 bg-red-50'; if (val <= 96.3) return 'text-yellow-600 bg-yellow-50'; return 'text-green-600 bg-green-50'; }
-                    };
-                    const renderTab = (id, map, isSvc) => {
-                        const tb = document.getElementById(id); if(!tb) return; tb.innerHTML='';
-                        const keys = Object.keys(map).sort((a,b) => map[b].t - map[a].t);
-                        let gT=0, gO=0, gP=0, gM=0, gC=0, gMH=0;
-                        keys.forEach(k=>{
-                            const x=map[k]; gT+=x.t; gO+=x.o; gP+=x.p; gM+=x.m; gC+=x.c; gMH+=x.mh;
-                            const pRaw = x.t ? (x.o/x.t)*100 : 0; const p = pRaw.toFixed(1)+'%'; const colorClass = getColorClass(pRaw, fType);
-                            
-                            // Warning Logic
-                            let warnIcon = '';
-                            if(!isSvc && pRaw < 95) warnIcon = '<i class="fa-solid fa-triangle-exclamation text-red-500 ml-2 animate-pulse" title="SLA < 95%"></i>';
-
-                            let c1 = k; 
-                            if(!isSvc) c1 = `<div class="font-bold text-slate-700 flex items-center">${k} ${warnIcon}</div><div class="text-[10px] text-slate-400 font-normal">${x.l}</div>`; 
-                            else c1 = `<div class="font-bold text-slate-700">${k}</div>`;
-                            
-                            tb.innerHTML+=`<tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none"><td class="px-4 py-3">${c1}</td><td class="text-center font-bold text-slate-700">${x.t}</td><td class="text-center text-green-600">${x.o}</td><td class="text-center"><span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${colorClass}">${p}</span></td><td class="text-center text-yellow-600">${x.p}</td><td class="text-center text-orange-600">${x.mh}</td><td class="text-center text-red-600">${x.m}</td><td class="text-center text-slate-400">${x.c}</td></tr>`;
-                        });
-                        if(keys.length > 0) {
-                             const pTotRaw = gT ? (gO/gT)*100 : 0; const pTot = pTotRaw.toFixed(1)+'%'; const colTot = getColorClass(pTotRaw, fType);
-                             tb.innerHTML+=`<tr class="bg-slate-100 font-bold border-t-2 border-slate-200"><td class="px-4 py-3 text-right text-xs uppercase text-slate-500">Total Global</td><td class="text-center text-slate-900">${gT}</td><td class="text-center text-green-700">${gO}</td><td class="text-center"><span class="px-1.5 py-0.5 rounded text-[10px] ${colTot}">${pTot}</span></td><td class="text-center text-yellow-700">${gP}</td><td class="text-center text-orange-700">${gMH}</td><td class="text-center text-red-700">${gM}</td><td class="text-center text-slate-600">${gC}</td></tr>`;
-                        }
-                    };
-                    renderTab('staging-breakdown-body', stgMap, false); renderTab('service-breakdown-body', svcMap, true);
-                    const tbFb = document.getElementById('feedback-recap-body'); if(tbFb) { tbFb.innerHTML=''; 
-                        // Sum Totals
-                        let sumInt = 0; Object.values(fbMapInt).forEach(v => sumInt += v);
-                        let sumExt = 0; Object.values(fbMapExt).forEach(v => sumExt += v);
-
-                        // Build Lists
-                        const buildList = (map) => {
-                            const sortedKeys = Object.keys(map).sort((a,b) => map[b] - map[a]);
-                            if(sortedKeys.length === 0) return '<p class="text-slate-400 italic">Tidak ada feedback</p>';
-                            return `<ul class="list-disc pl-4 marker:text-brand-400 space-y-1">${sortedKeys.map(k => `<li><span class="font-bold text-slate-700">[${map[k]}]</span> <span class="text-sm text-slate-600">${k}</span></li>`).join('')}</ul>`;
-                        };
-                        
-                        tbFb.innerHTML = `
-                            <tr class="align-top">
-                                <td class="px-6 py-5 border-r border-slate-50 w-1/2">
-                                    <div class="flex items-center gap-3 mb-4">
-                                        <div class="bg-blue-50 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg">${sumInt}</div>
-                                        <div><p class="text-xs font-bold text-slate-400 uppercase">Total Paket</p><p class="text-sm font-bold text-slate-800">Internal Issue</p></div>
-                                    </div>
-                                    <div class="text-sm text-slate-600 leading-relaxed">${buildList(fbMapInt)}</div>
-                                </td>
-                                <td class="px-6 py-5 w-1/2">
-                                     <div class="flex items-center gap-3 mb-4">
-                                        <div class="bg-indigo-50 text-indigo-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg">${sumExt}</div>
-                                        <div><p class="text-xs font-bold text-slate-400 uppercase">Total Paket</p><p class="text-sm font-bold text-slate-800">External Issue</p></div>
-                                    </div>
-                                    <div class="text-sm text-slate-600 leading-relaxed">${buildList(fbMapExt)}</div>
-                                </td>
-                            </tr>
-                        `;
-                    }
-                    if(!document.getElementById('section-dashboard').classList.contains('hidden-section') && window.updateCharts) window.updateCharts(filtered, !!fStart||!!fEnd);
-                };
-
-                window.updateCharts = (data, filterActive) => {
-                    if(!window.Chart || !data) return;
-                    const today = new Date(); const d30 = new Date(); d30.setDate(today.getDate()-30); const daily={}, annual={}; for(let i=0;i<12;i++) annual[i]={t:0,o:0};
-                    data.forEach(r=>{ const rd=new Date(r.date); if(filterActive || (rd>=d30 && rd<=today)) { const k=r.date.substring(5); if(!daily[k]) daily[k]={t:0,o:0}; daily[k].t+=r.metrics.total; daily[k].o+=r.metrics.ok; } if(filterActive || rd.getFullYear()===today.getFullYear()){ annual[rd.getMonth()].t+=r.metrics.total; annual[rd.getMonth()].o+=r.metrics.ok; } });
-                    
-                    const typeFilter = document.getElementById('filter-type') ? document.getElementById('filter-type').value : '';
-                    
-                    const getColor = (pct, total) => {
-                        if (!total || total === 0) return '#ffffff'; 
-                        if (typeFilter === 'Pickup') {
-                            if (pct < 93) return '#dc2626'; 
-                            if (pct <= 95) return '#eab308'; 
-                            return '#059669'; 
-                        } else {
-                            if (pct < 95) return '#dc2626'; 
-                            if (pct <= 96.3) return '#eab308'; 
-                            return '#059669'; 
-                        }
-                    };
-
-                    const getTextColor = (bgColor) => {
-                        if (bgColor === '#ffffff') return '#94a3b8'; 
-                        return '#ffffff'; 
-                    };
-
-                    const commonOptions = { 
-                        responsive: true, 
-                        maintainAspectRatio: false, 
-                        plugins: { 
-                            legend: { display: false }, 
-                            tooltip: { mode: 'index', intersect: false },
-                            datalabels: { 
-                                backgroundColor: (context) => {
-                                     if(context.dataset.type === 'line') {
-                                         const index = context.dataIndex;
-                                         const total = context.chart.data.datasets[0].data[index];
-                                         const pct = context.raw;
-                                         return getColor(pct, total);
-                                     }
-                                     return '#f1f5f9'; 
-                                },
-                                borderColor: (context) => {
-                                    if(context.dataset.type === 'line') {
-                                         const index = context.dataIndex;
-                                         const total = context.chart.data.datasets[0].data[index];
-                                         if(!total || total === 0) return '#cbd5e1';
-                                    }
-                                    return 'transparent';
-                                },
-                                borderWidth: 1,
-                                color: (context) => {
-                                    if(context.dataset.type === 'line') {
-                                         const index = context.dataIndex;
-                                         const total = context.chart.data.datasets[0].data[index];
-                                         const pct = context.raw;
-                                         return getTextColor(getColor(pct, total));
-                                    }
-                                    return '#1e293b'; 
-                                },
-                                anchor: 'end', 
-                                align: (context) => context.dataset.type === 'line' ? 'top' : 'end',
-                                borderRadius: 6, 
-                                padding: { top:4, bottom:4, left:6, right:6 }, 
-                                font: { weight: 'bold', size: 10 }, 
-                                formatter: Math.round,
-                                offset: 4
-                            } 
-                        }, 
-                        scales: { 
-                            y: { display: false, beginAtZero: true }, 
-                            x: { grid: { display: false } }, 
-                            y1: { display: false, position: 'right', grid: {drawOnChartArea: false}, min: 0, max: 120 } 
-                        },
-                        layout: { padding: { top: 30 } } 
-                    };
-                    
-                    const draw = (id, labels, dTot, dOk) => { 
-                        const cv = document.getElementById(id); if(!cv) return; const ctx = cv.getContext('2d'); 
-                        if(window.appState[id]) window.appState[id].destroy(); 
-                        
-                        window.appState[id] = new Chart(ctx, { 
-                            type: 'bar', 
-                            plugins: [ChartDataLabels], 
-                            data: { 
-                                labels: labels, 
-                                datasets: [ 
-                                    { 
-                                        label:'Total', 
-                                        data: dTot, 
-                                        backgroundColor:'#818cf8', 
-                                        borderRadius: 4, 
-                                        order:2,
-                                        yAxisID: 'y',
-                                        datalabels:{anchor:'end', align:'end', offset: -4, backgroundColor: '#f1f5f9', color: '#1e293b', borderColor: 'transparent'} 
-                                    }, 
-                                    { 
-                                        type:'line', 
-                                        label:'% SLA', 
-                                        data: dOk, 
-                                        yAxisID: 'y1', 
-                                        segment: { borderColor: ctx => getColor(ctx.p1.parsed.y, 100) },
-                                        borderColor: '#94a3b8',
-                                        pointBackgroundColor: (ctx) => {
-                                            const index = ctx.dataIndex;
-                                            const total = dTot[index];
-                                            return getColor(ctx.raw, total);
-                                        },
-                                        pointBorderColor: '#fff',
-                                        pointRadius: 5, 
-                                        pointHoverRadius: 7,
-                                        borderWidth: 2, 
-                                        tension: 0.3, 
-                                        order:1
-                                    } 
-                                ] 
-                            }, 
-                            options: commonOptions 
-                        }); 
-                    };
-                    
-                    const dKeys = Object.keys(daily).sort(); 
-                    draw('chartDaily', dKeys, dKeys.map(k=>daily[k].t), dKeys.map(k=>daily[k].t?(daily[k].o/daily[k].t*100):0)); 
-                    
-                    draw('chartAnnual', MONTH_NAMES, Object.values(annual).map(x=>x.t), Object.values(annual).map(x=>x.t?(x.o/x.t*100):0));
-                };
-
-                window.saveUser = async () => {
-                    const getV = (id) => document.getElementById(id).value;
-                    const data = {
-                        username: getV('modal-username'),
-                        password: getV('modal-password'),
-                        area: getV('modal-area'),
-                        staging: getV('modal-staging'),
-                        leader: getV('modal-leader'),
-                        role: getV('modal-role'),
-                        name: getV('modal-username'),
-                        createdAt: serverTimestamp()
-                    };
-                    if(!data.username || !data.password) return window.showToast("Username & Password wajib diisi", true);
-
-                    const id = document.getElementById('edit-user-id').value;
-                    const colRef = collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users');
-                    
-                    try {
-                        if(id) {
-                            delete data.username; delete data.createdAt;
-                            await updateDoc(doc(colRef, id), data);
-                            window.showToast("User Berhasil Diupdate!");
-                        } else {
-                            const q = query(colRef, where("username", "==", data.username));
-                            const snap = await getDocs(q);
-                            if(!snap.empty) return window.showToast("Username sudah dipakai!", true);
-                            await addDoc(colRef, data);
-                            window.showToast("User Baru Berhasil Ditambah!");
-                        }
-                        window.closeUserModal();
-                    } catch(err) { console.error(err); window.showToast("Gagal menyimpan data user", true); }
-                };
-
-                // --- EDIT LOGIC (GLOBAL) ---
-                window.promptEdit = (docId) => {
-                    console.log("Prompt Edit for:", docId);
-                    window.appState.pendingEditId = docId;
-                    document.getElementById('admin-auth-modal').classList.remove('hidden');
-                    document.getElementById('auth-daily-token').value = '';
-                    document.getElementById('auth-daily-token').focus();
-                };
-
-                window.verifyTokenAndEdit = async () => {
-                    const tokenIn = document.getElementById('auth-daily-token').value;
-                    if(!tokenIn) return window.showToast("Masukkan Kode Token", true);
-                    
-                    const validToken = window.appState.dailyAuthCode;
-                    
-                    if(tokenIn === validToken || tokenIn === 'OPS2025') {
-                         document.getElementById('admin-auth-modal').classList.add('hidden');
-                         loadDataForEdit(window.appState.pendingEditId);
-                    } else {
-                        window.showToast("Kode Token Salah!", true);
-                    }
-                };
-
-                window.loadDataForEdit = (docId) => {
-                    try {
-                        const data = window.appState.reportsData.find(r => r.id === docId);
-                        if(!data) return window.showToast("Data tidak ditemukan!", true);
-                        
-                        window.switchTab('form');
-                        document.getElementById('edit-doc-id').value = docId;
-                        document.getElementById('input-form-title').innerText = "Edit Laporan (Mode Edit)";
-                        document.getElementById('input-form-title').classList.add('text-amber-600');
-                        document.getElementById('btn-text').innerText = "Update Laporan";
-                        document.getElementById('btn-cancel-edit').classList.remove('hidden');
-
-                        document.getElementById('input-date').value = data.date;
-                        if(data.type === 'Delivery') { document.getElementById('type-delivery').click(); }
-                        else { document.getElementById('type-pickup').click(); }
-
-                        // Clear inputs safely
-                        SERVICES.forEach(svc => { 
-                            ['total','ok','prog','miss-hr','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => {
-                                const el = document.getElementById(`input-${svc}-${f}`);
-                                if(el) el.value = '';
-                            }); 
-                        });
-
-                        const s = data.service;
-                        const m = data.metrics;
-                        if(SERVICES.includes(s)) {
-                            const setVal = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
-                            
-                            setVal(`input-${s}-total`, m.total);
-                            setVal(`input-${s}-ok`, m.ok);
-                            setVal(`input-${s}-prog`, m.progress);
-                            setVal(`input-${s}-miss-hr`, m.missedByHour || 0);
-                            setVal(`input-${s}-miss`, m.missed);
-                            setVal(`input-${s}-claim`, m.claim);
-                            setVal(`input-${s}-int`, m.internalPkg || 0);
-                            setVal(`input-${s}-fb-int`, m.feedbackIn || '');
-                            setVal(`input-${s}-ext`, m.externalPkg || 0);
-                            setVal(`input-${s}-fb-ext`, m.feedbackExt || '');
-                            
-                            ['total','ok','prog','miss-hr','miss','claim','int','ext'].forEach(f => {
-                                const el = document.getElementById(`input-${s}-${f}`);
-                                if(el) window.formatNumberInput(el);
-                            });
-                        }
-                    } catch (e) {
-                        console.error(e);
-                        window.showToast("Gagal memuat data edit: " + e.message, true);
-                    }
-                };
-
-                window.cancelEdit = () => {
-                    document.getElementById('edit-doc-id').value = '';
-                    document.getElementById('input-form-title').innerText = "Input Laporan Harian";
-                    document.getElementById('input-form-title').classList.remove('text-amber-600');
-                    document.getElementById('btn-text').innerText = "Kirim Laporan";
-                    document.getElementById('btn-cancel-edit').classList.add('hidden');
-                    document.getElementById('reportForm').reset();
-                     document.getElementById('input-date').valueAsDate = new Date();
-                     document.getElementById('type-delivery').click();
-                };
-
-                window.handleTypeChange = (type) => {
-                    document.getElementById('input-type-val').value = type;
-                    const claimHeaders = document.querySelectorAll('.col-claim');
-                    const claimInputs = document.querySelectorAll('.input-claim-cell');
-                    if (type === 'Pickup') {
-                        claimHeaders.forEach(el => el.classList.add('hidden'));
-                        claimInputs.forEach(el => el.classList.add('hidden'));
-                    } else {
-                        claimHeaders.forEach(el => el.classList.remove('hidden'));
-                        claimInputs.forEach(el => el.classList.remove('hidden'));
-                    }
-                };
-
-                window.downloadCSV = () => {
-                    const d = window.appState.reportsData;
-                    if (!d || d.length === 0) return window.showToast("Tidak ada data untuk diexport", true);
-                    
-                    let csv = 'Tanggal,Staging,Tipe,Service,Total,OK,Progress,Miss Hr,Missed,Claim,Int Pkg,Feedback Int,Ext Pkg,Feedback Ext\n';
-                    d.forEach(r => {
-                        const m = r.metrics;
-                        const row = [
-                            r.date, r.staging, r.type, r.service,
-                            m.total, m.ok, m.progress, m.missedByHour || 0, m.missed, m.claim || 0,
-                            m.internalPkg || 0, `"${(m.feedbackIn || '').replace(/"/g, '""')}"`,
-                            m.externalPkg || 0, `"${(m.feedbackExt || '').replace(/"/g, '""')}"`
-                        ];
-                        csv += row.join(',') + '\n';
-                    });
-                    
-                    const blob = new Blob([csv], { type: 'text/csv' });
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.setAttribute('hidden', '');
-                    a.setAttribute('href', url);
-                    a.setAttribute('download', 'ops_report_export.csv');
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                };
-
-                // --- INIT FUNCTION DEFINITION ---
-                async function initApp() {
-                    let firebaseConfig = null;
-                    let isCustomConfig = false;
-                    try {
-                        const userConfig = {
-                          apiKey: "AIzaSyAqbDeVLDBRDEIfi4RliLMC-3Qrwh8p96k",
-                          authDomain: "logsheet-5r.firebaseapp.com",
-                          projectId: "logsheet-5r",
-                          storageBucket: "logsheet-5r.firebasestorage.app",
-                          messagingSenderId: "358725557740",
-                          appId: "1:358725557740:web:664cca8d2ae984221ff4c9"
-                        };
-                        if (userConfig) { firebaseConfig = userConfig; isCustomConfig = true; }
-                        else if (typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config);
-                        if (typeof __app_id !== 'undefined') window.appState.appId = __app_id;
-                    } catch (e) { console.error(e); return; }
-
-                    if (firebaseConfig) {
-                        try {
-                            const app = initializeApp(firebaseConfig);
-                            const auth = getAuth(app);
-                            const db = getFirestore(app);
-                            window.appState.app = app; window.appState.auth = auth; window.appState.db = db;
-
-                            const d = new Date();
-                            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                            document.getElementById('banner-date').innerText = d.toLocaleDateString('id-ID', options);
-
-                            document.getElementById('input-date').valueAsDate = new Date();
-                            
-                            // CALL LOCAL FUNCTION
-                            generateBulkTable();
-                            
-                            if (isCustomConfig) await signInAnonymously(auth);
-                            else if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
-                            else await signInAnonymously(auth);
-
-                            onAuthStateChanged(auth, (user) => { if (user) setupSettingsListener(); });
-
-                        } catch (err) { console.error(err); window.showToast("DB Error", true); }
-                    }
+                    } else throw new Error("Username tidak ditemukan.");
                 }
+            } catch(err) {
+                errEl.textContent = err.message;
+                errEl.classList.remove('hidden');
+            }
+        });
 
-                initApp();
-            </script>
-        </body>
-        </html>
+        function finishLogin() {
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('user-display-name').textContent = currentUser.name;
+            document.getElementById('dashboard-greeting-name').textContent = currentUser.name;
+            document.getElementById('user-display-role').textContent = currentUser.role;
+            
+            if(currentUser.role === 'coordinator') document.getElementById('admin-menu').classList.remove('hidden');
+            
+            fetchGlobalSettings();
+            listenToReports();
+            if(currentUser.role === 'coordinator') listenToUsers();
+            
+            setupReportForm();
+            setupDashboardFilters();
+            renderInputTable();
+            window.showTab('dashboard');
+        }
+
+        async function logout() {
+            try {
+                if(reportsUnsubscribe) reportsUnsubscribe();
+                if(usersUnsubscribe) usersUnsubscribe();
+                
+                await signOut(auth);
+                
+                currentUser = null;
+                allReports = [];
+                allUsers = [];
+                
+                document.getElementById('main-app').classList.add('hidden');
+                document.getElementById('login-page').classList.remove('hidden');
+                document.getElementById('login-form').reset();
+                
+                switchLoginTab('user');
+                showNotification("Anda telah logout.", "success");
+            } catch (error) {
+                console.error("Logout error", error);
+                window.location.reload();
+            }
+        }
+        window.logout = logout;
+
+        // GLOBAL SETTINGS
+        async function fetchGlobalSettings() {
+            const snap = await getDoc(doc(db, 'settings', 'globalConfig'));
+            if(snap.exists()) {
+                currentAdminCode = snap.data().adminCode || "123456";
+                const inp = document.getElementById('setting-admin-code');
+                if(inp) inp.value = currentAdminCode;
+            } else {
+                setDoc(doc(db, 'settings', 'globalConfig'), {adminCode: "123456"});
+            }
+        }
+        window.saveGlobalSettings = async () => {
+            const code = document.getElementById('setting-admin-code').value.trim();
+            if(!code) return showNotification("Kode tidak boleh kosong", "error");
+            await setDoc(doc(db,'settings','globalConfig'), {adminCode: code}, {merge:true});
+            currentAdminCode = code;
+            showNotification("Kode tersimpan!");
+        }
+
+        // DASHBOARD LOGIC
+        function setupDashboardFilters() {
+            const ssSet = new Set(allReports.map(r => r.kodeSS).filter(Boolean));
+            const ssSel = document.getElementById('dash-filter-ss');
+            if(ssSel) {
+                const cur = ssSel.value;
+                ssSel.innerHTML = '<option value="all">Semua SS</option>' + [...ssSet].map(ss => `<option value="${ss}">${ss}</option>`).join('');
+                if([...ssSet].includes(cur)) ssSel.value = cur;
+            }
+            
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+            const startIn = document.getElementById('dash-date-start');
+            const endIn = document.getElementById('dash-date-end');
+            if(startIn && !startIn.value) startIn.value = firstDay;
+            if(endIn && !endIn.value) endIn.value = lastDay;
+
+            ['dash-date-start', 'dash-date-end', 'dash-filter-ss', 'dash-filter-service', 'dash-filter-type'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.addEventListener('change', renderDashboard);
+            });
+        }
+
+        function renderDashboard() {
+            if(!document.getElementById('dash-date-start')) return;
+            
+            const start = document.getElementById('dash-date-start').value;
+            const end = document.getElementById('dash-date-end').value;
+            const fSS = document.getElementById('dash-filter-ss').value;
+            const fSvc = document.getElementById('dash-filter-service').value;
+            const fType = document.getElementById('dash-filter-type').value;
+
+            const filtered = allReports.filter(r => {
+                const rDate = r.date || new Date(r.timestamp.seconds*1000).toISOString().split('T')[0];
+                const inDate = (!start || rDate >= start) && (!end || rDate <= end);
+                const inSS = fSS === 'all' || r.kodeSS === fSS;
+                const inType = fType === 'all' || r.type === fType;
+                return inDate && inSS && inType;
+            });
+
+            processCharts(filtered);
+            processBreakdowns(filtered, fSvc, fType);
+            processFeedback(filtered);
+        }
+
+        function processCharts(data) {
+            const chartAnnualCanvas = document.getElementById('chartAnnual');
+            const chartMonthlyCanvas = document.getElementById('chartMonthly');
+            if(!chartAnnualCanvas || !chartMonthlyCanvas) return;
+
+            // Annual (Chronological)
+            const months = {};
+            for(let i=0; i<12; i++) { const m = new Date(new Date().getFullYear(), i, 1).toLocaleString('id-ID',{month:'short'}); months[m] = {total:0, ok:0}; }
+            
+            data.forEach(r => {
+                const m = new Date(r.date).toLocaleString('id-ID',{month:'short'});
+                let rTotal = 0, rOK = 0;
+                r.details?.forEach(d => { rTotal+=d.total; rOK+=d.ok; });
+                if(months[m]) { months[m].total+=rTotal; months[m].ok+=rOK; }
+            });
+
+            const keysM = Object.keys(months);
+            const datM_Vol = keysM.map(k=>months[k].total);
+            const datM_SLA = keysM.map(k=> months[k].total>0 ? ((months[k].ok/months[k].total)*100).toFixed(1) : 0);
+
+            if(chartAnnual) chartAnnual.destroy();
+            chartAnnual = new Chart(chartAnnualCanvas, {
+                type: 'bar',
+                data: { labels: keysM, datasets: [{ type:'bar', label:'Total', data:datM_Vol, backgroundColor:'#3b82f6', borderRadius:4, order:2 }, { type:'line', label:'% SLA', data:datM_SLA, borderColor:'#f59e0b', borderWidth:2, tension:0.3, pointRadius:0, yAxisID:'y1', order:1 }] },
+                options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ y:{display:false}, y1:{display:false, min:0, max:100}, x:{grid:{display:false}} } }
+            });
+
+            // 30 Days (Chronological)
+            const days = {};
+            for(let i=29; i>=0; i--) {
+                const d = new Date(); d.setDate(d.getDate()-i);
+                const k = d.toISOString().split('T')[0];
+                days[k] = { label: d.getDate(), total:0, ok:0 };
+            }
+            data.forEach(r => {
+                if(days[r.date]) { r.details?.forEach(d => { days[r.date].total+=d.total; days[r.date].ok+=d.ok; }); }
+            });
+            const keysD = Object.keys(days).sort();
+            const lblD = keysD.map(k=>days[k].label);
+            const datD_Vol = keysD.map(k=>days[k].total);
+            const datD_SLA = keysD.map(k=> days[k].total>0 ? ((days[k].ok/days[k].total)*100).toFixed(1) : 0);
+
+            if(chartMonthly) chartMonthly.destroy();
+            chartMonthly = new Chart(chartMonthlyCanvas, {
+                type: 'bar',
+                data: { labels: lblD, datasets: [{ type:'bar', label:'Total', data:datD_Vol, backgroundColor:'#10b981', borderRadius:4, order:2 }, { type:'line', label:'% SLA', data:datD_SLA, borderColor:'#3b82f6', borderWidth:2, tension:0.3, pointRadius:0, yAxisID:'y1', order:1 }] },
+                options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ y:{display:false}, y1:{display:false, min:0, max:100}, x:{grid:{display:false}} } }
+            });
+        }
+
+        function processBreakdowns(data, filterSvc, filterType) {
+            const byService = {};
+            const byStaging = {};
+
+            data.forEach(r => {
+                const type = r.type; 
+                r.details?.forEach(d => {
+                    if (filterSvc !== 'all' && d.label !== filterSvc) return;
+                    
+                    // Service Agg
+                    if(!byService[d.label]) byService[d.label] = { total:0, ok:0, inp:0, mbh:0, miss:0, claim:0, type: type };
+                    else if(byService[d.label].type !== type) byService[d.label].type = 'mixed';
+                    
+                    const s = byService[d.label];
+                    s.total+=d.total; s.ok+=d.ok; s.inp+=d.inprogress; s.mbh+=d.mbh; s.miss+=d.missed; s.claim+=d.claimed;
+
+                    // Staging Agg
+                    const key = `${r.kodeSS} - ${r.reporterName}`;
+                    if(!byStaging[key]) byStaging[key] = { name:key, total:0, ok:0, inp:0, mbh:0, miss:0, claim:0, type: type };
+                    else if(byStaging[key].type !== type) byStaging[key].type = 'mixed';
+                    
+                    const ss = byStaging[key];
+                    ss.total+=d.total; ss.ok+=d.ok; ss.inp+=d.inprogress; ss.mbh+=d.mbh; ss.miss+=d.missed; ss.claim+=d.claimed;
+                });
+            });
+
+            const renderRow = (label, d) => {
+                const sla = d.total > 0 ? (d.ok / d.total * 100) : 0;
+                const slaColor = getSLAColor(sla, d.type);
+                const showClaim = filterType === 'delivery' || d.claim > 0;
+                return `<tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="p-2 font-medium">${label}</td>
+                    <td class="p-2 text-right font-bold">${d.total.toLocaleString()}</td>
+                    <td class="p-2 text-right">${d.ok.toLocaleString()}</td>
+                    <td class="p-2 text-center"><div class="${slaColor} text-xs font-bold px-2 py-1 rounded">${sla.toFixed(1)}%</div></td>
+                    <td class="p-2 text-right text-gray-500">${d.inp}</td>
+                    <td class="p-2 text-right text-gray-500">${d.mbh}</td>
+                    <td class="p-2 text-right text-red-500">${d.miss}</td>
+                    <td class="p-2 text-right claim-col ${showClaim?'':'hidden'}">${d.claim}</td>
+                </tr>`;
+            };
+
+            const sList = Object.entries(byService).map(([k,v]) => ({label:k, ...v})).sort((a,b)=>b.total - a.total);
+            const elSvc = document.getElementById('body-breakdown-service');
+            if (elSvc) elSvc.innerHTML = sList.map(item => renderRow(item.label, item)).join('');
+
+            const ssList = Object.values(byStaging).sort((a,b)=>b.total - a.total);
+            const elStg = document.getElementById('body-breakdown-staging');
+            if (elStg) elStg.innerHTML = ssList.map(item => renderRow(item.name, item)).join('');
+            
+            // Toggle global claim header if needed
+            const showClaimGlobally = filterType !== 'pickup';
+            document.querySelectorAll('.claim-col').forEach(el => el.classList.toggle('hidden', !showClaimGlobally));
+        }
+
+        function getSLAColor(pct, type) {
+            let color = 'bg-sla-red';
+            if(type === 'pickup') {
+                if(pct > 95) color = 'bg-sla-green';
+                else if(pct >= 93) color = 'bg-sla-yellow';
+            } else { // Delivery/Mixed
+                if(pct > 96.3) color = 'bg-sla-green';
+                else if(pct >= 95) color = 'bg-sla-yellow';
+            }
+            return color;
+        }
+
+        function processFeedback(data) {
+            const feedInt = {}, feedExt = {};
+            let totInt = 0, totExt = 0;
+
+            data.forEach(r => {
+                r.details?.forEach(d => {
+                    if(d.total_int > 0) totInt += d.total_int;
+                    if(d.feed_int && d.feed_int.trim() !== '-' && d.feed_int.trim() !== '') {
+                        const t = d.feed_int.trim().toLowerCase();
+                        feedInt[t] = (feedInt[t] || 0) + d.total_int;
+                    }
+                    if(d.total_ext > 0) totExt += d.total_ext;
+                    if(d.feed_ext && d.feed_ext.trim() !== '-' && d.feed_ext.trim() !== '') {
+                        const t = d.feed_ext.trim().toLowerCase();
+                        feedExt[t] = (feedExt[t] || 0) + d.total_ext;
+                    }
+                });
+            });
+
+            document.getElementById('feedback-total-int').textContent = totInt;
+            document.getElementById('feedback-total-ext').textContent = totExt;
+
+            const render = (obj) => Object.entries(obj).map(([k,v]) => `<li class="flex justify-between border-b border-gray-100 pb-1"><span class="capitalize text-gray-700">${k}</span><span class="font-bold text-gray-900">${v}</span></li>`).join('') || '<li class="text-gray-400 italic">Tidak ada feedback</li>';
+            
+            document.getElementById('feedback-list-int').innerHTML = render(feedInt);
+            document.getElementById('feedback-list-ext').innerHTML = render(feedExt);
+        }
+
+        // REPORT FORM
+        function setupReportForm() {
+            document.getElementById('input-date').valueAsDate = new Date();
+            const isCoord = currentUser.role === 'coordinator';
+            document.getElementById('admin-user-select-container').classList.toggle('hidden', !isCoord);
+            document.getElementById('leader-user-info').classList.toggle('md:col-span-2', !isCoord);
+            if(isCoord) populateAdminUserSelect();
+            else {
+                document.getElementById('input-pic-name').value = currentUser.name;
+                document.getElementById('input-pic-id').value = currentUser.id;
+                document.getElementById('input-kode-ss').value = currentUser.kodeSS || '-';
+            }
+        }
+        function populateAdminUserSelect() {
+            const sel = document.getElementById('input-admin-select-user');
+            sel.innerHTML = '<option value="">-- Pilih Anggota Tim --</option>';
+            allUsers.filter(u=>u.username!=='admin' && u.status!=='inactive').forEach(u => sel.innerHTML += `<option value="${u.id}">${u.name} (${u.kodeSS||'-'})</option>`);
+        }
+        window.updateReporterInfo = () => {
+            const uid = document.getElementById('input-admin-select-user').value;
+            if(!uid) return;
+            const u = allUsers.find(x=>x.id===uid);
+            document.getElementById('input-pic-name').value = u.name;
+            document.getElementById('input-kode-ss').value = u.kodeSS || '-';
+            document.getElementById('input-pic-id').value = u.id;
+        }
+        window.renderInputTable = () => {
+            const isDel = document.getElementById('input-type').value === 'delivery';
+            let head = `<tr><th class="p-2 border">Kategori</th><th class="p-2 border bg-blue-50">Total</th><th class="p-2 border">OK</th><th class="p-2 border">Inprog</th><th class="p-2 border">MBH</th><th class="p-2 border">Miss</th>${isDel?'<th class="p-2 border">Claim</th>':''}<th class="p-2 border border-l-4 border-l-gray-300">Int Total</th><th class="p-2 border">Int Ket</th><th class="p-2 border">Ext Total</th><th class="p-2 border">Ext Ket</th></tr>`;
+            document.getElementById('table-header').innerHTML = head;
+            let body = '';
+            ROW_LABELS.forEach((lbl, i) => {
+                const rid = `row-${i}`;
+                body += `<tr data-label="${lbl}">
+                    <td class="p-2 border font-bold text-gray-700 bg-gray-50">${lbl}</td>
+                    <td class="p-2 border total-cell input-cell"><input type="text" id="${rid}-total" readonly value="0"></td>
+                    <td class="p-2 border input-cell"><input type="number" class="sla-input" data-row="${rid}" min="0" oninput="calcRow('${rid}')"></td>
+                    <td class="p-2 border input-cell"><input type="number" class="sla-input" data-row="${rid}" min="0" oninput="calcRow('${rid}')"></td>
+                    <td class="p-2 border input-cell"><input type="number" class="sla-input" data-row="${rid}" min="0" oninput="calcRow('${rid}')"></td>
+                    <td class="p-2 border input-cell"><input type="number" class="sla-input" data-row="${rid}" min="0" oninput="calcRow('${rid}')"></td>
+                    ${isDel ? `<td class="p-2 border input-cell"><input type="number" class="sla-input" data-row="${rid}" min="0" oninput="calcRow('${rid}')"></td>` : ''}
+                    <td class="p-2 border input-cell border-l-4 border-l-gray-300"><input type="number" min="0"></td>
+                    <td class="p-2 border"><input type="text" class="w-full text-xs border rounded p-1"></td>
+                    <td class="p-2 border input-cell"><input type="number" min="0"></td>
+                    <td class="p-2 border"><input type="text" class="w-full text-xs border rounded p-1"></td>
+                </tr>`;
+            });
+            document.getElementById('table-body').innerHTML = body;
+        }
+        window.calcRow = (rid) => {
+            let tot = 0;
+            document.querySelectorAll(`input.sla-input[data-row="${rid}"]`).forEach(i => tot += (parseInt(i.value)||0));
+            document.getElementById(`${rid}-total`).value = tot.toLocaleString('id-ID');
+        }
+
+        document.getElementById('report-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-report');
+            const editId = document.getElementById('report-id-hidden').value;
+            const date = document.getElementById('input-date').value;
+            const type = document.getElementById('input-type').value;
+            const picId = document.getElementById('input-pic-id').value;
+            const picName = document.getElementById('input-pic-name').value;
+            const kodeSS = document.getElementById('input-kode-ss').value;
+
+            if(!picId || !date) return showNotification("Identitas/Tanggal kosong", "error");
+            if(!editId) {
+                const qDup = query(collection(db,'reports'), where('reporterId','==',picId), where('date','==',date), where('type','==',type));
+                const dupSnap = await getDocs(qDup);
+                if(!dupSnap.empty) return showNotification(`Laporan ${type} tanggal ${date} sudah ada!`, "error");
+            }
+
+            let gTotal = 0; const details = [];
+            document.querySelectorAll('#table-body tr').forEach(tr => {
+                const inps = tr.querySelectorAll('input');
+                const isDel = type === 'delivery';
+                const tot = parseInt(inps[0].value.replace(/\./g,'')) || 0;
+                gTotal += tot;
+                details.push({
+                    label: tr.getAttribute('data-label'),
+                    total: tot, ok: parseInt(inps[1].value)||0, inprogress: parseInt(inps[2].value)||0, mbh: parseInt(inps[3].value)||0, missed: parseInt(inps[4].value)||0,
+                    claimed: isDel ? (parseInt(inps[5].value)||0) : 0,
+                    total_int: parseInt(inps[isDel?6:5].value)||0, feed_int: inps[isDel?7:6].value,
+                    total_ext: parseInt(inps[isDel?8:7].value)||0, feed_ext: inps[isDel?9:8].value
+                });
+            });
+
+            btn.disabled = true;
+            try {
+                const payload = { date, type, reporterName: picName, reporterId: picId, kodeSS, grandTotalVolume: gTotal, details, timestamp: serverTimestamp() };
+                if(editId) { await updateDoc(doc(db,'reports',editId), payload); showNotification("Terupdate!"); window.cancelEditMode(); }
+                else { await addDoc(collection(db,'reports'), payload); showNotification("Tersimpan!"); document.getElementById('report-form').reset(); setupReportForm(); renderInputTable(); }
+            } catch(e) { console.error(e); showNotification("Gagal", "error"); }
+            btn.disabled = false;
+        });
+
+        window.requestEditReport = (id) => { if(currentUser.role==='coordinator') loadReportToForm(id); else openAuthModal('editReport', id); }
+        window.requestDeleteReport = (id) => { if(currentUser.role==='coordinator') openConfirmDelete(id); else openAuthModal('deleteReport', id); }
+        function loadReportToForm(id) {
+            const r = allReports.find(x => x.id === id);
+            if(!r) return;
+            window.showTab('reports');
+            document.getElementById('report-id-hidden').value = r.id;
+            document.getElementById('input-date').value = r.date;
+            document.getElementById('input-type').value = r.type;
+            if(currentUser.role === 'coordinator') { document.getElementById('input-admin-select-user').value = r.reporterId; updateReporterInfo(); }
+            document.getElementById('edit-mode-indicator').classList.remove('hidden');
+            document.getElementById('btn-submit-text').textContent = "Update Laporan";
+            renderInputTable();
+            const rows = document.querySelectorAll('#table-body tr');
+            r.details?.forEach(d => {
+                rows.forEach(tr => {
+                    if(tr.getAttribute('data-label') === d.label) {
+                        const inps = tr.querySelectorAll('input');
+                        const isDel = r.type === 'delivery';
+                        inps[1].value = d.ok||''; inps[2].value = d.inprogress||''; inps[3].value = d.mbh||''; inps[4].value = d.missed||'';
+                        if(isDel) inps[5].value = d.claimed||'';
+                        const off = isDel ? 6 : 5;
+                        inps[off].value = d.total_int||''; inps[off+1].value = d.feed_int||''; inps[off+2].value = d.total_ext||''; inps[off+3].value = d.feed_ext||'';
+                        calcRow(tr.querySelector('.sla-input').getAttribute('data-row'));
+                    }
+                })
+            });
+            document.getElementById('report-form').scrollIntoView();
+        }
+        window.cancelEditMode = () => {
+            document.getElementById('report-form').reset();
+            document.getElementById('report-id-hidden').value = '';
+            document.getElementById('edit-mode-indicator').classList.add('hidden');
+            document.getElementById('btn-submit-report').innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span id="btn-submit-text">Simpan Laporan</span>';
+            setupReportForm(); renderInputTable();
+        }
+
+        // LISTENERS
+        function listenToReports() {
+            const q = query(collection(db, 'reports'), orderBy('timestamp', 'desc'));
+            reportsUnsubscribe = onSnapshot(q, (s) => { 
+                allReports = s.docs.map(d=>({id:d.id, ...d.data()})); 
+                renderDashboard(); setupDashboardFilters(); renderReportsTable(); updateFilterUser();
+            });
+        }
+        function listenToUsers() {
+            onSnapshot(collection(db, 'users'), (s) => { 
+                allUsers = s.docs.map(d=>({id:d.id, ...d.data()})); 
+                renderUsersTable(); 
+                if(currentUser.role === 'coordinator') populateAdminUserSelect();
+            });
+        }
+
+        function renderReportsTable() {
+            const f = document.getElementById('filter-user').value;
+            let d = allReports;
+            if(f !== 'all') d = d.filter(x => x.reporterName === f);
+            
+            document.getElementById('reports-table-body').innerHTML = d.map(r => {
+                const date = r.date ? new Date(r.date).toLocaleDateString('id-ID') : '-';
+                let det = '', ti=0, te=0;
+                r.details?.forEach(x => { if(x.total>0) det += `<div class="flex text-xs"><span class="font-bold w-12">${x.label}</span><span>Total: ${x.total}</span></div>`; ti+=x.total_int||0; te+=x.total_ext||0; });
+                return `<tr class="hover:bg-gray-50 border-b last:border-0 align-top"><td class="p-4 text-xs font-mono">${date}</td><td class="p-4"><div class="font-bold text-gray-800 text-lg">${r.kodeSS||'-'}</div><div class="text-xs text-gray-500">${r.reporterName}</div></td><td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold uppercase ${r.type==='delivery'?'bg-blue-100 text-blue-700':'bg-orange-100 text-orange-700'}">${r.type}</span></td><td class="p-4">${det}</td><td class="p-4 text-right text-xs"><div class="text-blue-600">Int: ${ti}</div><div class="text-orange-600">Ext: ${te}</div></td><td class="p-4 text-center"><button onclick="requestEditReport('${r.id}')" class="text-blue-600 text-xs mr-2 border px-2 py-1 rounded">Edit</button><button onclick="requestDeleteReport('${r.id}')" class="text-red-600 text-xs border px-2 py-1 rounded">Hapus</button></td></tr>`;
+            }).join('') || '<tr><td colspan="6" class="p-8 text-center text-gray-400">Kosong</td></tr>';
+        }
+        function updateFilterUser() {
+            const sel = document.getElementById('filter-user');
+            const cur = sel.value;
+            sel.innerHTML = '<option value="all">Semua Anggota</option>' + [...new Set(allReports.map(r=>r.reporterName))].map(n=>`<option>${n}</option>`).join('');
+            sel.value = cur;
+        }
+
+        // USER MGMT (Toggle Button Updated)
+        window.toggleUserStatus = async (id, currentStatus) => {
+            const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+            try { await updateDoc(doc(db,'users',id), {status: newStatus}); showNotification("Status user diubah"); } 
+            catch(e) { showNotification("Gagal", "error"); }
+        }
+        function renderUsersTable() {
+            const tbody = document.getElementById('users-table-body');
+            // FIX: If allUsers is empty, show loading message
+            if (allUsers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400 italic">Belum ada anggota tim.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = allUsers.map(u => {
+                const isActive = u.status !== 'inactive';
+                const statusColor = isActive ? 'bg-green-500' : 'bg-gray-400';
+                const statusText = isActive ? 'Aktif' : 'Non-Aktif';
+                
+                // Toggle Button UI
+                const toggleBtn = (u.username !== 'admin' && u.id !== currentUser.id)
+                    ? `<button onclick="toggleUserStatus('${u.id}', '${isActive?'active':'inactive'}')" class="relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none ${isActive ? 'bg-green-500' : 'bg-gray-300'}">
+                        <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${isActive ? 'translate-x-6' : 'translate-x-1'}"></span>
+                       </button>`
+                    : `<span class="text-xs text-gray-400 font-mono">LOCKED</span>`;
+
+                return `<tr class="hover:bg-gray-50 border-b border-gray-100 ${!isActive?'opacity-60':''}">
+                    <td class="p-4 font-medium">${u.name}</td>
+                    <td class="p-4 text-gray-500">${u.username}</td>
+                    <td class="p-4">${u.kodeSS||'-'}</td>
+                    <td class="p-4"><span class="px-2 py-1 rounded text-xs uppercase ${u.role==='coordinator'?'bg-purple-100 text-purple-700':'bg-blue-100 text-blue-700'}">${u.role}</span></td>
+                    <td class="p-4 text-center">
+                        <div class="flex flex-col items-center gap-1">
+                            ${toggleBtn}
+                            <span class="text-[10px] font-semibold uppercase tracking-wider ${isActive?'text-green-600':'text-gray-500'}">${statusText}</span>
+                        </div>
+                    </td>
+                    <td class="p-4 text-center">
+                        <button onclick="editUser('${u.id}')" class="text-blue-500 p-2"><i class="fa-regular fa-pen-to-square"></i></button>
+                        ${u.id!==currentUser.id && u.username!=='admin' ? `<button onclick="openDeleteModal('${u.id}', '${u.username}')" class="text-red-500 p-2"><i class="fa-regular fa-trash-can"></i></button>` : ''}
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        window.editUser = (id) => {
+            const u = allUsers.find(x=>x.id===id);
+            if(!u) return;
+            document.getElementById('edit-user-id').value = u.id;
+            document.getElementById('new-role').value = u.role;
+            document.getElementById('new-account-status').value = u.status || 'active';
+            document.getElementById('new-name').value = u.name;
+            document.getElementById('new-username').value = u.username;
+            document.getElementById('new-password').value = u.password;
+            document.getElementById('new-kode-ss').value = u.kodeSS||'';
+            document.getElementById('new-kota').value = u.kotaArea||'';
+            
+            const isAdm = u.username === 'admin';
+            document.getElementById('new-username').readOnly = isAdm;
+            document.getElementById('new-role').disabled = isAdm;
+            document.getElementById('new-account-status').disabled = isAdm;
+
+            toggleFormFields();
+            document.getElementById('modal-add-user').classList.remove('hidden');
+        }
+        window.prepareAddUser = () => { 
+            document.getElementById('add-user-form').reset(); 
+            document.getElementById('edit-user-id').value=''; 
+            document.getElementById('new-role').disabled = false;
+            document.getElementById('new-username').readOnly = false;
+            document.getElementById('new-account-status').disabled = false;
+            document.getElementById('modal-add-user').classList.remove('hidden'); 
+        }
+        window.closeAddUserModal = () => document.getElementById('modal-add-user').classList.add('hidden');
+        window.toggleFormFields = () => { const r = document.getElementById('new-role').value; document.getElementById('leader-fields').classList.toggle('hidden', r==='coordinator'); }
+        
+        document.getElementById('add-user-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const uid = document.getElementById('edit-user-id').value;
+            const roleEl = document.getElementById('new-role');
+            const statusEl = document.getElementById('new-account-status');
+            const roleVal = roleEl.disabled ? 'coordinator' : roleEl.value;
+            const statusVal = statusEl.disabled ? 'active' : statusEl.value;
+
+            const data = {
+                role: roleVal,
+                name: document.getElementById('new-name').value,
+                username: document.getElementById('new-username').value,
+                password: document.getElementById('new-password').value,
+                kodeSS: document.getElementById('new-kode-ss').value,
+                kotaArea: document.getElementById('new-kota').value,
+                status: statusVal
+            };
+            if(!uid) data.createdAt = serverTimestamp();
+            try {
+                if(uid) await updateDoc(doc(db,'users',uid), data);
+                else await addDoc(collection(db,'users'), data);
+                showNotification("Tersimpan"); closeAddUserModal();
+            } catch(e) { showNotification("Gagal", "error"); }
+        });
+
+        // GENERIC MODALS (AUTH & DELETE)
+        window.openAuthModal = (action, id) => {
+            targetId = id; pendingAction = action;
+            document.getElementById('auth-code-input').value='';
+            document.getElementById('modal-auth-code').classList.remove('hidden');
+        }
+        window.closeAuthModal = () => document.getElementById('modal-auth-code').classList.add('hidden');
+        window.verifyAuthCode = () => {
+            if(document.getElementById('auth-code-input').value === currentAdminCode) {
+                closeAuthModal();
+                if(pendingAction === 'deleteReport') openConfirmDelete(targetId);
+                if(pendingAction === 'editReport') loadReportToForm(targetId);
+            } else showNotification("Kode Salah", "error");
+        }
+        function openConfirmDelete(id, username) { 
+            targetId = id; pendingAction = username ? 'deleteUser' : 'deleteReport';
+            document.getElementById('delete-confirmation-text').textContent = username ? `Hapus user ${username}?` : "Hapus laporan ini?";
+            document.getElementById('modal-confirm-delete').classList.remove('hidden');
+        }
+        window.openDeleteModal = openConfirmDelete; 
+        window.closeDeleteModal = () => document.getElementById('modal-confirm-delete').classList.add('hidden');
+        window.executeDelete = async () => {
+            try {
+                if(pendingAction === 'deleteReport') await deleteDoc(doc(db,'reports',targetId));
+                if(pendingAction === 'deleteUser') await deleteDoc(doc(db,'users',targetId));
+                showNotification("Terhapus"); closeDeleteModal();
+            } catch(e) { showNotification("Gagal", "error"); }
+        }
+
+        window.showTab = (t) => {
+            ['dashboard','reports','settings'].forEach(x => {
+                document.getElementById('tab-'+x).classList.add('hidden');
+                document.getElementById('nav-'+x).classList.remove('sidebar-active','bg-gray-50','text-blue-600');
+            });
+            document.getElementById('tab-'+t).classList.remove('hidden');
+            document.getElementById('nav-'+t).classList.add('sidebar-active');
+        }
+
+        switchLoginTab('user');
+    </script>
+</body>
+</html>
