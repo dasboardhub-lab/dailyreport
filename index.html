@@ -1312,10 +1312,21 @@
             const today = new Date(); const d30 = new Date(); d30.setDate(today.getDate()-30); const daily={}, annual={}; for(let i=0;i<12;i++) annual[i]={t:0,o:0};
             data.forEach(r=>{ const rd=new Date(r.date); if(filterActive || (rd>=d30 && rd<=today)) { const k=r.date.substring(5); if(!daily[k]) daily[k]={t:0,o:0}; daily[k].t+=r.metrics.total; daily[k].o+=r.metrics.ok; } if(filterActive || rd.getFullYear()===today.getFullYear()){ annual[rd.getMonth()].t+=r.metrics.total; annual[rd.getMonth()].o+=r.metrics.ok; } });
             
+            // LOGIKA WARNA DINAMIS (REVISI)
+            const typeFilter = document.getElementById('filter-type') ? document.getElementById('filter-type').value : '';
+            
             const getColor = (val) => {
-                if (val < 93) return '#dc2626'; // Red
-                if (val < 95) return '#d97706'; // Yellow/Orange
-                return '#059669'; // Green
+                if (typeFilter === 'Pickup') {
+                    // Standar Pickup
+                    if (val < 93) return '#dc2626'; // Merah (< 93%)
+                    if (val <= 95) return '#d97706'; // Kuning (93% - 95%)
+                    return '#059669'; // Hijau (> 95%)
+                } else {
+                    // Standar Delivery (Default)
+                    if (val < 95) return '#dc2626'; // Merah (< 95%)
+                    if (val <= 96.3) return '#d97706'; // Kuning (95% - 96.3%)
+                    return '#059669'; // Hijau (> 96.3%)
+                }
             };
 
             const commonOptions = { 
@@ -1340,7 +1351,51 @@
                 scales: { y: { display: false }, x: { grid: { display: false } }, y1: { display: false, grid: {drawOnChartArea: false} } } 
             };
             
-            const draw = (id, labels, dTot, dOk) => { const cv = document.getElementById(id); if(!cv) return; const ctx = cv.getContext('2d'); if(window.appState[id]) window.appState[id].destroy(); window.appState[id] = new Chart(ctx, { type: 'bar', plugins: [ChartDataLabels], data: { labels: labels, datasets: [ { label:'Tot', data: dTot, backgroundColor:'#818cf8', borderRadius: 4, order:2, datalabels:{anchor:'end', align:'end', offset: -4} }, { type:'line', label:'%OK', data: dOk, borderColor:'#34d399', borderWidth:2, pointRadius:3, order:1, datalabels:{color:'white', align:'top', offset: 4, formatter:(v)=>Math.round(v)+'%'} } ] }, options: commonOptions }); };
+            const draw = (id, labels, dTot, dOk) => { 
+                const cv = document.getElementById(id); if(!cv) return; const ctx = cv.getContext('2d'); 
+                if(window.appState[id]) window.appState[id].destroy(); 
+                
+                window.appState[id] = new Chart(ctx, { 
+                    type: 'bar', 
+                    plugins: [ChartDataLabels], 
+                    data: { 
+                        labels: labels, 
+                        datasets: [ 
+                            { 
+                                label:'Tot', 
+                                data: dTot, 
+                                backgroundColor:'#818cf8', 
+                                borderRadius: 4, 
+                                order:2, 
+                                datalabels:{anchor:'end', align:'end', offset: -4} 
+                            }, 
+                            { 
+                                type:'line', 
+                                label:'%OK', 
+                                data: dOk, 
+                                // Warna Garis Dinamis (Segment)
+                                segment: {
+                                    borderColor: ctx => getColor(ctx.p1.parsed.y)
+                                },
+                                // Fallback color
+                                borderColor: '#94a3b8',
+                                pointBackgroundColor: (ctx) => getColor(ctx.raw), // Warna Titik
+                                pointBorderColor: '#fff',
+                                borderWidth:2, 
+                                pointRadius:4, 
+                                order:1, 
+                                datalabels:{
+                                    color:'white', 
+                                    align:'top', 
+                                    offset: 4, 
+                                    formatter:(v)=>Math.round(v)+'%'
+                                } 
+                            } 
+                        ] 
+                    }, 
+                    options: commonOptions 
+                }); 
+            };
             
             const dKeys = Object.keys(daily).sort(); draw('chartDaily', dKeys, dKeys.map(k=>daily[k].t), dKeys.map(k=>daily[k].t?(daily[k].o/daily[k].t*100):0)); draw('chartAnnual', MONTH_NAMES, Object.values(annual).map(x=>x.t), Object.values(annual).map(x=>x.t?(x.o/x.t*100):0));
         };
