@@ -607,6 +607,111 @@
                     }, 3000); 
                 };
 
+                // --- UI HANDLERS (MISSING RESTORED) ---
+                window.switchLoginMode = (mode) => {
+                    window.appState.loginMode = mode;
+                    const tabBg = document.getElementById('login-tab-bg');
+                    const tabUser = document.getElementById('tab-user');
+                    const tabAdmin = document.getElementById('tab-admin');
+                    const fieldUser = document.getElementById('field-username');
+                    const btnText = document.getElementById('btn-login-text');
+
+                    if(mode === 'user') {
+                        tabBg.style.transform = 'translateX(0)';
+                        tabUser.classList.replace('text-slate-400', 'text-brand-600');
+                        tabAdmin.classList.replace('text-brand-600', 'text-slate-400');
+                        fieldUser.classList.remove('hidden', 'opacity-0', 'h-0'); fieldUser.classList.add('opacity-100', 'h-auto');
+                        document.getElementById('login-username').required = true; btnText.innerText = "Masuk Aplikasi";
+                    } else {
+                        tabBg.style.transform = 'translateX(100%)';
+                        tabUser.classList.replace('text-brand-600', 'text-slate-400');
+                        tabAdmin.classList.replace('text-slate-400', 'text-brand-600');
+                        fieldUser.classList.remove('opacity-100', 'h-auto'); fieldUser.classList.add('opacity-0', 'h-0');
+                        setTimeout(() => fieldUser.classList.add('hidden'), 300);
+                        document.getElementById('login-username').required = false; btnText.innerText = "Masuk Admin";
+                    }
+                };
+
+                window.handleLogout = () => {
+                    if(window.appState.unsubscribeReports) window.appState.unsubscribeReports();
+                    if(window.appState.unsubscribeUsers) window.appState.unsubscribeUsers();
+                    if(window.appState.unsubscribeSettings) window.appState.unsubscribeSettings();
+                    window.appState.appProfile = null;
+                    document.getElementById('reportForm').reset();
+                    window.cancelEdit();
+                    document.getElementById('app-layout').classList.add('hidden-section');
+                    document.getElementById('section-login').classList.remove('hidden');
+                    document.getElementById('section-login').style.display = 'flex';
+                    document.getElementById('login-username').value = '';
+                    document.getElementById('login-password').value = '';
+                    window.switchLoginMode('user');
+                };
+
+                window.switchTab = (tabName) => {
+                    if(tabName === 'settings' && window.appState.appProfile?.role !== 'admin') {
+                        window.showToast("Akses hanya untuk Admin!", true);
+                        return;
+                    }
+
+                    ['form', 'dashboard', 'settings', 'recap'].forEach(t => {
+                        const sec = document.getElementById(`section-${t}`);
+                        const btn = document.getElementById(`nav-${t}`);
+                        if(t === tabName) {
+                            sec.classList.remove('hidden-section');
+                            if(btn) btn.classList.add('active-tab'); 
+                            if(tabName === 'dashboard') {
+                                document.getElementById('welcome-banner').classList.remove('hidden-section');
+                                updateDashboard();
+                            } else if(tabName === 'recap') {
+                                document.getElementById('welcome-banner').classList.add('hidden-section');
+                                updateRecapTable();
+                            } else {
+                                document.getElementById('welcome-banner').classList.add('hidden-section');
+                            }
+                        } else {
+                            sec.classList.add('hidden-section');
+                            if(btn) btn.classList.remove('active-tab'); 
+                        }
+                    });
+                };
+
+                window.resetFilters = () => { ['filter-date-start', 'filter-date-end', 'filter-staging', 'filter-service', 'filter-type'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; }); window.updateDashboard(); };
+                window.calcTotal = (svc) => { const ok = window.getRawValue(`input-${svc}-ok`); const prog = window.getRawValue(`input-${svc}-prog`); const missHr = window.getRawValue(`input-${svc}-miss-hr`); const miss = window.getRawValue(`input-${svc}-miss`); const claim = window.getRawValue(`input-${svc}-claim`); const total = ok + prog + missHr + miss + claim; document.getElementById(`input-${svc}-total`).value = total > 0 ? new Intl.NumberFormat('id-ID').format(total) : ''; };
+                window.autoFillAdminData = () => {
+                    const staging = document.getElementById('input-staging-admin').value; const areaIn = document.getElementById('input-area-admin'); const leaderIn = document.getElementById('input-leader-admin');
+                    if(staging && window.appState.stagingMap && window.appState.stagingMap[staging]) { const info = window.appState.stagingMap[staging]; areaIn.value = info.area; leaderIn.value = info.leader; } else { areaIn.value = ''; leaderIn.value = ''; }
+                };
+                window.openUserModal = (id = null, uName = '', uPass = '', uArea = '', uStg = '', uLead = '', uRole = 'user') => {
+                    document.getElementById('userModal').classList.remove('hidden'); const content = document.getElementById('userModalContent'); content.classList.remove('scale-95'); content.classList.add('scale-100');
+                    document.getElementById('edit-user-id').value = id || ''; document.getElementById('modalTitle').innerText = id ? 'Edit User' : 'Tambah User'; document.getElementById('modal-username').value = uName; document.getElementById('modal-username').disabled = !!id; document.getElementById('modal-password').value = uPass; document.getElementById('modal-area').value = uArea; document.getElementById('modal-staging').value = uStg; document.getElementById('modal-leader').value = uLead; document.getElementById('modal-role').value = uRole;
+                };
+                window.closeUserModal = () => { const content = document.getElementById('userModalContent'); content.classList.remove('scale-100'); content.classList.add('scale-95'); setTimeout(() => { document.getElementById('userModal').classList.add('hidden'); document.getElementById('userForm').reset(); }, 200); };
+                window.deleteUser = async (id) => { 
+                    window.showConfirm("Hapus User?", "Tindakan ini tidak dapat dibatalkan.", async () => {
+                        await deleteDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users', id)); window.showToast("User dihapus."); 
+                    });
+                };
+                window.editUser = (id, uname, pass, area, stg, lead, role) => { window.openUserModal(id, uname, pass, area, stg, lead, role); };
+                
+                window.saveAdminFirstTime = async () => {
+                    const newPass = document.getElementById('setup-new-pass').value;
+                    if(newPass.length < 6) return window.showToast("Password minimal 6 karakter", true);
+                    const btn = document.getElementById('btn-save-setup'); btn.disabled = true; btn.innerText = "Menyimpan...";
+                    try {
+                        const colRef = collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users');
+                        const qAdmin = query(colRef, where("role", "==", "admin"));
+                        const snap = await getDocs(qAdmin);
+                        let profile = { username: 'admin', role: 'admin', name: 'Administrator', area: 'HQ', staging: 'HQ', leader: 'SuperAdmin', password: newPass, createdAt: serverTimestamp() };
+                        if (!snap.empty) { const docId = snap.docs[0].id; await updateDoc(doc(colRef, docId), { password: newPass }); profile = { ...snap.docs[0].data(), id: docId, password: newPass, role: 'admin' }; } 
+                        else { const ref = await addDoc(colRef, profile); profile.id = ref.id; }
+                        window.appState.appProfile = profile;
+                        document.getElementById('setup-admin-modal').classList.add('hidden');
+                        finishLogin();
+                        switchTab('settings');
+                        window.showToast("Password berhasil dibuat. Selamat Datang!");
+                    } catch(e) { console.error(e); window.showToast("Gagal menyimpan password", true); btn.disabled = false; btn.innerText = "Simpan Password"; }
+                };
+
                 // --- HELPER FUNCTION DEFINITIONS (INTERNAL & EXTERNAL) ---
                 function generateBulkTable() {
                     const tbody = document.getElementById('bulk-input-body'); 
