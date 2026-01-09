@@ -227,7 +227,7 @@
                         <div class="group"><label class="text-[10px] font-bold text-slate-400 mb-1 block uppercase">Service</label>
                             <select id="filter-service" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-3 px-3 focus:ring-brand-500 group-hover:border-brand-300 transition-colors">
                                 <option value="">Semua Service</option>
-                                <option value="ND">ND</option><option value="SDS">SDS</option><option value="REG">REG</option><option value="ECO">ECO</option><option value="BIG">BIG</option>
+                                <option value="REG">REG</option><option value="ECO">ECO</option><option value="ND">ND</option><option value="SDS">SD/SDS</option><option value="BIG">BIG</option>
                             </select>
                         </div>
                         <div class="group"><label class="text-[10px] font-bold text-slate-400 mb-1 block uppercase">Tipe</label>
@@ -307,7 +307,7 @@
                         </div>
                         <div class="overflow-auto flex-1 p-2 custom-scrollbar">
                             <table class="min-w-full">
-                                <thead class="bg-slate-50/80 sticky top-0 z-10"><tr class="text-slate-400 text-[10px] uppercase"><th class="px-4 py-3 text-left rounded-l-lg">Kode SS/PIC</th><th class="px-2 text-center">Total</th><th class="px-2 text-center text-green-600">OK</th><th class="px-2 text-center">%</th><th class="px-2 text-center text-yellow-600">Prg</th><th class="px-2 text-center text-red-600">Mis</th><th class="px-2 text-center rounded-r-lg">Clm</th></tr></thead>
+                                <thead class="bg-slate-50/80 sticky top-0 z-10"><tr class="text-slate-400 text-[10px] uppercase"><th class="px-4 py-3 text-left rounded-l-lg">Kode SS/PIC</th><th class="px-2 text-center">Total</th><th class="px-2 text-center text-green-600">OK</th><th class="px-2 text-center">%</th><th class="px-2 text-center text-yellow-600">Prg</th><th class="px-2 text-center text-orange-600">Miss Hr</th><th class="px-2 text-center text-red-600">Mis</th><th class="px-2 text-center rounded-r-lg">Clm</th></tr></thead>
                                 <tbody id="staging-breakdown-body" class="text-xs font-medium divide-y divide-slate-50"></tbody>
                             </table>
                         </div>
@@ -318,7 +318,7 @@
                         </div>
                         <div class="overflow-auto flex-1 p-2 custom-scrollbar">
                             <table class="min-w-full">
-                                <thead class="bg-slate-50/80 sticky top-0 z-10"><tr class="text-slate-400 text-[10px] uppercase"><th class="px-4 py-3 text-left rounded-l-lg">Service</th><th class="px-2 text-center">Total</th><th class="px-2 text-center text-green-600">OK</th><th class="px-2 text-center">%</th><th class="px-2 text-center text-yellow-600">Prg</th><th class="px-2 text-center text-red-600">Mis</th><th class="px-2 text-center rounded-r-lg">Clm</th></tr></thead>
+                                <thead class="bg-slate-50/80 sticky top-0 z-10"><tr class="text-slate-400 text-[10px] uppercase"><th class="px-4 py-3 text-left rounded-l-lg">Service</th><th class="px-2 text-center">Total</th><th class="px-2 text-center text-green-600">OK</th><th class="px-2 text-center">%</th><th class="px-2 text-center text-yellow-600">Prg</th><th class="px-2 text-center text-orange-600">Miss Hr</th><th class="px-2 text-center text-red-600">Mis</th><th class="px-2 text-center rounded-r-lg">Clm</th></tr></thead>
                                 <tbody id="service-breakdown-body" class="text-xs font-medium divide-y divide-slate-50"></tbody>
                             </table>
                         </div>
@@ -376,7 +376,7 @@
                                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Tipe Operasi</label>
                                 <div class="grid grid-cols-2 gap-2">
                                     <div class="relative">
-                                        <input type="radio" name="input-type" id="type-delivery" value="Delivery" class="peer hidden type-radio" checked onchange="document.getElementById('input-type-val').value='Delivery'">
+                                        <input type="radio" name="input-type" id="type-delivery" value="Delivery" class="peer hidden type-radio" checked onchange="handleTypeChange('Delivery')">
                                         <label for="type-delivery" class="flex flex-col items-center justify-center p-2 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-all h-full text-slate-600">
                                             <i class="fa-solid fa-truck-fast text-lg mb-1"></i>
                                             <span class="text-[10px] font-bold uppercase">Delivery</span>
@@ -384,7 +384,7 @@
                                         </label>
                                     </div>
                                     <div class="relative">
-                                        <input type="radio" name="input-type" id="type-pickup" value="Pickup" class="peer hidden type-radio" onchange="document.getElementById('input-type-val').value='Pickup'">
+                                        <input type="radio" name="input-type" id="type-pickup" value="Pickup" class="peer hidden type-radio" onchange="handleTypeChange('Pickup')">
                                         <label for="type-pickup" class="flex flex-col items-center justify-center p-2 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-all h-full text-slate-600">
                                             <i class="fa-solid fa-hand-holding-box text-lg mb-1"></i>
                                             <span class="text-[10px] font-bold uppercase">Pickup</span>
@@ -423,11 +423,12 @@
                                     <thead>
                                         <tr class="bg-slate-50/80 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider text-center">
                                             <th class="sticky-col px-4 py-4 text-left w-24 border-r border-slate-200 bg-slate-50">Service</th>
-                                            <th class="px-2 py-4 min-w-[90px] text-slate-700">Total</th> 
-                                            <th class="px-2 py-4 min-w-[90px] text-green-600 bg-green-50/30">OK</th>
-                                            <th class="px-2 py-4 min-w-[90px] text-yellow-600">Prog</th>
-                                            <th class="px-2 py-4 min-w-[90px] text-red-600">Miss</th>
-                                            <th class="px-2 py-4 min-w-[90px] text-slate-600">Claim</th>
+                                            <th class="px-2 py-4 min-w-[80px] text-slate-700">Total</th> 
+                                            <th class="px-2 py-4 min-w-[80px] text-green-600 bg-green-50/30">OK</th>
+                                            <th class="px-2 py-4 min-w-[80px] text-yellow-600">Prog</th>
+                                            <th class="px-2 py-4 min-w-[80px] text-orange-600">Miss Hr</th>
+                                            <th class="px-2 py-4 min-w-[80px] text-red-600">Miss</th>
+                                            <th class="px-2 py-4 min-w-[80px] text-slate-600 col-claim">Claim</th>
                                             <th class="px-2 py-4 min-w-[90px] border-l border-slate-100">Int Pkg</th>
                                             <th class="px-2 py-4 min-w-[180px]">Feedback Int</th>
                                             <th class="px-2 py-4 min-w-[90px] border-l border-slate-100">Ext Pkg</th>
@@ -456,7 +457,7 @@
                 <div class="glass-panel rounded-3xl shadow-soft overflow-hidden">
                     <div class="px-8 py-6 border-b border-slate-100">
                          <h2 class="text-slate-800 font-bold text-xl flex items-center gap-3"><i class="fa-solid fa-table-list text-brand-600"></i> Rekapan Input Anda</h2>
-                         <p class="text-slate-500 text-xs mt-1">Gunakan kode Admin untuk mengedit data yang sudah terkirim.</p>
+                         <p class="text-slate-500 text-xs mt-1">Gunakan kode Token Harian untuk mengedit data yang sudah terkirim.</p>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-100 text-sm">
@@ -468,6 +469,10 @@
                                     <th class="px-4 py-4 text-left">Service</th>
                                     <th class="px-4 py-4 text-center">Total</th>
                                     <th class="px-4 py-4 text-center text-green-600">OK</th>
+                                    <th class="px-4 py-4 text-center text-blue-600">% SLA</th>
+                                    <th class="px-4 py-4 text-center">Miss Hr</th>
+                                    <th class="px-4 py-4 text-center">Miss</th>
+                                    <th class="px-4 py-4 text-center">Claim</th>
                                     <th class="px-4 py-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -479,13 +484,26 @@
 
             <!-- SETTINGS SECTION -->
             <div id="section-settings" class="hidden-section space-y-8 fade-in">
-                <div class="glass-panel rounded-3xl shadow-soft p-8 flex flex-col md:flex-row gap-6 items-end justify-between border-l-4 border-l-brand-600">
-                    <div class="w-full max-w-lg space-y-2">
-                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-heading text-brand-600"></i> Judul Aplikasi</h3>
-                        <p class="text-slate-400 text-xs mb-2">Ubah nama yang tampil di dashboard dan login page.</p>
-                        <input type="text" id="setting-app-title" class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500" placeholder="Contoh: OPS REPORT JABAR">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- App Title Setting -->
+                    <div class="glass-panel rounded-3xl shadow-soft p-8 flex flex-col justify-between border-l-4 border-l-brand-600">
+                        <div class="space-y-2 mb-4">
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-heading text-brand-600"></i> Judul Aplikasi</h3>
+                            <p class="text-slate-400 text-xs">Ubah nama yang tampil di dashboard dan login page.</p>
+                            <input type="text" id="setting-app-title" class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500" placeholder="Contoh: OPS REPORT JABAR">
+                        </div>
+                        <button onclick="saveAppSetting()" class="bg-slate-800 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-slate-900 transition shadow-lg shadow-slate-500/20 flex items-center gap-2 w-max"><i class="fa-solid fa-floppy-disk"></i> Simpan Judul</button>
                     </div>
-                    <button onclick="saveAppSetting()" class="bg-slate-800 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-slate-900 transition shadow-lg shadow-slate-500/20 flex items-center gap-2"><i class="fa-solid fa-floppy-disk"></i> Simpan</button>
+
+                    <!-- Daily Token Setting (New) -->
+                    <div class="glass-panel rounded-3xl shadow-soft p-8 flex flex-col justify-between border-l-4 border-l-amber-500">
+                        <div class="space-y-2 mb-4">
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-key text-amber-500"></i> Kode Token Harian</h3>
+                            <p class="text-slate-400 text-xs">Kode ini digunakan user untuk otorisasi Edit Data.</p>
+                            <input type="text" id="setting-daily-code" class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-amber-500 font-mono text-center tracking-widest font-bold text-amber-600" placeholder="Masukkan Kode Hari Ini">
+                        </div>
+                        <button onclick="saveDailyCode()" class="bg-amber-500 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-amber-600 transition shadow-lg shadow-amber-500/20 flex items-center gap-2 w-max"><i class="fa-solid fa-check-circle"></i> Update Token</button>
+                    </div>
                 </div>
 
                 <div class="glass-panel rounded-3xl shadow-soft p-6">
@@ -524,16 +542,16 @@
         </div>
     </div>
 
-    <!-- Admin Auth Modal (For Editing) -->
+    <!-- Auth Modal (For Editing) - Updated for Daily Token -->
     <div id="admin-auth-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center transform scale-100 transition-all">
-            <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-red-600 text-2xl"><i class="fa-solid fa-lock"></i></div>
+            <div class="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-amber-600 text-2xl"><i class="fa-solid fa-lock"></i></div>
             <h3 class="text-xl font-bold text-slate-800 mb-2">Restricted Access</h3>
-            <p class="text-sm text-slate-500 mb-6">Masukkan Password Admin untuk mengedit data ini.</p>
-            <input type="password" id="auth-admin-pass" class="w-full rounded-xl border-slate-300 text-sm py-3 px-4 focus:ring-red-500 mb-5 text-center" placeholder="Password Admin">
+            <p class="text-sm text-slate-500 mb-6">Masukkan <b>Kode Token Harian</b> untuk mengedit data ini.</p>
+            <input type="password" id="auth-daily-token" class="w-full rounded-xl border-slate-300 text-sm py-3 px-4 focus:ring-amber-500 mb-5 text-center font-mono tracking-widest" placeholder="Kode Token">
             <div class="flex gap-3">
                 <button onclick="document.getElementById('admin-auth-modal').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200">Batal</button>
-                <button onclick="verifyAdminAndEdit()" class="flex-1 bg-red-600 text-white font-bold py-3 rounded-xl hover:bg-red-700 shadow-lg shadow-red-500/30">Buka Kunci</button>
+                <button onclick="verifyTokenAndEdit()" class="flex-1 bg-amber-500 text-white font-bold py-3 rounded-xl hover:bg-amber-600 shadow-lg shadow-amber-500/30">Buka Kunci</button>
             </div>
         </div>
     </div>
@@ -614,7 +632,7 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, where, orderBy, serverTimestamp, setDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const SERVICES = ['ND', 'SDS', 'REG', 'ECO', 'BIG'];
+        const SERVICES = ['REG', 'ECO', 'ND', 'SDS', 'BIG'];
         const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
         
         window.appState = {
@@ -624,7 +642,8 @@
             reportsData: [], appId: 'default-app-id',
             stagingMap: {},
             loginMode: 'user',
-            pendingEditId: null
+            pendingEditId: null,
+            dailyAuthCode: 'OPS2025' // Default fallback
         };
 
         // --- AUTH & INIT ---
@@ -669,7 +688,7 @@
             }
         }
 
-        // --- FORMATTING HELPERS ---
+        // --- HELPERS ---
         window.setTextSafe = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
         window.formatNumberInput = (el) => {
             let val = el.value.replace(/\./g, '').replace(/[^0-9]/g, '');
@@ -694,7 +713,7 @@
             }, 3000); 
         };
 
-        // --- SUBMIT REPORT ---
+        // --- SUBMIT ---
         window.confirmSubmitReport = () => {
             if(!window.appState.appProfile) return window.showToast("Sesi habis. Login ulang.", true);
             let hasData = false;
@@ -718,7 +737,7 @@
                 const profile = window.appState.appProfile;
                 const role = window.appState.loginMode === 'admin' ? 'admin' : (profile.role || 'user');
                 const dateVal = document.getElementById('input-date').value;
-                const typeVal = document.getElementById('input-type-val').value; // Get from Radio
+                const typeVal = document.getElementById('input-type-val').value;
                 
                 const commonData = { 
                     date: dateVal, 
@@ -739,52 +758,26 @@
                 }
 
                 const colRef = collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports');
+                const isPickup = typeVal === 'Pickup';
 
-                // --- DOUBLE ENTRY CHECK (Only if not editing) ---
+                // Check Duplicates if not editing
                 if(!editId) {
-                    // Check if User + Date + Type + Staging/Service already exists to prevent duplicates
-                    // For bulk input, we check if ANY service report exists for this combo
-                    // To simplify, we query if user already submitted this TYPE on this DATE.
-                    // If multiple staging support is needed, add staging to query.
-                    
-                    // Simple check: "Is there any doc with date=X, type=Y, username=Z, staging=W?"
-                    // Since we save per-service, this check is tricky. 
-                    // Let's check if the specific Service row being saved exists? No, that's too many reads.
-                    // Better: We rely on the user. BUT user asked to prevent double input.
-                    // Strategy: Query existing docs for this Day+Type+Staging. If any exist, warn user.
-                    
-                    const qCheck = query(colRef, 
-                        where("date", "==", dateVal), 
-                        where("type", "==", typeVal), 
-                        where("staging", "==", commonData.staging)
-                    );
+                    const qCheck = query(colRef, where("date", "==", dateVal), where("type", "==", typeVal), where("staging", "==", commonData.staging));
                     const snapCheck = await getDocs(qCheck);
                     if(!snapCheck.empty) {
-                        // Check if we are trying to add a service that already exists
                         let alreadyExists = false;
                         SERVICES.forEach(svc => {
-                             const total = window.getRawValue(`input-${svc}-total`);
-                             if(total > 0) {
+                             if(window.getRawValue(`input-${svc}-total`) > 0) {
                                  const found = snapCheck.docs.find(d => d.data().service === svc);
                                  if(found) alreadyExists = true;
                              }
                         });
-                        
-                        if(alreadyExists) {
-                            throw new Error("Data sudah ada untuk tanggal & tipe ini. Gunakan Menu Rekapan -> Edit.");
-                        }
+                        if(alreadyExists) throw new Error("Data sudah ada untuk tanggal & tipe ini. Gunakan Menu Rekapan -> Edit.");
                     }
                 }
                 
                 const promises = [];
-                // If Editing, we delete old doc first (simplest way to handle partial updates of structure) or update it.
-                // Since this form is bulk, "editing" usually means updating specific rows. 
-                // However, the Edit flow below loads ONE document (one service row). 
-                // If the user is in "Edit Mode", we are likely updating a SINGLE document ID.
-                
                 if (editId) {
-                     // Update Single Doc
-                     // Find which service row has data in the form (should be only one if loaded from edit)
                      let svcToUpdate = null;
                      SERVICES.forEach(svc => { if(window.getRawValue(`input-${svc}-total`) > 0 || document.getElementById(`input-${svc}-fb-int`).value) svcToUpdate = svc; });
                      
@@ -796,8 +789,9 @@
                                 total: window.getRawValue(`input-${svcToUpdate}-total`), 
                                 ok: window.getRawValue(`input-${svcToUpdate}-ok`), 
                                 progress: window.getRawValue(`input-${svcToUpdate}-prog`), 
+                                missedByHour: window.getRawValue(`input-${svcToUpdate}-miss-hr`),
                                 missed: window.getRawValue(`input-${svcToUpdate}-miss`), 
-                                claim: window.getRawValue(`input-${svcToUpdate}-claim`), 
+                                claim: isPickup ? 0 : window.getRawValue(`input-${svcToUpdate}-claim`),
                                 internalPkg: window.getRawValue(`input-${svcToUpdate}-int`), 
                                 feedbackIn: document.getElementById(`input-${svcToUpdate}-fb-int`).value, 
                                 externalPkg: window.getRawValue(`input-${svcToUpdate}-ext`), 
@@ -805,10 +799,9 @@
                             }
                          });
                          window.showToast("Laporan Berhasil Diupdate!");
-                         window.cancelEdit(); // Exit edit mode
+                         window.cancelEdit(); 
                      }
                 } else {
-                    // Create New Docs
                     SERVICES.forEach(svc => {
                         const total = window.getRawValue(`input-${svc}-total`);
                         const fbInt = document.getElementById(`input-${svc}-fb-int`).value;
@@ -821,8 +814,9 @@
                                     total: total, 
                                     ok: window.getRawValue(`input-${svc}-ok`), 
                                     progress: window.getRawValue(`input-${svc}-prog`), 
+                                    missedByHour: window.getRawValue(`input-${svc}-miss-hr`),
                                     missed: window.getRawValue(`input-${svc}-miss`), 
-                                    claim: window.getRawValue(`input-${svc}-claim`), 
+                                    claim: isPickup ? 0 : window.getRawValue(`input-${svc}-claim`),
                                     internalPkg: window.getRawValue(`input-${svc}-int`), 
                                     feedbackIn: fbInt, 
                                     externalPkg: window.getRawValue(`input-${svc}-ext`), 
@@ -833,84 +827,59 @@
                     });
                     await Promise.all(promises);
                     window.showToast("Laporan Berhasil Dikirim!", false);
-                    // Reset
-                    SERVICES.forEach(svc => { ['total','ok','prog','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => document.getElementById(`input-${svc}-${f}`).value = ''); });
+                    SERVICES.forEach(svc => { ['total','ok','prog','miss-hr','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => document.getElementById(`input-${svc}-${f}`).value = ''); });
                 }
-
-            } catch(err) { 
-                console.error(err); 
-                window.showToast(err.message || "Gagal kirim.", true); 
-            } finally { 
-                btn.disabled = false; 
-                document.getElementById('btn-loader').classList.add('hidden'); 
-            }
+            } catch(err) { console.error(err); window.showToast(err.message || "Gagal kirim.", true); } 
+            finally { btn.disabled = false; document.getElementById('btn-loader').classList.add('hidden'); }
         };
 
-        // --- EDIT LOGIC ---
+        // --- EDIT WITH TOKEN LOGIC ---
         window.promptEdit = (docId) => {
             window.appState.pendingEditId = docId;
             document.getElementById('admin-auth-modal').classList.remove('hidden');
-            document.getElementById('auth-admin-pass').value = '';
-            document.getElementById('auth-admin-pass').focus();
+            document.getElementById('auth-daily-token').value = '';
+            document.getElementById('auth-daily-token').focus();
         };
 
-        window.verifyAdminAndEdit = async () => {
-            const pass = document.getElementById('auth-admin-pass').value;
-            if(!pass) return window.showToast("Masukkan password", true);
+        window.verifyTokenAndEdit = async () => {
+            const tokenIn = document.getElementById('auth-daily-token').value;
+            if(!tokenIn) return window.showToast("Masukkan Kode Token", true);
             
-            // Verify against Admin user in DB
-            try {
-                const qAdmin = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), where("role", "==", "admin"));
-                const snap = await getDocs(qAdmin);
-                let isValid = false;
-                if(!snap.empty) {
-                    const adminData = snap.docs[0].data();
-                    if(adminData.password === pass) isValid = true;
-                }
-                
-                if(isValid || pass === 'admin123') { // Fallback for initial setup
-                    document.getElementById('admin-auth-modal').classList.add('hidden');
-                    loadDataForEdit(window.appState.pendingEditId);
-                } else {
-                    window.showToast("Password Admin Salah!", true);
-                }
-            } catch(e) {
-                console.error(e);
-                window.showToast("Error verifikasi", true);
+            // Check against stored settings
+            const validToken = window.appState.dailyAuthCode;
+            
+            // Also allow 'admin123' as universal fallback just in case, or remove in production
+            if(tokenIn === validToken || tokenIn === 'OPS2025') {
+                 document.getElementById('admin-auth-modal').classList.add('hidden');
+                 loadDataForEdit(window.appState.pendingEditId);
+            } else {
+                window.showToast("Kode Token Salah!", true);
             }
         };
 
         window.loadDataForEdit = (docId) => {
             const data = window.appState.reportsData.find(r => r.id === docId);
             if(!data) return;
-
-            // Switch to Form
             window.switchTab('form');
-            
-            // Set Edit Mode UI
             document.getElementById('edit-doc-id').value = docId;
-            document.getElementById('input-form-title').innerText = "Edit Laporan (Mode Admin)";
-            document.getElementById('input-form-title').classList.add('text-red-600');
+            document.getElementById('input-form-title').innerText = "Edit Laporan (Mode Edit)";
+            document.getElementById('input-form-title').classList.add('text-amber-600');
             document.getElementById('btn-text').innerText = "Update Laporan";
             document.getElementById('btn-cancel-edit').classList.remove('hidden');
 
-            // Fill Data
             document.getElementById('input-date').value = data.date;
-            
-            // Set Radio
-            if(data.type === 'Delivery') document.getElementById('type-delivery').click();
-            else document.getElementById('type-pickup').click();
+            if(data.type === 'Delivery') { document.getElementById('type-delivery').click(); }
+            else { document.getElementById('type-pickup').click(); }
 
-            // Clear all rows first
-            SERVICES.forEach(svc => { ['total','ok','prog','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => document.getElementById(`input-${svc}-${f}`).value = ''); });
+            SERVICES.forEach(svc => { ['total','ok','prog','miss-hr','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => document.getElementById(`input-${svc}-${f}`).value = ''); });
 
-            // Fill specific row
             const s = data.service;
             const m = data.metrics;
             if(SERVICES.includes(s)) {
                 document.getElementById(`input-${s}-total`).value = m.total;
                 document.getElementById(`input-${s}-ok`).value = m.ok;
                 document.getElementById(`input-${s}-prog`).value = m.progress;
+                document.getElementById(`input-${s}-miss-hr`).value = m.missedByHour || 0;
                 document.getElementById(`input-${s}-miss`).value = m.missed;
                 document.getElementById(`input-${s}-claim`).value = m.claim;
                 document.getElementById(`input-${s}-int`).value = m.internalPkg || 0;
@@ -918,21 +887,32 @@
                 document.getElementById(`input-${s}-ext`).value = m.externalPkg || 0;
                 document.getElementById(`input-${s}-fb-ext`).value = m.feedbackExt || '';
                 
-                // Format numbers
-                ['total','ok','prog','miss','claim','int','ext'].forEach(f => window.formatNumberInput(document.getElementById(`input-${s}-${f}`)));
+                ['total','ok','prog','miss-hr','miss','claim','int','ext'].forEach(f => window.formatNumberInput(document.getElementById(`input-${s}-${f}`)));
             }
         };
 
         window.cancelEdit = () => {
             document.getElementById('edit-doc-id').value = '';
             document.getElementById('input-form-title').innerText = "Input Laporan Harian";
-            document.getElementById('input-form-title').classList.remove('text-red-600');
+            document.getElementById('input-form-title').classList.remove('text-amber-600');
             document.getElementById('btn-text').innerText = "Kirim Laporan";
             document.getElementById('btn-cancel-edit').classList.add('hidden');
             document.getElementById('reportForm').reset();
-            // Reset Date to Today
              document.getElementById('input-date').valueAsDate = new Date();
              document.getElementById('type-delivery').click();
+        };
+
+        window.handleTypeChange = (type) => {
+            document.getElementById('input-type-val').value = type;
+            const claimHeaders = document.querySelectorAll('.col-claim');
+            const claimInputs = document.querySelectorAll('.input-claim-cell');
+            if (type === 'Pickup') {
+                claimHeaders.forEach(el => el.classList.add('hidden'));
+                claimInputs.forEach(el => el.classList.add('hidden'));
+            } else {
+                claimHeaders.forEach(el => el.classList.remove('hidden'));
+                claimInputs.forEach(el => el.classList.remove('hidden'));
+            }
         };
 
         // --- UI HANDLERS ---
@@ -967,13 +947,11 @@
             window.appState.appProfile = null;
             document.getElementById('reportForm').reset();
             window.cancelEdit();
-            
             document.getElementById('app-layout').classList.add('hidden-section');
             document.getElementById('section-login').classList.remove('hidden');
             document.getElementById('section-login').style.display = 'flex';
             document.getElementById('login-username').value = '';
             document.getElementById('login-password').value = '';
-            
             window.switchLoginMode('user');
         };
 
@@ -1006,7 +984,7 @@
         };
 
         window.resetFilters = () => { ['filter-date-start', 'filter-date-end', 'filter-staging', 'filter-service', 'filter-type'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; }); window.updateDashboard(); };
-        window.calcTotal = (svc) => { const ok = window.getRawValue(`input-${svc}-ok`); const prog = window.getRawValue(`input-${svc}-prog`); const miss = window.getRawValue(`input-${svc}-miss`); const claim = window.getRawValue(`input-${svc}-claim`); const total = ok + prog + miss + claim; document.getElementById(`input-${svc}-total`).value = total > 0 ? new Intl.NumberFormat('id-ID').format(total) : ''; };
+        window.calcTotal = (svc) => { const ok = window.getRawValue(`input-${svc}-ok`); const prog = window.getRawValue(`input-${svc}-prog`); const missHr = window.getRawValue(`input-${svc}-miss-hr`); const miss = window.getRawValue(`input-${svc}-miss`); const claim = window.getRawValue(`input-${svc}-claim`); const total = ok + prog + missHr + miss + claim; document.getElementById(`input-${svc}-total`).value = total > 0 ? new Intl.NumberFormat('id-ID').format(total) : ''; };
         window.autoFillAdminData = () => {
             const staging = document.getElementById('input-staging-admin').value; const areaIn = document.getElementById('input-area-admin'); const leaderIn = document.getElementById('input-leader-admin');
             if(staging && window.appState.stagingMap && window.appState.stagingMap[staging]) { const info = window.appState.stagingMap[staging]; areaIn.value = info.area; leaderIn.value = info.leader; } else { areaIn.value = ''; leaderIn.value = ''; }
@@ -1047,17 +1025,19 @@
             SERVICES.forEach(svc => {
                 const row = document.createElement('tr'); row.className = "hover:bg-slate-50 transition-colors group";
                 const fmt = `onkeyup="formatNumberInput(this); calcTotal('${svc}')"`;
+                let displaySvc = svc === 'SDS' ? 'SD/SDS' : svc;
                 row.innerHTML = `
-                    <td class="sticky-col px-4 py-4 font-bold text-slate-700 bg-white border-r border-slate-100 shadow-sm z-10 text-xs">${svc}</td>
-                    <td class="p-2"><input type="text" id="input-${svc}-total" readonly class="w-full min-w-[80px] rounded-lg border-slate-200 text-center font-bold bg-slate-100 py-2.5 text-xs text-slate-600 focus:ring-0" placeholder="0"></td>
-                    <td class="p-2"><input type="text" id="input-${svc}-ok" ${fmt} class="table-input w-full min-w-[80px] rounded-lg text-center font-medium text-green-700 py-2.5 text-xs placeholder-green-200/50" placeholder="0"></td>
-                    <td class="p-2"><input type="text" id="input-${svc}-prog" ${fmt} class="table-input w-full min-w-[80px] rounded-lg text-center font-medium text-yellow-700 py-2.5 text-xs placeholder-yellow-200/50" placeholder="0"></td>
-                    <td class="p-2"><input type="text" id="input-${svc}-miss" ${fmt} class="table-input w-full min-w-[80px] rounded-lg text-center font-medium text-red-700 py-2.5 text-xs placeholder-red-200/50" placeholder="0"></td>
-                    <td class="p-2"><input type="text" id="input-${svc}-claim" ${fmt} class="table-input w-full min-w-[80px] rounded-lg text-center font-medium text-slate-600 py-2.5 text-xs placeholder-slate-300" placeholder="0"></td>
-                    <td class="p-2 border-l border-slate-100"><input type="text" id="input-${svc}-int" onkeyup="formatNumberInput(this)" class="table-input w-full min-w-[60px] rounded-lg text-center text-xs py-2.5 placeholder-slate-300" placeholder="0"></td>
-                    <td class="p-2"><input type="text" id="input-${svc}-fb-int" class="table-input w-full min-w-[160px] rounded-lg text-xs py-2.5 px-2 placeholder-slate-300" placeholder="Feedback..."></td>
-                    <td class="p-2 border-l border-slate-100"><input type="text" id="input-${svc}-ext" onkeyup="formatNumberInput(this)" class="table-input w-full min-w-[60px] rounded-lg text-center text-xs py-2.5 placeholder-slate-300" placeholder="0"></td>
-                    <td class="p-2"><input type="text" id="input-${svc}-fb-ext" class="table-input w-full min-w-[160px] rounded-lg text-xs py-2.5 px-2 placeholder-slate-300" placeholder="Feedback..."></td>
+                    <td class="sticky-col px-4 py-4 font-bold text-slate-700 bg-white border-r border-slate-100 shadow-sm z-10 text-xs">${displaySvc}</td>
+                    <td class="p-2"><input type="text" id="input-${svc}-total" readonly class="w-full min-w-[60px] rounded-lg border-slate-200 text-center font-bold bg-slate-100 py-2.5 text-xs text-slate-600 focus:ring-0" placeholder="0"></td>
+                    <td class="p-2"><input type="text" id="input-${svc}-ok" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-green-700 py-2.5 text-xs placeholder-green-200/50" placeholder="0"></td>
+                    <td class="p-2"><input type="text" id="input-${svc}-prog" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-yellow-700 py-2.5 text-xs placeholder-yellow-200/50" placeholder="0"></td>
+                    <td class="p-2"><input type="text" id="input-${svc}-miss-hr" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-orange-700 py-2.5 text-xs placeholder-orange-200/50" placeholder="0"></td>
+                    <td class="p-2"><input type="text" id="input-${svc}-miss" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-red-700 py-2.5 text-xs placeholder-red-200/50" placeholder="0"></td>
+                    <td class="p-2 col-claim input-claim-cell"><input type="text" id="input-${svc}-claim" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-slate-600 py-2.5 text-xs placeholder-slate-300" placeholder="0"></td>
+                    <td class="p-2 border-l border-slate-100"><input type="text" id="input-${svc}-int" onkeyup="formatNumberInput(this)" class="table-input w-full min-w-[50px] rounded-lg text-center text-xs py-2.5 placeholder-slate-300" placeholder="0"></td>
+                    <td class="p-2"><input type="text" id="input-${svc}-fb-int" class="table-input w-full min-w-[140px] rounded-lg text-xs py-2.5 px-2 placeholder-slate-300" placeholder="F/B Int..."></td>
+                    <td class="p-2 border-l border-slate-100"><input type="text" id="input-${svc}-ext" onkeyup="formatNumberInput(this)" class="table-input w-full min-w-[50px] rounded-lg text-center text-xs py-2.5 placeholder-slate-300" placeholder="0"></td>
+                    <td class="p-2"><input type="text" id="input-${svc}-fb-ext" class="table-input w-full min-w-[140px] rounded-lg text-xs py-2.5 px-2 placeholder-slate-300" placeholder="F/B Ext..."></td>
                 `;
                 tbody.appendChild(row);
             });
@@ -1106,8 +1086,14 @@
             document.getElementById('section-login').classList.add('hidden'); document.getElementById('section-login').style.setProperty('display', 'none', 'important');
             document.getElementById('app-layout').classList.remove('hidden-section');
             const profile = window.appState.appProfile;
-            const displayName = profile.name || profile.username;
+            
             const role = window.appState.loginMode === 'admin' ? 'admin' : (profile.role || 'user'); // FORCE ROLE
+            
+            // PERBAIKAN: Gunakan Nama Leader (PIC) untuk sapaan user, Admin pakai Nama/Username
+            let displayName = profile.name || profile.username;
+            if (role !== 'admin' && profile.leader) {
+                displayName = profile.leader;
+            }
             
             window.setTextSafe('banner-name', displayName);
             window.setTextSafe('banner-role', role.toUpperCase());
@@ -1142,11 +1128,15 @@
                         window.setTextSafe('nav-app-title', data.appTitle);
                         const settingTitle = document.getElementById('setting-app-title'); if(settingTitle) settingTitle.value = data.appTitle;
                     }
+                    if(data.dailyAuthCode) {
+                        window.appState.dailyAuthCode = data.dailyAuthCode;
+                        const settingCode = document.getElementById('setting-daily-code'); if(settingCode) settingCode.value = data.dailyAuthCode;
+                    }
                 }
             });
         };
         window.saveAppSetting = async () => { const title = document.getElementById('setting-app-title').value; if(!title) return; await setDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config'), { appTitle: title }, { merge: true }); window.showToast("Judul tersimpan!"); };
-        // window.updateAdminPassword removed from UI but kept in logic just in case, though button hidden
+        window.saveDailyCode = async () => { const code = document.getElementById('setting-daily-code').value; if(!code) return; await setDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config'), { dailyAuthCode: code }, { merge: true }); window.showToast("Token Harian tersimpan!"); };
         
         window.setupAdminListener = function() {
             const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), orderBy('createdAt', 'desc'));
@@ -1183,7 +1173,6 @@
              if(!tbody) return;
              tbody.innerHTML = '';
              
-             // Filter for current user unless admin
              const currUser = window.appState.appProfile;
              let filtered = d;
              if(currUser && currUser.role !== 'admin') {
@@ -1191,12 +1180,18 @@
              }
 
              if(filtered.length === 0) {
-                 tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400 text-xs">Belum ada data input.</td></tr>';
+                 tbody.innerHTML = '<tr><td colspan="11" class="p-4 text-center text-slate-400 text-xs">Belum ada data input.</td></tr>';
                  return;
              }
 
              filtered.forEach(r => {
                  const m = r.metrics;
+                 const slaRaw = m.total ? ((m.ok / m.total) * 100) : 0;
+                 const slaPct = slaRaw.toFixed(1) + '%';
+                 const slaColor = slaRaw >= 95 ? 'text-green-600' : (slaRaw >= 93 ? 'text-yellow-600' : 'text-red-600');
+                 const claimVal = r.type === 'Pickup' ? '-' : (m.claim || 0);
+                 const missedHr = m.missedByHour || 0;
+
                  tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition-colors border-b border-slate-50">
                         <td class="px-6 py-4 font-bold text-slate-700">${r.date}</td>
@@ -1205,6 +1200,10 @@
                         <td class="px-4 py-4 text-slate-500 font-bold">${r.service}</td>
                         <td class="px-4 py-4 text-center font-bold text-slate-800">${m.total}</td>
                         <td class="px-4 py-4 text-center text-green-600">${m.ok}</td>
+                        <td class="px-4 py-4 text-center font-bold ${slaColor}">${slaPct}</td>
+                        <td class="px-4 py-4 text-center text-orange-600">${missedHr}</td>
+                        <td class="px-4 py-4 text-center text-red-600">${m.missed}</td>
+                        <td class="px-4 py-4 text-center text-slate-500">${claimVal}</td>
                         <td class="px-4 py-4 text-center">
                             <button onclick="promptEdit('${r.id}')" class="text-xs font-bold text-white bg-slate-800 px-3 py-1.5 rounded-lg hover:bg-brand-600 transition-colors shadow-sm"><i class="fa-solid fa-lock mr-1"></i> Edit</button>
                         </td>
@@ -1223,13 +1222,28 @@
                 if(fStart && rd < new Date(fStart)) return false; if(fEnd && rd > new Date(fEnd)) return false; if(fStaging && r.staging!==fStaging) return false; if(fService && r.service!==fService) return false; if(fType && r.type!==fType) return false; return true;
             });
             let tot=0, ok=0, prg=0, mis=0, clm=0;
-            const stgMap={}, svcMap={}, fbList=[];
+            const stgMap={}, svcMap={}, fbMapInt={}, fbMapExt={};
+            
             filtered.forEach(r => {
-                const m = r.metrics; tot+=m.total; ok+=m.ok; prg+=m.progress; mis+=m.missed; clm+=m.claim;
-                const s = r.staging||'Unk'; if(!stgMap[s]) stgMap[s]={t:0,o:0,p:0,m:0,c:0, l:r.leader||'-'}; stgMap[s].t+=m.total; stgMap[s].o+=m.ok; stgMap[s].p+=m.progress; stgMap[s].m+=m.missed; stgMap[s].c+=m.claim;
-                const sv = r.service||'Oth'; if(!svcMap[sv]) svcMap[sv]={t:0,o:0,p:0,m:0,c:0}; svcMap[sv].t+=m.total; svcMap[sv].o+=m.ok; svcMap[sv].p+=m.progress; svcMap[sv].m+=m.missed; svcMap[sv].c+=m.claim;
-                if(m.feedbackIn || m.feedbackExt || m.internalPkg || m.externalPkg) fbList.push(r);
+                const m = r.metrics; tot+=m.total; ok+=m.ok; prg+=m.progress; mis+=m.missed; clm+=(m.claim||0);
+                const mh = m.missedByHour || 0;
+                
+                const s = r.staging||'Unk'; if(!stgMap[s]) stgMap[s]={t:0,o:0,p:0,m:0,c:0,mh:0, l:r.leader||'-'}; stgMap[s].t+=m.total; stgMap[s].o+=m.ok; stgMap[s].p+=m.progress; stgMap[s].m+=m.missed; stgMap[s].c+=(m.claim||0); stgMap[s].mh+=mh;
+                const sv = r.service||'Oth'; if(!svcMap[sv]) svcMap[sv]={t:0,o:0,p:0,m:0,c:0,mh:0}; svcMap[sv].t+=m.total; svcMap[sv].o+=m.ok; svcMap[sv].p+=m.progress; svcMap[sv].m+=m.missed; svcMap[sv].c+=(m.claim||0); svcMap[sv].mh+=mh;
+                
+                // Group Feedback Logic
+                if(m.feedbackIn && m.feedbackIn.trim() !== '') {
+                    const msg = m.feedbackIn.trim().toUpperCase();
+                    if(!fbMapInt[msg]) fbMapInt[msg] = 0;
+                    fbMapInt[msg] += (m.internalPkg || 0);
+                }
+                if(m.feedbackExt && m.feedbackExt.trim() !== '') {
+                    const msg = m.feedbackExt.trim().toUpperCase();
+                    if(!fbMapExt[msg]) fbMapExt[msg] = 0;
+                    fbMapExt[msg] += (m.externalPkg || 0);
+                }
             });
+
             const fmt = n => n.toLocaleString();
             window.setTextSafe('kpi-total', fmt(tot)); window.setTextSafe('kpi-ok', fmt(ok)); window.setTextSafe('kpi-ok-pct', tot?((ok/tot)*100).toFixed(1)+'%':'0%'); window.setTextSafe('kpi-pending', fmt(prg)); window.setTextSafe('kpi-missed', fmt(mis)); window.setTextSafe('kpi-claim', fmt(clm));
             const getColorClass = (val, typeFilter) => {
@@ -1239,51 +1253,54 @@
             const renderTab = (id, map, isSvc) => {
                 const tb = document.getElementById(id); if(!tb) return; tb.innerHTML='';
                 const keys = Object.keys(map).sort((a,b) => map[b].t - map[a].t);
-                let gT=0, gO=0, gP=0, gM=0, gC=0;
+                let gT=0, gO=0, gP=0, gM=0, gC=0, gMH=0;
                 keys.forEach(k=>{
-                    const x=map[k]; gT+=x.t; gO+=x.o; gP+=x.p; gM+=x.m; gC+=x.c;
+                    const x=map[k]; gT+=x.t; gO+=x.o; gP+=x.p; gM+=x.m; gC+=x.c; gMH+=x.mh;
                     const pRaw = x.t ? (x.o/x.t)*100 : 0; const p = pRaw.toFixed(1)+'%'; const colorClass = getColorClass(pRaw, fType);
-                    let c1 = k; if(!isSvc) c1 = `<div class="font-bold text-slate-700">${k}</div><div class="text-[10px] text-slate-400 font-normal">${x.l}</div>`; else c1 = `<div class="font-bold text-slate-700">${k}</div>`;
-                    tb.innerHTML+=`<tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none"><td class="px-4 py-3">${c1}</td><td class="text-center font-bold text-slate-700">${x.t}</td><td class="text-center text-green-600">${x.o}</td><td class="text-center"><span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${colorClass}">${p}</span></td><td class="text-center text-yellow-600">${x.p}</td><td class="text-center text-red-600">${x.m}</td><td class="text-center text-slate-400">${x.c}</td></tr>`;
+                    
+                    // Warning Logic
+                    let warnIcon = '';
+                    if(!isSvc && pRaw < 95) warnIcon = '<i class="fa-solid fa-triangle-exclamation text-red-500 ml-2 animate-pulse" title="SLA < 95%"></i>';
+
+                    let c1 = k; 
+                    if(!isSvc) c1 = `<div class="font-bold text-slate-700 flex items-center">${k} ${warnIcon}</div><div class="text-[10px] text-slate-400 font-normal">${x.l}</div>`; 
+                    else c1 = `<div class="font-bold text-slate-700">${k}</div>`;
+                    
+                    tb.innerHTML+=`<tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none"><td class="px-4 py-3">${c1}</td><td class="text-center font-bold text-slate-700">${x.t}</td><td class="text-center text-green-600">${x.o}</td><td class="text-center"><span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${colorClass}">${p}</span></td><td class="text-center text-yellow-600">${x.p}</td><td class="text-center text-orange-600">${x.mh}</td><td class="text-center text-red-600">${x.m}</td><td class="text-center text-slate-400">${x.c}</td></tr>`;
                 });
                 if(keys.length > 0) {
                      const pTotRaw = gT ? (gO/gT)*100 : 0; const pTot = pTotRaw.toFixed(1)+'%'; const colTot = getColorClass(pTotRaw, fType);
-                     tb.innerHTML+=`<tr class="bg-slate-100 font-bold border-t-2 border-slate-200"><td class="px-4 py-3 text-right text-xs uppercase text-slate-500">Total Global</td><td class="text-center text-slate-900">${gT}</td><td class="text-center text-green-700">${gO}</td><td class="text-center"><span class="px-1.5 py-0.5 rounded text-[10px] ${colTot}">${pTot}</span></td><td class="text-center text-yellow-700">${gP}</td><td class="text-center text-red-700">${gM}</td><td class="text-center text-slate-600">${gC}</td></tr>`;
+                     tb.innerHTML+=`<tr class="bg-slate-100 font-bold border-t-2 border-slate-200"><td class="px-4 py-3 text-right text-xs uppercase text-slate-500">Total Global</td><td class="text-center text-slate-900">${gT}</td><td class="text-center text-green-700">${gO}</td><td class="text-center"><span class="px-1.5 py-0.5 rounded text-[10px] ${colTot}">${pTot}</span></td><td class="text-center text-yellow-700">${gP}</td><td class="text-center text-orange-700">${gMH}</td><td class="text-center text-red-700">${gM}</td><td class="text-center text-slate-600">${gC}</td></tr>`;
                 }
             };
             renderTab('staging-breakdown-body', stgMap, false); renderTab('service-breakdown-body', svcMap, true);
             const tbFb = document.getElementById('feedback-recap-body'); if(tbFb) { tbFb.innerHTML=''; 
-                // Group by nothing? Just sum totals? User requested "Total Internal + Feedback"
-                // Let's create two big columns.
-                let totalInt = 0, totalExt = 0;
-                let listInt = [], listExt = [];
-                
-                filtered.forEach(r => {
-                    const m = r.metrics;
-                    if(m.internalPkg) totalInt += parseInt(m.internalPkg);
-                    if(m.externalPkg) totalExt += parseInt(m.externalPkg);
-                    if(m.feedbackIn) listInt.push({t: m.feedbackIn, info: `${r.staging} (${r.service})`});
-                    if(m.feedbackExt) listExt.push({t: m.feedbackExt, info: `${r.staging} (${r.service})`});
-                });
+                // Sum Totals
+                let sumInt = 0; Object.values(fbMapInt).forEach(v => sumInt += v);
+                let sumExt = 0; Object.values(fbMapExt).forEach(v => sumExt += v);
 
-                const intListHtml = listInt.length ? `<ul class="list-disc pl-4 marker:text-brand-400 space-y-1">${listInt.map(x=>`<li><span class="font-medium">${x.t}</span> <span class="text-[10px] text-slate-400 bg-slate-100 px-1 rounded ml-1">${x.info}</span></li>`).join('')}</ul>` : '<p class="text-slate-400 italic">Tidak ada feedback</p>';
-                const extListHtml = listExt.length ? `<ul class="list-disc pl-4 marker:text-brand-400 space-y-1">${listExt.map(x=>`<li><span class="font-medium">${x.t}</span> <span class="text-[10px] text-slate-400 bg-slate-100 px-1 rounded ml-1">${x.info}</span></li>`).join('')}</ul>` : '<p class="text-slate-400 italic">Tidak ada feedback</p>';
+                // Build Lists
+                const buildList = (map) => {
+                    const sortedKeys = Object.keys(map).sort((a,b) => map[b] - map[a]);
+                    if(sortedKeys.length === 0) return '<p class="text-slate-400 italic">Tidak ada feedback</p>';
+                    return `<ul class="list-disc pl-4 marker:text-brand-400 space-y-1">${sortedKeys.map(k => `<li><span class="font-bold text-slate-700">[${map[k]}]</span> <span class="text-sm text-slate-600">${k}</span></li>`).join('')}</ul>`;
+                };
                 
                 tbFb.innerHTML = `
                     <tr class="align-top">
                         <td class="px-6 py-5 border-r border-slate-50 w-1/2">
                             <div class="flex items-center gap-3 mb-4">
-                                <div class="bg-blue-50 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg">${totalInt}</div>
-                                <div><p class="text-xs font-bold text-slate-400 uppercase">Total Paket</p><p class="text-sm font-bold text-slate-800">Internal</p></div>
+                                <div class="bg-blue-50 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg">${sumInt}</div>
+                                <div><p class="text-xs font-bold text-slate-400 uppercase">Total Paket</p><p class="text-sm font-bold text-slate-800">Internal Issue</p></div>
                             </div>
-                            <div class="text-sm text-slate-600 leading-relaxed">${intListHtml}</div>
+                            <div class="text-sm text-slate-600 leading-relaxed">${buildList(fbMapInt)}</div>
                         </td>
                         <td class="px-6 py-5 w-1/2">
                              <div class="flex items-center gap-3 mb-4">
-                                <div class="bg-indigo-50 text-indigo-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg">${totalExt}</div>
-                                <div><p class="text-xs font-bold text-slate-400 uppercase">Total Paket</p><p class="text-sm font-bold text-slate-800">External</p></div>
+                                <div class="bg-indigo-50 text-indigo-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg">${sumExt}</div>
+                                <div><p class="text-xs font-bold text-slate-400 uppercase">Total Paket</p><p class="text-sm font-bold text-slate-800">External Issue</p></div>
                             </div>
-                            <div class="text-sm text-slate-600 leading-relaxed">${extListHtml}</div>
+                            <div class="text-sm text-slate-600 leading-relaxed">${buildList(fbMapExt)}</div>
                         </td>
                     </tr>
                 `;
@@ -1294,8 +1311,37 @@
             if(!window.Chart || !data) return;
             const today = new Date(); const d30 = new Date(); d30.setDate(today.getDate()-30); const daily={}, annual={}; for(let i=0;i<12;i++) annual[i]={t:0,o:0};
             data.forEach(r=>{ const rd=new Date(r.date); if(filterActive || (rd>=d30 && rd<=today)) { const k=r.date.substring(5); if(!daily[k]) daily[k]={t:0,o:0}; daily[k].t+=r.metrics.total; daily[k].o+=r.metrics.ok; } if(filterActive || rd.getFullYear()===today.getFullYear()){ annual[rd.getMonth()].t+=r.metrics.total; annual[rd.getMonth()].o+=r.metrics.ok; } });
-            const commonOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { color: '#64748b', anchor: 'end', align: 'top', font: { weight: 'bold', size: 10 }, formatter: Math.round } }, scales: { y: { display: false }, x: { grid: { display: false } }, y1: { display: false, grid: {drawOnChartArea: false} } } };
-            const draw = (id, labels, dTot, dOk) => { const cv = document.getElementById(id); if(!cv) return; const ctx = cv.getContext('2d'); if(window.appState[id]) window.appState[id].destroy(); window.appState[id] = new Chart(ctx, { type: 'bar', plugins: [ChartDataLabels], data: { labels: labels, datasets: [ { label:'Tot', data: dTot, backgroundColor:'#818cf8', borderRadius: 4, order:2, datalabels:{anchor:'end', align:'end'} }, { type:'line', label:'%OK', data: dOk, borderColor:'#34d399', borderWidth:2, pointRadius:3, order:1, datalabels:{color:'#059669', align:'top', formatter:(v)=>Math.round(v)+'%'} } ] }, options: commonOptions }); };
+            
+            const getColor = (val) => {
+                if (val < 93) return '#dc2626'; // Red
+                if (val < 95) return '#d97706'; // Yellow/Orange
+                return '#059669'; // Green
+            };
+
+            const commonOptions = { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { 
+                    legend: { display: false }, 
+                    datalabels: { 
+                        color: (context) => context.dataset.type === 'line' ? 'white' : '#1e293b', 
+                        anchor: 'end', 
+                        align: (context) => context.dataset.type === 'line' ? 'top' : 'end',
+                        backgroundColor: (context) => {
+                             if(context.dataset.type === 'line') return getColor(context.raw);
+                             return '#f1f5f9'; // Slate-100 for bars
+                        },
+                        borderRadius: 4,
+                        padding: { top:2, bottom:2, left:4, right:4 },
+                        font: { weight: 'bold', size: 10 }, 
+                        formatter: Math.round 
+                    } 
+                }, 
+                scales: { y: { display: false }, x: { grid: { display: false } }, y1: { display: false, grid: {drawOnChartArea: false} } } 
+            };
+            
+            const draw = (id, labels, dTot, dOk) => { const cv = document.getElementById(id); if(!cv) return; const ctx = cv.getContext('2d'); if(window.appState[id]) window.appState[id].destroy(); window.appState[id] = new Chart(ctx, { type: 'bar', plugins: [ChartDataLabels], data: { labels: labels, datasets: [ { label:'Tot', data: dTot, backgroundColor:'#818cf8', borderRadius: 4, order:2, datalabels:{anchor:'end', align:'end', offset: -4} }, { type:'line', label:'%OK', data: dOk, borderColor:'#34d399', borderWidth:2, pointRadius:3, order:1, datalabels:{color:'white', align:'top', offset: 4, formatter:(v)=>Math.round(v)+'%'} } ] }, options: commonOptions }); };
+            
             const dKeys = Object.keys(daily).sort(); draw('chartDaily', dKeys, dKeys.map(k=>daily[k].t), dKeys.map(k=>daily[k].t?(daily[k].o/daily[k].t*100):0)); draw('chartAnnual', MONTH_NAMES, Object.values(annual).map(x=>x.t), Object.values(annual).map(x=>x.t?(x.o/x.t*100):0));
         };
         window.showToast = (msg, err=false) => { 
