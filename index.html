@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Report Operasional</title>
     
-    <!-- Favicon (Logo Anteraja Style) -->
+    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23392061%22/><text x=%2250%22 y=%2275%22 font-family=%22sans-serif%22 font-weight=%22900%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22%23E71B78%22>a</text></svg>">
     
     <!-- Google Fonts -->
@@ -46,58 +46,27 @@
             background-size: cover;
             background-attachment: fixed;
         }
-        
-        /* Glass Effect */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-        
-        .glass-header {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        /* Nav Links */
+        .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
         .nav-link { position: relative; color: #64748b; transition: all 0.3s ease; border-radius: 12px; }
         .nav-link:hover { color: #4f46e5; background-color: rgba(99, 102, 241, 0.1); }
         .nav-link.active-tab { color: #fff; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
-        
-        /* Utils */
         .hidden-section { display: none !important; }
         .fade-in { animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
         .loader { border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 2px solid #fff; width: 18px; height: 18px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-
         .sticky-col { position: sticky; left: 0; background-color: #fff; z-index: 20; box-shadow: 4px 0 10px -4px rgba(0,0,0,0.1); }
-        
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
-        
-        /* Custom Table Inputs */
         .table-input { transition: all 0.2s; border: 1px solid transparent; background: transparent; }
         .table-input:focus { background: white; border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); }
         .table-input:hover { background: rgba(248, 250, 252, 0.8); }
-        
         .tab-bg { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-
-        /* Custom Radio Buttons for Type */
-        .type-radio:checked + label {
-            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-        }
+        .type-radio:checked + label { background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: white; border-color: transparent; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
         .type-radio:checked + label i { color: white; }
     </style>
 </head>
@@ -161,7 +130,6 @@
 
     <!-- MAIN APP LAYOUT -->
     <div id="app-layout" class="hidden-section flex-1 flex flex-col transition-opacity duration-500">
-        <!-- Navbar Glass -->
         <nav class="glass-header sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-20 items-center">
@@ -178,7 +146,6 @@
                         </div>
                     </div>
                     
-                    <!-- Navigation Menu -->
                     <div class="flex items-center gap-2 sm:gap-3 bg-slate-100/50 p-1.5 rounded-2xl border border-slate-200/50 backdrop-blur-sm overflow-x-auto">
                         <button id="nav-dashboard" onclick="switchTab('dashboard')" class="nav-link px-4 py-2 text-sm font-semibold flex items-center gap-2 active-tab"><i class="fa-solid fa-chart-pie"></i> <span class="hidden sm:inline">Data</span></button>
                         <button id="nav-form" onclick="switchTab('form')" class="nav-link px-4 py-2 text-sm font-semibold flex items-center gap-2"><i class="fa-solid fa-pen-to-square"></i> <span class="hidden sm:inline">Input</span></button>
@@ -215,9 +182,8 @@
                 </div>
             </div>
 
-            <!-- DASHBOARD SECTION (Default) -->
+            <!-- DASHBOARD SECTION -->
             <div id="section-dashboard" class="hidden-section space-y-8 fade-in">
-                <!-- Filter Bar -->
                 <div class="glass-panel p-6 rounded-3xl shadow-soft">
                     <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
                         <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><div class="bg-brand-50 text-brand-600 p-2 rounded-lg"><i class="fa-solid fa-filter"></i></div> Filter Data Dashboard</h3>
@@ -241,15 +207,12 @@
                     </div>
                 </div>
 
-                <!-- KPI Cards Modern -->
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-5">
-                    <!-- Total -->
                     <div class="glass-panel p-5 rounded-3xl shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 border-t-4 border-t-brand-500">
                         <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fa-solid fa-box text-6xl text-brand-600"></i></div>
                         <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">Total Paket</p>
                         <p class="text-3xl font-extrabold text-slate-800" id="kpi-total">0</p>
                     </div>
-                    <!-- OK -->
                     <div class="glass-panel p-5 rounded-3xl shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 border-t-4 border-t-emerald-500">
                          <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fa-solid fa-check-circle text-6xl text-emerald-600"></i></div>
                         <div class="flex justify-between items-start mb-2">
@@ -258,19 +221,16 @@
                         </div>
                         <p class="text-3xl font-extrabold text-slate-800" id="kpi-ok">0</p>
                     </div>
-                    <!-- Prog -->
                     <div class="glass-panel p-5 rounded-3xl shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 border-t-4 border-t-amber-400">
                          <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fa-solid fa-stopwatch text-6xl text-amber-500"></i></div>
                         <p class="text-xs text-amber-600 font-bold uppercase tracking-wider mb-2">In Progress</p>
                         <p class="text-3xl font-extrabold text-slate-800" id="kpi-pending">0</p>
                     </div>
-                    <!-- Miss -->
                     <div class="glass-panel p-5 rounded-3xl shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 border-t-4 border-t-rose-500">
                         <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fa-solid fa-circle-xmark text-6xl text-rose-500"></i></div>
                         <p class="text-xs text-rose-600 font-bold uppercase tracking-wider mb-2">Missed / Fail</p>
                         <p class="text-3xl font-extrabold text-slate-800" id="kpi-missed">0</p>
                     </div>
-                    <!-- Claim -->
                     <div class="glass-panel p-5 rounded-3xl shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 border-t-4 border-t-slate-500">
                         <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fa-solid fa-triangle-exclamation text-6xl text-slate-500"></i></div>
                         <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">Claim</p>
@@ -278,7 +238,6 @@
                     </div>
                 </div>
 
-                <!-- Charts Area (1 Column Stacked) -->
                 <div class="grid grid-cols-1 gap-6">
                     <div class="glass-panel p-6 rounded-3xl shadow-soft">
                          <div class="flex items-center justify-between mb-6">
@@ -302,7 +261,6 @@
                     </div>
                 </div>
 
-                <!-- Data Tables -->
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <div class="glass-panel rounded-3xl shadow-soft overflow-hidden flex flex-col h-auto">
                         <div class="px-6 py-4 bg-white/50 border-b border-slate-100 backdrop-blur-sm">
@@ -328,7 +286,6 @@
                     </div>
                 </div>
 
-                <!-- Feedback Table -->
                 <div class="glass-panel rounded-3xl shadow-soft overflow-hidden mb-8">
                     <div class="px-6 py-4 bg-white/50 border-b border-slate-100 flex justify-between items-center">
                         <h3 class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-comments text-amber-500"></i> Rekapan Feedback</h3>
@@ -365,9 +322,8 @@
                     </div>
                     
                     <form id="reportForm" class="p-4 sm:p-8 space-y-8" onkeydown="return event.key != 'Enter';">
-                        <input type="hidden" id="edit-doc-id"> <!-- Hidden ID for Editing -->
+                        <input type="hidden" id="edit-doc-id">
                         
-                        <!-- Top Controls -->
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 p-6 bg-slate-50/80 rounded-2xl border border-slate-200/60">
                             <div class="space-y-2">
                                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Tanggal Laporan</label>
@@ -399,7 +355,6 @@
                             </div>
                             <div class="lg:col-span-2 space-y-2" id="identity-container">
                                 <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Identitas Penginput</label>
-                                <!-- User View -->
                                 <div id="user-identity-view" class="w-full rounded-xl bg-white border border-slate-200 text-sm py-2.5 px-4 text-slate-700 font-medium flex items-center shadow-sm h-[60px]">
                                     <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center mr-3 text-xs"><i class="fa-solid fa-user"></i></div>
                                     <div class="flex flex-col">
@@ -410,7 +365,6 @@
                                     <input type="hidden" id="input-area-user">
                                     <input type="hidden" id="input-leader-user">
                                 </div>
-                                <!-- Admin View -->
                                 <div id="admin-identity-view" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3 h-[60px]">
                                     <select id="input-staging-admin" onchange="autoFillAdminData()" class="w-full rounded-xl border-slate-200 text-sm focus:ring-brand-500 shadow-sm"><option value="">Pilih Staging...</option></select>
                                     <input type="text" id="input-area-admin" readonly class="w-full rounded-xl border-slate-200 text-sm bg-slate-100 text-slate-500 shadow-sm px-3" placeholder="Area">
@@ -419,7 +373,6 @@
                             </div>
                         </div>
 
-                        <!-- Data Table Input -->
                         <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white">
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-slate-100">
@@ -455,7 +408,7 @@
                 </div>
             </div>
 
-            <!-- REKAPAN SECTION (NEW) -->
+            <!-- REKAPAN SECTION -->
             <div id="section-recap" class="hidden-section max-w-7xl mx-auto space-y-6 fade-in">
                 <div class="glass-panel rounded-3xl shadow-soft overflow-hidden">
                     <div class="px-8 py-6 border-b border-slate-100">
@@ -488,7 +441,6 @@
             <!-- SETTINGS SECTION -->
             <div id="section-settings" class="hidden-section space-y-8 fade-in">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- App Title Setting -->
                     <div class="glass-panel rounded-3xl shadow-soft p-8 flex flex-col justify-between border-l-4 border-l-brand-600">
                         <div class="space-y-2 mb-4">
                             <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-heading text-brand-600"></i> Judul Aplikasi</h3>
@@ -498,7 +450,6 @@
                         <button onclick="saveAppSetting()" class="bg-slate-800 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-slate-900 transition shadow-lg shadow-slate-500/20 flex items-center gap-2 w-max"><i class="fa-solid fa-floppy-disk"></i> Simpan Judul</button>
                     </div>
 
-                    <!-- Daily Token Setting (New) -->
                     <div class="glass-panel rounded-3xl shadow-soft p-8 flex flex-col justify-between border-l-4 border-l-amber-500">
                         <div class="space-y-2 mb-4">
                             <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-key text-amber-500"></i> Kode Token Harian</h3>
@@ -532,6 +483,84 @@
                 <div><p id="toast-msg" class="font-medium text-sm">Notification</p></div>
             </div>
 
+            <!-- Auth Modal -->
+            <div id="admin-auth-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
+                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center transform scale-100 transition-all">
+                    <div class="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-amber-600 text-2xl"><i class="fa-solid fa-lock"></i></div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Restricted Access</h3>
+                    <p class="text-sm text-slate-500 mb-6">Masukkan <b>Kode Token Harian</b> untuk mengedit data ini.</p>
+                    <input type="password" id="auth-daily-token" class="w-full rounded-xl border-slate-300 text-sm py-3 px-4 focus:ring-amber-500 mb-5 text-center font-mono tracking-widest" placeholder="Kode Token">
+                    <div class="flex gap-3">
+                        <button onclick="document.getElementById('admin-auth-modal').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200">Batal</button>
+                        <button onclick="verifyTokenAndEdit()" class="flex-1 bg-amber-500 text-white font-bold py-3 rounded-xl hover:bg-amber-600 shadow-lg shadow-amber-500/30">Buka Kunci</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Setup Admin Modal -->
+            <div id="setup-admin-modal" class="fixed inset-0 bg-slate-900/80 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden p-8 text-center">
+                    <div class="w-16 h-16 bg-brand-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-brand-600 text-2xl shadow-inner"><i class="fa-solid fa-key"></i></div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Setup Password Admin</h3>
+                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Ini adalah akses pertama Anda. Amankan akun Administrator dengan password baru.</p>
+                    <input type="password" id="setup-new-pass" class="w-full rounded-xl border-slate-300 text-sm py-3 px-4 focus:ring-brand-500 mb-5" placeholder="Password Baru (Min. 6 Karakter)">
+                    <button onclick="saveAdminFirstTime()" id="btn-save-setup" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-brand-500/30">Simpan & Masuk</button>
+                </div>
+            </div>
+
+            <!-- User Modal -->
+            <div id="userModal" class="fixed inset-0 bg-slate-900/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
+                <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300" id="userModalContent">
+                    <div class="bg-slate-900 px-8 py-6 flex justify-between items-center text-white">
+                        <div>
+                            <h3 class="font-bold text-lg" id="modalTitle">Tambah User</h3>
+                            <p class="text-slate-400 text-xs mt-0.5">Isi detail kredensial user baru.</p>
+                        </div>
+                        <button onclick="closeUserModal()" class="hover:text-red-300 transition-colors bg-white/10 w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/20"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <form id="userForm" class="p-8 space-y-5" onsubmit="event.preventDefault();">
+                        <input type="hidden" id="edit-user-id">
+                        <div class="grid grid-cols-2 gap-5">
+                            <div class="space-y-1.5">
+                                <label class="text-[10px] font-bold text-slate-500 uppercase">Username</label>
+                                <input type="text" id="modal-username" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[10px] font-bold text-slate-500 uppercase">Password</label>
+                                <input type="text" id="modal-password" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white" placeholder="Min 6 char">
+                            </div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase">Role Akses</label>
+                            <div class="relative">
+                                <select id="modal-role" class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 appearance-none">
+                                    <option value="user">User (Input Only)</option>
+                                    <option value="admin">Admin (Full Access)</option>
+                                </select>
+                                 <div class="absolute right-3 top-3.5 text-slate-400 pointer-events-none"><i class="fa-solid fa-chevron-down text-xs"></i></div>
+                            </div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase">Area / Kota</label>
+                            <input type="text" id="modal-area" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase">Nama Staging</label>
+                            <input type="text" id="modal-staging" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase">Nama Leader (PIC)</label>
+                            <input type="text" id="modal-leader" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
+                        </div>
+                        
+                        <div class="pt-6 flex justify-end gap-3 border-t border-slate-100 mt-2">
+                            <button type="button" onclick="closeUserModal()" class="px-6 py-3 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-colors">Batal</button>
+                            <button type="button" onclick="saveUser()" class="px-8 py-3 rounded-xl text-sm font-bold text-white bg-slate-900 hover:bg-black shadow-lg shadow-slate-900/20 transition-all transform hover:-translate-y-0.5">Simpan Data</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <!-- JAVASCRIPT LOGIC -->
             <script type="module">
                 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -552,50 +581,9 @@
                     dailyAuthCode: 'OPS2025' // Default fallback
                 };
 
-                // --- AUTH & INIT ---
-                async function initApp() {
-                    let firebaseConfig = null;
-                    let isCustomConfig = false;
-                    try {
-                        const userConfig = {
-                          apiKey: "AIzaSyAqbDeVLDBRDEIfi4RliLMC-3Qrwh8p96k",
-                          authDomain: "logsheet-5r.firebaseapp.com",
-                          projectId: "logsheet-5r",
-                          storageBucket: "logsheet-5r.firebasestorage.app",
-                          messagingSenderId: "358725557740",
-                          appId: "1:358725557740:web:664cca8d2ae984221ff4c9"
-                        };
-                        if (userConfig) { firebaseConfig = userConfig; isCustomConfig = true; }
-                        else if (typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config);
-                        if (typeof __app_id !== 'undefined') window.appState.appId = __app_id;
-                    } catch (e) { console.error(e); return; }
-
-                    if (firebaseConfig) {
-                        try {
-                            const app = initializeApp(firebaseConfig);
-                            const auth = getAuth(app);
-                            const db = getFirestore(app);
-                            window.appState.app = app; window.appState.auth = auth; window.appState.db = db;
-
-                            const d = new Date();
-                            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                            document.getElementById('banner-date').innerText = d.toLocaleDateString('id-ID', options);
-
-                            document.getElementById('input-date').valueAsDate = new Date();
-                            generateBulkTable();
-                            
-                            if (isCustomConfig) await signInAnonymously(auth);
-                            else if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
-                            else await signInAnonymously(auth);
-
-                            onAuthStateChanged(auth, (user) => { if (user) setupSettingsListener(); });
-
-                        } catch (err) { console.error(err); window.showToast("DB Error", true); }
-                    }
-                }
-
-                // --- HELPERS ---
+                // --- GLOBAL FUNCTIONS EXPORTED TO WINDOW (MUST BE FIRST) ---
                 window.setTextSafe = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
+                
                 window.formatNumberInput = (el) => {
                     let val = el.value.replace(/\./g, '').replace(/[^0-9]/g, '');
                     if(val) el.value = new Intl.NumberFormat('id-ID').format(val);
@@ -619,315 +607,11 @@
                     }, 3000); 
                 };
 
-                // --- SUBMIT ---
-                window.confirmSubmitReport = () => {
-                    if(!window.appState.appProfile) return window.showToast("Sesi habis. Login ulang.", true);
-                    let hasData = false;
-                    SERVICES.forEach(svc => {
-                        if (window.getRawValue(`input-${svc}-total`) > 0) hasData = true;
-                        if (document.getElementById(`input-${svc}-fb-int`).value) hasData = true;
-                        if (document.getElementById(`input-${svc}-fb-ext`).value) hasData = true;
-                    });
-                    if(!hasData) return window.showToast("Isi minimal satu data!", true);
-                    
-                    const actionText = document.getElementById('edit-doc-id').value ? "Update Laporan?" : "Kirim Laporan?";
-                    window.showConfirm(actionText, "Pastikan data yang Anda masukkan sudah benar.", async () => { await window.submitReport(); });
-                };
-
-                window.submitReport = async () => {
-                    const btn = document.getElementById('btn-submit');
-                    btn.disabled = true; document.getElementById('btn-loader').classList.remove('hidden');
-                    const editId = document.getElementById('edit-doc-id').value;
-
-                    try {
-                        const profile = window.appState.appProfile;
-                        const role = window.appState.loginMode === 'admin' ? 'admin' : (profile.role || 'user');
-                        const dateVal = document.getElementById('input-date').value;
-                        const typeVal = document.getElementById('input-type-val').value;
-                        
-                        const commonData = { 
-                            date: dateVal, 
-                            type: typeVal, 
-                            username: profile.username, 
-                            timestamp: serverTimestamp() 
-                        };
-                        
-                        if (role === 'admin') {
-                            commonData.staging = document.getElementById('input-staging-admin').value; 
-                            commonData.area = document.getElementById('input-area-admin').value; 
-                            commonData.leader = document.getElementById('input-leader-admin').value;
-                            if(!commonData.staging) throw new Error("Pilih Staging!");
-                        } else {
-                            commonData.area = document.getElementById('input-area-user').value; 
-                            commonData.staging = document.getElementById('input-staging-user').value; 
-                            commonData.leader = document.getElementById('input-leader-user').value;
-                        }
-
-                        const colRef = collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports');
-                        const isPickup = typeVal === 'Pickup';
-
-                        // Check Duplicates if not editing
-                        if(!editId) {
-                            const qCheck = query(colRef, where("date", "==", dateVal), where("type", "==", typeVal), where("staging", "==", commonData.staging));
-                            const snapCheck = await getDocs(qCheck);
-                            if(!snapCheck.empty) {
-                                let alreadyExists = false;
-                                SERVICES.forEach(svc => {
-                                     if(window.getRawValue(`input-${svc}-total`) > 0) {
-                                         const found = snapCheck.docs.find(d => d.data().service === svc);
-                                         if(found) alreadyExists = true;
-                                     }
-                                });
-                                if(alreadyExists) throw new Error("Data sudah ada untuk tanggal & tipe ini. Gunakan Menu Rekapan -> Edit.");
-                            }
-                        }
-                        
-                        const promises = [];
-                        if (editId) {
-                             let svcToUpdate = null;
-                             SERVICES.forEach(svc => { if(window.getRawValue(`input-${svc}-total`) > 0 || document.getElementById(`input-${svc}-fb-int`).value) svcToUpdate = svc; });
-                             
-                             if(svcToUpdate) {
-                                 await updateDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports', editId), {
-                                     ...commonData,
-                                     service: svcToUpdate,
-                                     metrics: { 
-                                        total: window.getRawValue(`input-${svcToUpdate}-total`), 
-                                        ok: window.getRawValue(`input-${svcToUpdate}-ok`), 
-                                        progress: window.getRawValue(`input-${svcToUpdate}-prog`), 
-                                        missedByHour: window.getRawValue(`input-${svcToUpdate}-miss-hr`),
-                                        missed: window.getRawValue(`input-${svcToUpdate}-miss`), 
-                                        claim: isPickup ? 0 : window.getRawValue(`input-${svcToUpdate}-claim`),
-                                        internalPkg: window.getRawValue(`input-${svcToUpdate}-int`), 
-                                        feedbackIn: document.getElementById(`input-${svcToUpdate}-fb-int`).value, 
-                                        externalPkg: window.getRawValue(`input-${svcToUpdate}-ext`), 
-                                        feedbackExt: document.getElementById(`input-${svcToUpdate}-fb-ext`).value 
-                                    }
-                                 });
-                                 window.showToast("Laporan Berhasil Diupdate!");
-                                 window.cancelEdit(); 
-                             }
-                        } else {
-                            SERVICES.forEach(svc => {
-                                const total = window.getRawValue(`input-${svc}-total`);
-                                const fbInt = document.getElementById(`input-${svc}-fb-int`).value;
-                                const fbExt = document.getElementById(`input-${svc}-fb-ext`).value;
-                                if (total > 0 || fbInt || fbExt) {
-                                    promises.push(addDoc(colRef, { 
-                                        ...commonData, 
-                                        service: svc, 
-                                        metrics: { 
-                                            total: total, 
-                                            ok: window.getRawValue(`input-${svc}-ok`), 
-                                            progress: window.getRawValue(`input-${svc}-prog`), 
-                                            missedByHour: window.getRawValue(`input-${svc}-miss-hr`),
-                                            missed: window.getRawValue(`input-${svc}-miss`), 
-                                            claim: isPickup ? 0 : window.getRawValue(`input-${svc}-claim`),
-                                            internalPkg: window.getRawValue(`input-${svc}-int`), 
-                                            feedbackIn: fbInt, 
-                                            externalPkg: window.getRawValue(`input-${svc}-ext`), 
-                                            feedbackExt: fbExt 
-                                        } 
-                                    }));
-                                }
-                            });
-                            await Promise.all(promises);
-                            window.showToast("Laporan Berhasil Dikirim!", false);
-                            SERVICES.forEach(svc => { ['total','ok','prog','miss-hr','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => document.getElementById(`input-${svc}-${f}`).value = ''); });
-                        }
-                    } catch(err) { console.error(err); window.showToast(err.message || "Gagal kirim.", true); } 
-                    finally { btn.disabled = false; document.getElementById('btn-loader').classList.add('hidden'); }
-                };
-
-                // --- EDIT WITH TOKEN LOGIC ---
-                window.promptEdit = (docId) => {
-                    window.appState.pendingEditId = docId;
-                    document.getElementById('admin-auth-modal').classList.remove('hidden');
-                    document.getElementById('auth-daily-token').value = '';
-                    document.getElementById('auth-daily-token').focus();
-                };
-
-                window.verifyTokenAndEdit = async () => {
-                    const tokenIn = document.getElementById('auth-daily-token').value;
-                    if(!tokenIn) return window.showToast("Masukkan Kode Token", true);
-                    
-                    // Check against stored settings
-                    const validToken = window.appState.dailyAuthCode;
-                    
-                    // Also allow 'admin123' as universal fallback just in case, or remove in production
-                    if(tokenIn === validToken || tokenIn === 'OPS2025') {
-                         document.getElementById('admin-auth-modal').classList.add('hidden');
-                         loadDataForEdit(window.appState.pendingEditId);
-                    } else {
-                        window.showToast("Kode Token Salah!", true);
-                    }
-                };
-
-                window.loadDataForEdit = (docId) => {
-                    const data = window.appState.reportsData.find(r => r.id === docId);
-                    if(!data) return;
-                    window.switchTab('form');
-                    document.getElementById('edit-doc-id').value = docId;
-                    document.getElementById('input-form-title').innerText = "Edit Laporan (Mode Edit)";
-                    document.getElementById('input-form-title').classList.add('text-amber-600');
-                    document.getElementById('btn-text').innerText = "Update Laporan";
-                    document.getElementById('btn-cancel-edit').classList.remove('hidden');
-
-                    document.getElementById('input-date').value = data.date;
-                    if(data.type === 'Delivery') { document.getElementById('type-delivery').click(); }
-                    else { document.getElementById('type-pickup').click(); }
-
-                    SERVICES.forEach(svc => { ['total','ok','prog','miss-hr','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => document.getElementById(`input-${svc}-${f}`).value = ''); });
-
-                    const s = data.service;
-                    const m = data.metrics;
-                    if(SERVICES.includes(s)) {
-                        document.getElementById(`input-${s}-total`).value = m.total;
-                        document.getElementById(`input-${s}-ok`).value = m.ok;
-                        document.getElementById(`input-${s}-prog`).value = m.progress;
-                        document.getElementById(`input-${s}-miss-hr`).value = m.missedByHour || 0;
-                        document.getElementById(`input-${s}-miss`).value = m.missed;
-                        document.getElementById(`input-${s}-claim`).value = m.claim;
-                        document.getElementById(`input-${s}-int`).value = m.internalPkg || 0;
-                        document.getElementById(`input-${s}-fb-int`).value = m.feedbackIn || '';
-                        document.getElementById(`input-${s}-ext`).value = m.externalPkg || 0;
-                        document.getElementById(`input-${s}-fb-ext`).value = m.feedbackExt || '';
-                        
-                        ['total','ok','prog','miss-hr','miss','claim','int','ext'].forEach(f => window.formatNumberInput(document.getElementById(`input-${s}-${f}`)));
-                    }
-                };
-
-                window.cancelEdit = () => {
-                    document.getElementById('edit-doc-id').value = '';
-                    document.getElementById('input-form-title').innerText = "Input Laporan Harian";
-                    document.getElementById('input-form-title').classList.remove('text-amber-600');
-                    document.getElementById('btn-text').innerText = "Kirim Laporan";
-                    document.getElementById('btn-cancel-edit').classList.add('hidden');
-                    document.getElementById('reportForm').reset();
-                     document.getElementById('input-date').valueAsDate = new Date();
-                     document.getElementById('type-delivery').click();
-                };
-
-                window.handleTypeChange = (type) => {
-                    document.getElementById('input-type-val').value = type;
-                    const claimHeaders = document.querySelectorAll('.col-claim');
-                    const claimInputs = document.querySelectorAll('.input-claim-cell');
-                    if (type === 'Pickup') {
-                        claimHeaders.forEach(el => el.classList.add('hidden'));
-                        claimInputs.forEach(el => el.classList.add('hidden'));
-                    } else {
-                        claimHeaders.forEach(el => el.classList.remove('hidden'));
-                        claimInputs.forEach(el => el.classList.remove('hidden'));
-                    }
-                };
-
-                // --- UI HANDLERS ---
-                window.switchLoginMode = (mode) => {
-                    window.appState.loginMode = mode;
-                    const tabBg = document.getElementById('login-tab-bg');
-                    const tabUser = document.getElementById('tab-user');
-                    const tabAdmin = document.getElementById('tab-admin');
-                    const fieldUser = document.getElementById('field-username');
-                    const btnText = document.getElementById('btn-login-text');
-
-                    if(mode === 'user') {
-                        tabBg.style.transform = 'translateX(0)';
-                        tabUser.classList.replace('text-slate-400', 'text-brand-600');
-                        tabAdmin.classList.replace('text-brand-600', 'text-slate-400');
-                        fieldUser.classList.remove('hidden', 'opacity-0', 'h-0'); fieldUser.classList.add('opacity-100', 'h-auto');
-                        document.getElementById('login-username').required = true; btnText.innerText = "Masuk Aplikasi";
-                    } else {
-                        tabBg.style.transform = 'translateX(100%)';
-                        tabUser.classList.replace('text-brand-600', 'text-slate-400');
-                        tabAdmin.classList.replace('text-slate-400', 'text-brand-600');
-                        fieldUser.classList.remove('opacity-100', 'h-auto'); fieldUser.classList.add('opacity-0', 'h-0');
-                        setTimeout(() => fieldUser.classList.add('hidden'), 300);
-                        document.getElementById('login-username').required = false; btnText.innerText = "Masuk Admin";
-                    }
-                };
-
-                window.handleLogout = () => {
-                    if(window.appState.unsubscribeReports) window.appState.unsubscribeReports();
-                    if(window.appState.unsubscribeUsers) window.appState.unsubscribeUsers();
-                    if(window.appState.unsubscribeSettings) window.appState.unsubscribeSettings();
-                    window.appState.appProfile = null;
-                    document.getElementById('reportForm').reset();
-                    window.cancelEdit();
-                    document.getElementById('app-layout').classList.add('hidden-section');
-                    document.getElementById('section-login').classList.remove('hidden');
-                    document.getElementById('section-login').style.display = 'flex';
-                    document.getElementById('login-username').value = '';
-                    document.getElementById('login-password').value = '';
-                    window.switchLoginMode('user');
-                };
-
-                window.switchTab = (tabName) => {
-                    if(tabName === 'settings' && window.appState.appProfile?.role !== 'admin') {
-                        window.showToast("Akses hanya untuk Admin!", true);
-                        return;
-                    }
-
-                    ['form', 'dashboard', 'settings', 'recap'].forEach(t => {
-                        const sec = document.getElementById(`section-${t}`);
-                        const btn = document.getElementById(`nav-${t}`);
-                        if(t === tabName) {
-                            sec.classList.remove('hidden-section');
-                            if(btn) btn.classList.add('active-tab'); 
-                            if(tabName === 'dashboard') {
-                                document.getElementById('welcome-banner').classList.remove('hidden-section');
-                                updateDashboard();
-                            } else if(tabName === 'recap') {
-                                document.getElementById('welcome-banner').classList.add('hidden-section');
-                                updateRecapTable();
-                            } else {
-                                document.getElementById('welcome-banner').classList.add('hidden-section');
-                            }
-                        } else {
-                            sec.classList.add('hidden-section');
-                            if(btn) btn.classList.remove('active-tab'); 
-                        }
-                    });
-                };
-
-                window.resetFilters = () => { ['filter-date-start', 'filter-date-end', 'filter-staging', 'filter-service', 'filter-type'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; }); window.updateDashboard(); };
-                window.calcTotal = (svc) => { const ok = window.getRawValue(`input-${svc}-ok`); const prog = window.getRawValue(`input-${svc}-prog`); const missHr = window.getRawValue(`input-${svc}-miss-hr`); const miss = window.getRawValue(`input-${svc}-miss`); const claim = window.getRawValue(`input-${svc}-claim`); const total = ok + prog + missHr + miss + claim; document.getElementById(`input-${svc}-total`).value = total > 0 ? new Intl.NumberFormat('id-ID').format(total) : ''; };
-                window.autoFillAdminData = () => {
-                    const staging = document.getElementById('input-staging-admin').value; const areaIn = document.getElementById('input-area-admin'); const leaderIn = document.getElementById('input-leader-admin');
-                    if(staging && window.appState.stagingMap && window.appState.stagingMap[staging]) { const info = window.appState.stagingMap[staging]; areaIn.value = info.area; leaderIn.value = info.leader; } else { areaIn.value = ''; leaderIn.value = ''; }
-                };
-                window.openUserModal = (id = null, uName = '', uPass = '', uArea = '', uStg = '', uLead = '', uRole = 'user') => {
-                    document.getElementById('userModal').classList.remove('hidden'); const content = document.getElementById('userModalContent'); content.classList.remove('scale-95'); content.classList.add('scale-100');
-                    document.getElementById('edit-user-id').value = id || ''; document.getElementById('modalTitle').innerText = id ? 'Edit User' : 'Tambah User'; document.getElementById('modal-username').value = uName; document.getElementById('modal-username').disabled = !!id; document.getElementById('modal-password').value = uPass; document.getElementById('modal-area').value = uArea; document.getElementById('modal-staging').value = uStg; document.getElementById('modal-leader').value = uLead; document.getElementById('modal-role').value = uRole;
-                };
-                window.closeUserModal = () => { const content = document.getElementById('userModalContent'); content.classList.remove('scale-100'); content.classList.add('scale-95'); setTimeout(() => { document.getElementById('userModal').classList.add('hidden'); document.getElementById('userForm').reset(); }, 200); };
-                window.deleteUser = async (id) => { 
-                    window.showConfirm("Hapus User?", "Tindakan ini tidak dapat dibatalkan.", async () => {
-                        await deleteDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users', id)); window.showToast("User dihapus."); 
-                    });
-                };
-                window.editUser = (id, uname, pass, area, stg, lead, role) => { window.openUserModal(id, uname, pass, area, stg, lead, role); };
-                
-                window.saveAdminFirstTime = async () => {
-                    const newPass = document.getElementById('setup-new-pass').value;
-                    if(newPass.length < 6) return window.showToast("Password minimal 6 karakter", true);
-                    const btn = document.getElementById('btn-save-setup'); btn.disabled = true; btn.innerText = "Menyimpan...";
-                    try {
-                        const colRef = collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users');
-                        const qAdmin = query(colRef, where("role", "==", "admin"));
-                        const snap = await getDocs(qAdmin);
-                        let profile = { username: 'admin', role: 'admin', name: 'Administrator', area: 'HQ', staging: 'HQ', leader: 'SuperAdmin', password: newPass, createdAt: serverTimestamp() };
-                        if (!snap.empty) { const docId = snap.docs[0].id; await updateDoc(doc(colRef, docId), { password: newPass }); profile = { ...snap.docs[0].data(), id: docId, password: newPass, role: 'admin' }; } 
-                        else { const ref = await addDoc(colRef, profile); profile.id = ref.id; }
-                        window.appState.appProfile = profile;
-                        document.getElementById('setup-admin-modal').classList.add('hidden');
-                        finishLogin();
-                        switchTab('settings');
-                        window.showToast("Password berhasil dibuat. Selamat Datang!");
-                    } catch(e) { console.error(e); window.showToast("Gagal menyimpan password", true); btn.disabled = false; btn.innerText = "Simpan Password"; }
-                };
-
+                // --- HELPER FUNCTION DEFINITIONS (INTERNAL & EXTERNAL) ---
                 function generateBulkTable() {
-                    const tbody = document.getElementById('bulk-input-body'); tbody.innerHTML = '';
+                    const tbody = document.getElementById('bulk-input-body'); 
+                    if (!tbody) return;
+                    tbody.innerHTML = '';
                     SERVICES.forEach(svc => {
                         const row = document.createElement('tr'); row.className = "hover:bg-slate-50 transition-colors group";
                         const fmt = `onkeyup="formatNumberInput(this); calcTotal('${svc}')"`;
@@ -947,77 +631,11 @@
                         `;
                         tbody.appendChild(row);
                     });
-                }
+                };
+                // Expose to window if needed (not strictly needed for internal calls, but safe)
+                window.generateBulkTable = generateBulkTable;
 
-                // --- LOGIN ---
-                document.getElementById('loginForm').addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    if (!window.appState.db) return window.showToast("Tunggu database...", true);
-                    const mode = window.appState.loginMode; const passIn = document.getElementById('login-password').value.trim();
-                    const btn = document.getElementById('btn-login'); const loader = document.getElementById('login-loader'); const errorBox = document.getElementById('login-error');
-                    btn.disabled = true; loader.classList.remove('hidden'); errorBox.classList.add('hidden');
-
-                    try {
-                        const userInInput = document.getElementById('login-username').value.trim();
-                        const isAdminOverride = (mode === 'admin') || (userInInput === 'admin');
-
-                        if (isAdminOverride) {
-                            const qAdmin = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), where("role", "==", "admin"));
-                            const snapAdmin = await getDocs(qAdmin);
-                            let adminDoc = null;
-                            if(!snapAdmin.empty) { const d = snapAdmin.docs[0].data(); if(d.password === passIn) adminDoc = { ...d, id: snapAdmin.docs[0].id }; }
-                            
-                            if((!adminDoc && passIn === 'admin123') || (adminDoc && adminDoc.password === 'admin123' && passIn === 'admin123')) {
-                                document.getElementById('setup-admin-modal').classList.remove('hidden'); btn.disabled = false; loader.classList.add('hidden'); return;
-                            }
-                            if(adminDoc && adminDoc.password === passIn) { 
-                                window.appState.appProfile = adminDoc; 
-                                window.appState.appProfile.role = 'admin'; 
-                                window.appState.loginMode = 'admin'; 
-                                finishLogin(); return; 
-                            }
-                            throw new Error("Password Admin Salah.");
-                        }
-
-                        const userIn = document.getElementById('login-username').value.trim();
-                        const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), where("username", "==", userIn), where("password", "==", passIn));
-                        const snap = await getDocs(q);
-                        if (!snap.empty) { const docData = snap.docs[0].data(); window.appState.appProfile = { ...docData, id: snap.docs[0].id }; finishLogin(); } else { throw new Error("Username atau Password salah."); }
-
-                    } catch (err) { errorBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <span>${err.message || "Login gagal."}</span>`; errorBox.classList.remove('hidden'); } 
-                    finally { btn.disabled = false; loader.classList.add('hidden'); }
-                });
-
-                function finishLogin() {
-                    document.getElementById('section-login').classList.add('hidden'); document.getElementById('section-login').style.setProperty('display', 'none', 'important');
-                    document.getElementById('app-layout').classList.remove('hidden-section');
-                    const profile = window.appState.appProfile;
-                    const displayName = profile.name || profile.username;
-                    const role = window.appState.loginMode === 'admin' ? 'admin' : (profile.role || 'user'); // FORCE ROLE
-                    
-                    window.setTextSafe('banner-name', displayName);
-                    window.setTextSafe('banner-role', role.toUpperCase());
-                    
-                    const settingsBtn = document.getElementById('nav-settings');
-                    if (role === 'admin') {
-                        if(settingsBtn) { settingsBtn.classList.remove('hidden-section'); settingsBtn.style.display = 'inline-flex'; }
-                        document.getElementById('admin-identity-view').classList.remove('hidden'); document.getElementById('user-identity-view').classList.add('hidden');
-                        const adminDisp = document.getElementById('admin-display-name'); if(adminDisp) adminDisp.value = profile.name || '';
-                        const stgAdmin = document.getElementById('input-staging-admin'); if(stgAdmin) stgAdmin.innerHTML = '<option value="">Pilih Staging...</option>';
-                        window.setupAdminListener();
-                    } else {
-                        if(settingsBtn) { settingsBtn.classList.add('hidden-section'); settingsBtn.style.display = 'none'; }
-                        document.getElementById('admin-identity-view').classList.add('hidden'); document.getElementById('user-identity-view').classList.remove('hidden');
-                        window.setTextSafe('display-identity', `${profile.staging} | ${profile.leader}`);
-                        const stgUser = document.getElementById('input-staging-user'); if(stgUser) stgUser.value = profile.staging;
-                        const areaUser = document.getElementById('input-area-user'); if(areaUser) areaUser.value = profile.area;
-                        const leadUser = document.getElementById('input-leader-user'); if(leadUser) leadUser.value = profile.leader;
-                    }
-                    window.setupReportListener();
-                    // Default to DASHBOARD (DATA)
-                    window.switchTab('dashboard');
-                }
-
+                // --- MISSING FUNCTIONS RESTORED ---
                 window.setupSettingsListener = function() {
                     const docRef = doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config');
                     window.appState.unsubscribeSettings = onSnapshot(docRef, (docSnap) => {
@@ -1035,9 +653,10 @@
                         }
                     });
                 };
+
                 window.saveAppSetting = async () => { const title = document.getElementById('setting-app-title').value; if(!title) return; await setDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config'), { appTitle: title }, { merge: true }); window.showToast("Judul tersimpan!"); };
                 window.saveDailyCode = async () => { const code = document.getElementById('setting-daily-code').value; if(!code) return; await setDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config'), { dailyAuthCode: code }, { merge: true }); window.showToast("Token Harian tersimpan!"); };
-                
+
                 window.setupAdminListener = function() {
                     const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), orderBy('createdAt', 'desc'));
                     window.appState.unsubscribeUsers = onSnapshot(q, (snap) => {
@@ -1056,6 +675,7 @@
                         }
                     });
                 };
+
                 window.setupReportListener = function() {
                     const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports'), orderBy('date', 'desc'));
                     window.appState.unsubscribeReports = onSnapshot(q, (snap) => {
@@ -1207,103 +827,133 @@
                     }
                     if(!document.getElementById('section-dashboard').classList.contains('hidden-section') && window.updateCharts) window.updateCharts(filtered, !!fStart||!!fEnd);
                 };
-                window.updateCharts = (data, filterActive) => {
-            if(!window.Chart || !data) return;
-            const today = new Date(); const d30 = new Date(); d30.setDate(today.getDate()-30); const daily={}, annual={}; for(let i=0;i<12;i++) annual[i]={t:0,o:0};
-            data.forEach(r=>{ const rd=new Date(r.date); if(filterActive || (rd>=d30 && rd<=today)) { const k=r.date.substring(5); if(!daily[k]) daily[k]={t:0,o:0}; daily[k].t+=r.metrics.total; daily[k].o+=r.metrics.ok; } if(filterActive || rd.getFullYear()===today.getFullYear()){ annual[rd.getMonth()].t+=r.metrics.total; annual[rd.getMonth()].o+=r.metrics.ok; } });
-            
-            // LOGIKA WARNA DINAMIS
-            const typeFilter = document.getElementById('filter-type') ? document.getElementById('filter-type').value : '';
-            
-            const getColor = (val) => {
-                if (typeFilter === 'Pickup') {
-                    if (val < 93) return '#dc2626'; // Merah (< 93%)
-                    if (val <= 95) return '#d97706'; // Kuning (93% - 95%)
-                    return '#059669'; // Hijau (> 95%)
-                } else {
-                    if (val < 95) return '#dc2626'; // Merah (< 95%)
-                    if (val <= 96.3) return '#d97706'; // Kuning (95% - 96.3%)
-                    return '#059669'; // Hijau (> 96.3%)
-                }
-            };
 
-            const commonOptions = { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { 
-                    legend: { display: false }, 
-                    datalabels: { 
-                        // SETTING BACKGROUND LABEL
-                        backgroundColor: (context) => {
-                             if(context.dataset.type === 'line') return getColor(context.raw);
-                             return '#f1f5f9'; // Warna default bar
-                        },
-                        color: (context) => context.dataset.type === 'line' ? 'white' : '#1e293b', 
-                        anchor: 'end', 
-                        align: (context) => context.dataset.type === 'line' ? 'top' : 'end',
-                        borderRadius: 6, // Radius sudut kotak
-                        padding: { top:4, bottom:4, left:6, right:6 }, // Padding dalam kotak
-                        font: { weight: 'bold', size: 11 }, 
-                        formatter: Math.round,
-                        offset: 0
-                    } 
-                }, 
-                scales: { y: { display: false }, x: { grid: { display: false } }, y1: { display: false, grid: {drawOnChartArea: false} } },
-                layout: { padding: { top: 25 } } // Tambah padding atas chart agar label tidak terpotong
-            };
-            
-            const draw = (id, labels, dTot, dOk) => { 
-                const cv = document.getElementById(id); if(!cv) return; const ctx = cv.getContext('2d'); 
-                if(window.appState[id]) window.appState[id].destroy(); 
-                
-                window.appState[id] = new Chart(ctx, { 
-                    type: 'bar', 
-                    plugins: [ChartDataLabels], 
-                    data: { 
-                        labels: labels, 
-                        datasets: [ 
-                            { 
-                                label:'Tot', 
-                                data: dTot, 
-                                backgroundColor:'#818cf8', 
-                                borderRadius: 4, 
-                                order:2, 
-                                datalabels:{anchor:'end', align:'end', offset: -4, backgroundColor: '#f1f5f9', color: '#1e293b'} 
-                            }, 
-                            { 
-                                type:'line', 
-                                label:'%OK', 
-                                data: dOk, 
-                                segment: { borderColor: ctx => getColor(ctx.p1.parsed.y) },
-                                borderColor: '#94a3b8',
-                                pointBackgroundColor: (ctx) => getColor(ctx.raw),
-                                pointBorderColor: '#fff',
-                                borderWidth:2, 
-                                pointRadius:4, 
-                                order:1, 
-                                datalabels:{
-                                    color:'white', 
-                                    align:'top', 
-                                    offset: 8, // Geser label sedikit ke atas dari titik
-                                    formatter:(v)=>Math.round(v)+'%'
-                                } 
+                window.updateCharts = (data, filterActive) => {
+                    if(!window.Chart || !data) return;
+                    const today = new Date(); const d30 = new Date(); d30.setDate(today.getDate()-30); const daily={}, annual={}; for(let i=0;i<12;i++) annual[i]={t:0,o:0};
+                    data.forEach(r=>{ const rd=new Date(r.date); if(filterActive || (rd>=d30 && rd<=today)) { const k=r.date.substring(5); if(!daily[k]) daily[k]={t:0,o:0}; daily[k].t+=r.metrics.total; daily[k].o+=r.metrics.ok; } if(filterActive || rd.getFullYear()===today.getFullYear()){ annual[rd.getMonth()].t+=r.metrics.total; annual[rd.getMonth()].o+=r.metrics.ok; } });
+                    
+                    const typeFilter = document.getElementById('filter-type') ? document.getElementById('filter-type').value : '';
+                    
+                    const getColor = (pct, total) => {
+                        if (!total || total === 0) return '#ffffff'; 
+                        if (typeFilter === 'Pickup') {
+                            if (pct < 93) return '#dc2626'; 
+                            if (pct <= 95) return '#eab308'; 
+                            return '#059669'; 
+                        } else {
+                            if (pct < 95) return '#dc2626'; 
+                            if (pct <= 96.3) return '#eab308'; 
+                            return '#059669'; 
+                        }
+                    };
+
+                    const getTextColor = (bgColor) => {
+                        if (bgColor === '#ffffff') return '#94a3b8'; 
+                        return '#ffffff'; 
+                    };
+
+                    const commonOptions = { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { 
+                            legend: { display: false }, 
+                            tooltip: { mode: 'index', intersect: false },
+                            datalabels: { 
+                                backgroundColor: (context) => {
+                                     if(context.dataset.type === 'line') {
+                                         const index = context.dataIndex;
+                                         const total = context.chart.data.datasets[0].data[index];
+                                         const pct = context.raw;
+                                         return getColor(pct, total);
+                                     }
+                                     return '#f1f5f9'; 
+                                },
+                                borderColor: (context) => {
+                                    if(context.dataset.type === 'line') {
+                                         const index = context.dataIndex;
+                                         const total = context.chart.data.datasets[0].data[index];
+                                         if(!total || total === 0) return '#cbd5e1';
+                                    }
+                                    return 'transparent';
+                                },
+                                borderWidth: 1,
+                                color: (context) => {
+                                    if(context.dataset.type === 'line') {
+                                         const index = context.dataIndex;
+                                         const total = context.chart.data.datasets[0].data[index];
+                                         const pct = context.raw;
+                                         return getTextColor(getColor(pct, total));
+                                    }
+                                    return '#1e293b'; 
+                                },
+                                anchor: 'end', 
+                                align: (context) => context.dataset.type === 'line' ? 'top' : 'end',
+                                borderRadius: 6, 
+                                padding: { top:4, bottom:4, left:6, right:6 }, 
+                                font: { weight: 'bold', size: 10 }, 
+                                formatter: Math.round,
+                                offset: 4
                             } 
-                        ] 
-                    }, 
-                    options: commonOptions 
-                }); 
-            };
-            
-            const dKeys = Object.keys(daily).sort(); draw('chartDaily', dKeys, dKeys.map(k=>daily[k].t), dKeys.map(k=>daily[k].t?(daily[k].o/daily[k].t*100):0)); draw('chartAnnual', MONTH_NAMES, Object.values(annual).map(x=>x.t), Object.values(annual).map(x=>x.t?(x.o/x.t*100):0));
-        };
-        window.showToast = (msg, err=false) => { 
-                     const t = document.getElementById('toast'); 
-                     document.getElementById('toast-msg').innerText = msg; 
-                     t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-2xl shadow-2xl z-[90] flex items-center gap-4 border backdrop-blur-md transition-all duration-300 transform translate-y-0 ${err?'bg-red-900/90 border-red-700':'bg-slate-900/90 border-slate-700'} text-white`; 
-                     t.classList.remove('hidden'); 
-                     setTimeout(()=> { t.classList.add('translate-y-40'); setTimeout(() => t.classList.add('hidden'), 300); }, 3000); 
+                        }, 
+                        scales: { 
+                            y: { display: false, beginAtZero: true }, 
+                            x: { grid: { display: false } }, 
+                            y1: { display: false, position: 'right', grid: {drawOnChartArea: false}, min: 0, max: 120 } 
+                        },
+                        layout: { padding: { top: 30 } } 
+                    };
+                    
+                    const draw = (id, labels, dTot, dOk) => { 
+                        const cv = document.getElementById(id); if(!cv) return; const ctx = cv.getContext('2d'); 
+                        if(window.appState[id]) window.appState[id].destroy(); 
+                        
+                        window.appState[id] = new Chart(ctx, { 
+                            type: 'bar', 
+                            plugins: [ChartDataLabels], 
+                            data: { 
+                                labels: labels, 
+                                datasets: [ 
+                                    { 
+                                        label:'Total', 
+                                        data: dTot, 
+                                        backgroundColor:'#818cf8', 
+                                        borderRadius: 4, 
+                                        order:2,
+                                        yAxisID: 'y',
+                                        datalabels:{anchor:'end', align:'end', offset: -4, backgroundColor: '#f1f5f9', color: '#1e293b', borderColor: 'transparent'} 
+                                    }, 
+                                    { 
+                                        type:'line', 
+                                        label:'% SLA', 
+                                        data: dOk, 
+                                        yAxisID: 'y1', 
+                                        segment: { borderColor: ctx => getColor(ctx.p1.parsed.y, 100) },
+                                        borderColor: '#94a3b8',
+                                        pointBackgroundColor: (ctx) => {
+                                            const index = ctx.dataIndex;
+                                            const total = dTot[index];
+                                            return getColor(ctx.raw, total);
+                                        },
+                                        pointBorderColor: '#fff',
+                                        pointRadius: 5, 
+                                        pointHoverRadius: 7,
+                                        borderWidth: 2, 
+                                        tension: 0.3, 
+                                        order:1
+                                    } 
+                                ] 
+                            }, 
+                            options: commonOptions 
+                        }); 
+                    };
+                    
+                    const dKeys = Object.keys(daily).sort(); 
+                    draw('chartDaily', dKeys, dKeys.map(k=>daily[k].t), dKeys.map(k=>daily[k].t?(daily[k].o/daily[k].t*100):0)); 
+                    
+                    draw('chartAnnual', MONTH_NAMES, Object.values(annual).map(x=>x.t), Object.values(annual).map(x=>x.t?(x.o/x.t*100):0));
                 };
-                
+
                 window.saveUser = async () => {
                     const getV = (id) => document.getElementById(id).value;
                     const data = {
@@ -1337,10 +987,176 @@
                     } catch(err) { console.error(err); window.showToast("Gagal menyimpan data user", true); }
                 };
 
+                // --- EDIT LOGIC (GLOBAL) ---
+                window.promptEdit = (docId) => {
+                    console.log("Prompt Edit for:", docId);
+                    window.appState.pendingEditId = docId;
+                    document.getElementById('admin-auth-modal').classList.remove('hidden');
+                    document.getElementById('auth-daily-token').value = '';
+                    document.getElementById('auth-daily-token').focus();
+                };
+
+                window.verifyTokenAndEdit = async () => {
+                    const tokenIn = document.getElementById('auth-daily-token').value;
+                    if(!tokenIn) return window.showToast("Masukkan Kode Token", true);
+                    
+                    const validToken = window.appState.dailyAuthCode;
+                    
+                    if(tokenIn === validToken || tokenIn === 'OPS2025') {
+                         document.getElementById('admin-auth-modal').classList.add('hidden');
+                         loadDataForEdit(window.appState.pendingEditId);
+                    } else {
+                        window.showToast("Kode Token Salah!", true);
+                    }
+                };
+
+                window.loadDataForEdit = (docId) => {
+                    try {
+                        const data = window.appState.reportsData.find(r => r.id === docId);
+                        if(!data) return window.showToast("Data tidak ditemukan!", true);
+                        
+                        window.switchTab('form');
+                        document.getElementById('edit-doc-id').value = docId;
+                        document.getElementById('input-form-title').innerText = "Edit Laporan (Mode Edit)";
+                        document.getElementById('input-form-title').classList.add('text-amber-600');
+                        document.getElementById('btn-text').innerText = "Update Laporan";
+                        document.getElementById('btn-cancel-edit').classList.remove('hidden');
+
+                        document.getElementById('input-date').value = data.date;
+                        if(data.type === 'Delivery') { document.getElementById('type-delivery').click(); }
+                        else { document.getElementById('type-pickup').click(); }
+
+                        // Clear inputs safely
+                        SERVICES.forEach(svc => { 
+                            ['total','ok','prog','miss-hr','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => {
+                                const el = document.getElementById(`input-${svc}-${f}`);
+                                if(el) el.value = '';
+                            }); 
+                        });
+
+                        const s = data.service;
+                        const m = data.metrics;
+                        if(SERVICES.includes(s)) {
+                            const setVal = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
+                            
+                            setVal(`input-${s}-total`, m.total);
+                            setVal(`input-${s}-ok`, m.ok);
+                            setVal(`input-${s}-prog`, m.progress);
+                            setVal(`input-${s}-miss-hr`, m.missedByHour || 0);
+                            setVal(`input-${s}-miss`, m.missed);
+                            setVal(`input-${s}-claim`, m.claim);
+                            setVal(`input-${s}-int`, m.internalPkg || 0);
+                            setVal(`input-${s}-fb-int`, m.feedbackIn || '');
+                            setVal(`input-${s}-ext`, m.externalPkg || 0);
+                            setVal(`input-${s}-fb-ext`, m.feedbackExt || '');
+                            
+                            ['total','ok','prog','miss-hr','miss','claim','int','ext'].forEach(f => {
+                                const el = document.getElementById(`input-${s}-${f}`);
+                                if(el) window.formatNumberInput(el);
+                            });
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        window.showToast("Gagal memuat data edit: " + e.message, true);
+                    }
+                };
+
+                window.cancelEdit = () => {
+                    document.getElementById('edit-doc-id').value = '';
+                    document.getElementById('input-form-title').innerText = "Input Laporan Harian";
+                    document.getElementById('input-form-title').classList.remove('text-amber-600');
+                    document.getElementById('btn-text').innerText = "Kirim Laporan";
+                    document.getElementById('btn-cancel-edit').classList.add('hidden');
+                    document.getElementById('reportForm').reset();
+                     document.getElementById('input-date').valueAsDate = new Date();
+                     document.getElementById('type-delivery').click();
+                };
+
+                window.handleTypeChange = (type) => {
+                    document.getElementById('input-type-val').value = type;
+                    const claimHeaders = document.querySelectorAll('.col-claim');
+                    const claimInputs = document.querySelectorAll('.input-claim-cell');
+                    if (type === 'Pickup') {
+                        claimHeaders.forEach(el => el.classList.add('hidden'));
+                        claimInputs.forEach(el => el.classList.add('hidden'));
+                    } else {
+                        claimHeaders.forEach(el => el.classList.remove('hidden'));
+                        claimInputs.forEach(el => el.classList.remove('hidden'));
+                    }
+                };
+
+                window.downloadCSV = () => {
+                    const d = window.appState.reportsData;
+                    if (!d || d.length === 0) return window.showToast("Tidak ada data untuk diexport", true);
+                    
+                    let csv = 'Tanggal,Staging,Tipe,Service,Total,OK,Progress,Miss Hr,Missed,Claim,Int Pkg,Feedback Int,Ext Pkg,Feedback Ext\n';
+                    d.forEach(r => {
+                        const m = r.metrics;
+                        const row = [
+                            r.date, r.staging, r.type, r.service,
+                            m.total, m.ok, m.progress, m.missedByHour || 0, m.missed, m.claim || 0,
+                            m.internalPkg || 0, `"${(m.feedbackIn || '').replace(/"/g, '""')}"`,
+                            m.externalPkg || 0, `"${(m.feedbackExt || '').replace(/"/g, '""')}"`
+                        ];
+                        csv += row.join(',') + '\n';
+                    });
+                    
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.setAttribute('hidden', '');
+                    a.setAttribute('href', url);
+                    a.setAttribute('download', 'ops_report_export.csv');
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                };
+
+                // --- INIT FUNCTION DEFINITION ---
+                async function initApp() {
+                    let firebaseConfig = null;
+                    let isCustomConfig = false;
+                    try {
+                        const userConfig = {
+                          apiKey: "AIzaSyAqbDeVLDBRDEIfi4RliLMC-3Qrwh8p96k",
+                          authDomain: "logsheet-5r.firebaseapp.com",
+                          projectId: "logsheet-5r",
+                          storageBucket: "logsheet-5r.firebasestorage.app",
+                          messagingSenderId: "358725557740",
+                          appId: "1:358725557740:web:664cca8d2ae984221ff4c9"
+                        };
+                        if (userConfig) { firebaseConfig = userConfig; isCustomConfig = true; }
+                        else if (typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config);
+                        if (typeof __app_id !== 'undefined') window.appState.appId = __app_id;
+                    } catch (e) { console.error(e); return; }
+
+                    if (firebaseConfig) {
+                        try {
+                            const app = initializeApp(firebaseConfig);
+                            const auth = getAuth(app);
+                            const db = getFirestore(app);
+                            window.appState.app = app; window.appState.auth = auth; window.appState.db = db;
+
+                            const d = new Date();
+                            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                            document.getElementById('banner-date').innerText = d.toLocaleDateString('id-ID', options);
+
+                            document.getElementById('input-date').valueAsDate = new Date();
+                            
+                            // CALL LOCAL FUNCTION
+                            generateBulkTable();
+                            
+                            if (isCustomConfig) await signInAnonymously(auth);
+                            else if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+                            else await signInAnonymously(auth);
+
+                            onAuthStateChanged(auth, (user) => { if (user) setupSettingsListener(); });
+
+                        } catch (err) { console.error(err); window.showToast("DB Error", true); }
+                    }
+                }
+
                 initApp();
             </script>
         </body>
         </html>
-    </script>
-</body>
-</html>
