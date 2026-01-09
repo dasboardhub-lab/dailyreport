@@ -33,20 +33,15 @@
         .nav-link { position: relative; color: #64748b; transition: all 0.3s ease; }
         .nav-link:hover { color: #2563eb; background-color: #eff6ff; border-radius: 8px; }
         .nav-link.active-tab { color: #2563eb; font-weight: 700; background-color: #eff6ff; border-radius: 8px; }
-        
         .hidden-section { display: none !important; }
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
         .loader { border: 3px solid #e2e8f0; border-radius: 50%; border-top: 3px solid #2563eb; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        
         .sticky-col { position: sticky; left: 0; background-color: #ffffff; z-index: 20; box-shadow: 4px 0 6px -4px rgba(0,0,0,0.1); }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-        
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
         input[readonly] { background-color: #f8fafc; color: #64748b; cursor: not-allowed; border-color: #e2e8f0; }
@@ -126,7 +121,7 @@
         </nav>
 
         <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-            <!-- Welcome Banner -->
+            <!-- Welcome Banner & Status -->
             <div id="welcome-banner" class="hidden-section fade-in bg-gradient-to-r from-slate-800 to-slate-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden mb-8">
                 <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white/5 blur-3xl"></div>
                 <div class="absolute bottom-0 left-20 w-40 h-40 rounded-full bg-brand-500/20 blur-2xl"></div>
@@ -503,7 +498,7 @@
             }
         }
 
-        // --- GLOBAL HELPERS (MUST BE FIRST) ---
+        // --- FORMATTING HELPERS ---
         window.setTextSafe = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
         window.formatNumberInput = (el) => {
             let val = el.value.replace(/\./g, '').replace(/[^0-9]/g, '');
@@ -731,27 +726,15 @@
             btn.disabled = true; loader.classList.remove('hidden'); errorBox.classList.add('hidden');
 
             try {
-                // FORCE ADMIN LOGIN LOGIC FOR "admin" USERNAME or ADMIN TAB
-                const userInInput = document.getElementById('login-username').value.trim();
-                const isAdminOverride = (mode === 'admin') || (userInInput === 'admin');
-
-                if (isAdminOverride) {
+                if (mode === 'admin') {
                     const qAdmin = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), where("role", "==", "admin"));
                     const snapAdmin = await getDocs(qAdmin);
                     let adminDoc = null;
                     if(!snapAdmin.empty) { const d = snapAdmin.docs[0].data(); if(d.password === passIn) adminDoc = { ...d, id: snapAdmin.docs[0].id }; }
-                    
-                    // Setup Trigger
                     if((!adminDoc && passIn === 'admin123') || (adminDoc && adminDoc.password === 'admin123' && passIn === 'admin123')) {
                         document.getElementById('setup-admin-modal').classList.remove('hidden'); btn.disabled = false; loader.classList.add('hidden'); return;
                     }
-                    if(adminDoc && adminDoc.password === passIn) { 
-                        window.appState.appProfile = adminDoc; 
-                        // IMPORTANT: Force admin role in memory
-                        window.appState.appProfile.role = 'admin'; 
-                        window.appState.loginMode = 'admin'; // Sync mode
-                        finishLogin(); return; 
-                    }
+                    if(adminDoc && adminDoc.password === passIn) { window.appState.appProfile = adminDoc; finishLogin(); return; }
                     throw new Error("Password Admin Salah.");
                 }
 
@@ -878,8 +861,32 @@
                 }
             };
             renderTab('staging-breakdown-body', stgMap, false); renderTab('service-breakdown-body', svcMap, true);
-            const tbFb = document.getElementById('feedback-recap-body'); if(tbFb) { tbFb.innerHTML=''; fbList.slice(0,20).forEach(r=>{ tbFb.innerHTML+=`<tr class="hover:bg-slate-50 border-b border-slate-50"><td class="px-6 py-3 align-top"><div class="font-bold text-slate-700">${r.date}</div><div class="text-[10px] text-slate-400">${r.staging} (${r.service})</div></td><td class="px-6 py-3 text-sm text-slate-600">${r.metrics.feedbackIn||'-'}</td><td class="px-6 py-3 text-sm text-slate-600">${r.metrics.feedbackExt||'-'}</td></tr>`; }); }
+            const tbFb = document.getElementById('feedback-recap-body'); if(tbFb) { tbFb.innerHTML=''; 
+                // Group feedback by staging/service/date to summarize
+                const summary = {};
+                fbList.forEach(r => {
+                    const key = `${r.date} - ${r.staging} (${r.service})`;
+                    if (!summary[key]) summary[key] = { date: r.date, staging: r.staging, service: r.service, int: [], ext: [] };
+                    if (r.metrics.feedbackIn) summary[key].int.push(r.metrics.feedbackIn);
+                    if (r.metrics.feedbackExt) summary[key].ext.push(r.metrics.feedbackExt);
+                });
+                
+                Object.values(summary).forEach(s => {
+                    const intText = s.int.length ? `<ul class="list-disc pl-4">${s.int.map(f => `<li>${f}</li>`).join('')}</ul>` : '-';
+                    const extText = s.ext.length ? `<ul class="list-disc pl-4">${s.ext.map(f => `<li>${f}</li>`).join('')}</ul>` : '-';
+                    
+                    tbFb.innerHTML+=`<tr class="hover:bg-slate-50 border-b border-slate-50"><td class="px-6 py-3 align-top"><div class="font-bold text-slate-700">${s.date}</div><div class="text-[10px] text-slate-400">${s.staging} (${s.service})</div></td><td class="px-6 py-3 text-sm text-slate-600">${intText}</td><td class="px-6 py-3 text-sm text-slate-600">${extText}</td></tr>`; 
+                });
+            }
             if(!document.getElementById('section-dashboard').classList.contains('hidden-section') && window.updateCharts) window.updateCharts(filtered, !!fStart||!!fEnd);
+        };
+        window.updateCharts = (data, filterActive) => {
+            if(!window.Chart || !data) return;
+            const today = new Date(); const d30 = new Date(); d30.setDate(today.getDate()-30); const daily={}, annual={}; for(let i=0;i<12;i++) annual[i]={t:0,o:0};
+            data.forEach(r=>{ const rd=new Date(r.date); if(filterActive || (rd>=d30 && rd<=today)) { const k=r.date.substring(5); if(!daily[k]) daily[k]={t:0,o:0}; daily[k].t+=r.metrics.total; daily[k].o+=r.metrics.ok; } if(filterActive || rd.getFullYear()===today.getFullYear()){ annual[rd.getMonth()].t+=r.metrics.total; annual[rd.getMonth()].o+=r.metrics.ok; } });
+            const commonOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { color: '#64748b', anchor: 'end', align: 'top', font: { weight: 'bold', size: 10 }, formatter: Math.round } }, scales: { y: { display: false }, x: { grid: { display: false } }, y1: { display: false, grid: {drawOnChartArea: false} } } };
+            const draw = (id, labels, dTot, dOk) => { const cv = document.getElementById(id); if(!cv) return; const ctx = cv.getContext('2d'); if(window.appState[id]) window.appState[id].destroy(); window.appState[id] = new Chart(ctx, { type: 'bar', plugins: [ChartDataLabels], data: { labels: labels, datasets: [ { label:'Tot', data: dTot, backgroundColor:'#3b82f6', order:2, datalabels:{anchor:'end', align:'end'} }, { type:'line', label:'%OK', data: dOk, borderColor:'#22c55e', borderWidth:2, pointRadius:3, order:1, datalabels:{color:'#166534', align:'top', formatter:(v)=>Math.round(v)+'%'} } ] }, options: commonOptions }); };
+            const dKeys = Object.keys(daily).sort(); draw('chartDaily', dKeys, dKeys.map(k=>daily[k].t), dKeys.map(k=>daily[k].t?(daily[k].o/daily[k].t*100):0)); draw('chartAnnual', MONTH_NAMES, Object.values(annual).map(x=>x.t), Object.values(annual).map(x=>x.t?(x.o/x.t*100):0));
         };
         window.showToast = (msg, err=false) => { const t = document.getElementById('toast'); document.getElementById('toast-msg').innerText = msg; t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-xl shadow-2xl z-[90] flex items-center gap-3 border ${err?'bg-red-900 border-red-700':'bg-slate-800 border-slate-700'} text-white`; t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'), 3000); };
         
