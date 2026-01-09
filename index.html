@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Report Operasional</title>
     
+    <!-- Favicon (Logo Anteraja Style) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23392061%22/><text x=%2250%22 y=%2275%22 font-family=%22sans-serif%22 font-weight=%22900%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22%23E71B78%22>a</text></svg>">
+    
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -522,807 +525,702 @@
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
 
-    <!-- Confirm Modal -->
-    <div id="confirmModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden scale-95 transition-transform duration-300 border border-white/20" id="confirmContent">
-            <div class="p-8 text-center">
-                <div class="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-blue-50 mb-4">
-                    <i class="fa-solid fa-circle-question text-blue-600 text-2xl"></i>
-                </div>
-                <h3 class="text-lg font-extrabold text-slate-900 mb-2" id="confirmTitle">Konfirmasi</h3>
-                <p class="text-sm text-slate-500 mb-8" id="confirmMessage">Apakah Anda yakin?</p>
-                <div class="flex justify-center gap-3">
-                    <button id="btn-confirm-cancel" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-colors">Batal</button>
-                    <button id="btn-confirm-yes" class="px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5">Ya, Lanjutkan</button>
-                </div>
+            <!-- Toast -->
+            <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl transform translate-y-40 transition-all duration-300 z-[80] flex items-center gap-4 hidden border border-slate-700/50 backdrop-blur-md">
+                <div id="toast-icon" class="text-blue-400 text-xl"><i class="fa-solid fa-circle-info"></i></div>
+                <div><p id="toast-msg" class="font-medium text-sm">Notification</p></div>
             </div>
-        </div>
-    </div>
 
-    <!-- Auth Modal (For Editing) - Updated for Daily Token -->
-    <div id="admin-auth-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center transform scale-100 transition-all">
-            <div class="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-amber-600 text-2xl"><i class="fa-solid fa-lock"></i></div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">Restricted Access</h3>
-            <p class="text-sm text-slate-500 mb-6">Masukkan <b>Kode Token Harian</b> untuk mengedit data ini.</p>
-            <input type="password" id="auth-daily-token" class="w-full rounded-xl border-slate-300 text-sm py-3 px-4 focus:ring-amber-500 mb-5 text-center font-mono tracking-widest" placeholder="Kode Token">
-            <div class="flex gap-3">
-                <button onclick="document.getElementById('admin-auth-modal').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200">Batal</button>
-                <button onclick="verifyTokenAndEdit()" class="flex-1 bg-amber-500 text-white font-bold py-3 rounded-xl hover:bg-amber-600 shadow-lg shadow-amber-500/30">Buka Kunci</button>
-            </div>
-        </div>
-    </div>
+            <!-- JAVASCRIPT LOGIC -->
+            <script type="module">
+                import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+                import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+                import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, where, orderBy, serverTimestamp, setDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    <!-- Setup Admin Modal -->
-    <div id="setup-admin-modal" class="fixed inset-0 bg-slate-900/80 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden p-8 text-center">
-            <div class="w-16 h-16 bg-brand-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-brand-600 text-2xl shadow-inner"><i class="fa-solid fa-key"></i></div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">Setup Password Admin</h3>
-            <p class="text-sm text-slate-500 mb-6 leading-relaxed">Ini adalah akses pertama Anda. Amankan akun Administrator dengan password baru.</p>
-            <input type="password" id="setup-new-pass" class="w-full rounded-xl border-slate-300 text-sm py-3 px-4 focus:ring-brand-500 mb-5" placeholder="Password Baru (Min. 6 Karakter)">
-            <button onclick="saveAdminFirstTime()" id="btn-save-setup" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-brand-500/30">Simpan & Masuk</button>
-        </div>
-    </div>
-
-    <!-- User Modal -->
-    <div id="userModal" class="fixed inset-0 bg-slate-900/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
-        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300" id="userModalContent">
-            <div class="bg-slate-900 px-8 py-6 flex justify-between items-center text-white">
-                <div>
-                    <h3 class="font-bold text-lg" id="modalTitle">Tambah User</h3>
-                    <p class="text-slate-400 text-xs mt-0.5">Isi detail kredensial user baru.</p>
-                </div>
-                <button onclick="closeUserModal()" class="hover:text-red-300 transition-colors bg-white/10 w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/20"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <form id="userForm" class="p-8 space-y-5" onsubmit="event.preventDefault();">
-                <input type="hidden" id="edit-user-id">
-                <div class="grid grid-cols-2 gap-5">
-                    <div class="space-y-1.5">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase">Username</label>
-                        <input type="text" id="modal-username" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase">Password</label>
-                        <input type="text" id="modal-password" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white" placeholder="Min 6 char">
-                    </div>
-                </div>
-                <div class="space-y-1.5">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase">Role Akses</label>
-                    <div class="relative">
-                        <select id="modal-role" class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 appearance-none">
-                            <option value="user">User (Input Only)</option>
-                            <option value="admin">Admin (Full Access)</option>
-                        </select>
-                         <div class="absolute right-3 top-3.5 text-slate-400 pointer-events-none"><i class="fa-solid fa-chevron-down text-xs"></i></div>
-                    </div>
-                </div>
-                <div class="space-y-1.5">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase">Area / Kota</label>
-                    <input type="text" id="modal-area" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
-                </div>
-                <div class="space-y-1.5">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase">Nama Staging</label>
-                    <input type="text" id="modal-staging" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
-                </div>
-                <div class="space-y-1.5">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase">Nama Leader (PIC)</label>
-                    <input type="text" id="modal-leader" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
-                </div>
+                const SERVICES = ['REG', 'ECO', 'ND', 'SDS', 'BIG'];
+                const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
                 
-                <div class="pt-6 flex justify-end gap-3 border-t border-slate-100 mt-2">
-                    <button type="button" onclick="closeUserModal()" class="px-6 py-3 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-colors">Batal</button>
-                    <button type="button" onclick="saveUser()" class="px-8 py-3 rounded-xl text-sm font-bold text-white bg-slate-900 hover:bg-black shadow-lg shadow-slate-900/20 transition-all transform hover:-translate-y-0.5">Simpan Data</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Toast -->
-    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl transform translate-y-40 transition-all duration-300 z-[80] flex items-center gap-4 hidden border border-slate-700/50 backdrop-blur-md">
-        <div id="toast-icon" class="text-blue-400 text-xl"><i class="fa-solid fa-circle-info"></i></div>
-        <div><p id="toast-msg" class="font-medium text-sm">Notification</p></div>
-    </div>
-
-    <!-- JAVASCRIPT LOGIC -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, where, orderBy, serverTimestamp, setDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const SERVICES = ['REG', 'ECO', 'ND', 'SDS', 'BIG'];
-        const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
-        
-        window.appState = {
-            app: null, auth: null, db: null,
-            sessionUser: null, appProfile: null,
-            unsubscribeReports: null, unsubscribeUsers: null, unsubscribeSettings: null,
-            reportsData: [], appId: 'default-app-id',
-            stagingMap: {},
-            loginMode: 'user',
-            pendingEditId: null,
-            dailyAuthCode: 'OPS2025' // Default fallback
-        };
-
-        // --- AUTH & INIT ---
-        async function initApp() {
-            let firebaseConfig = null;
-            let isCustomConfig = false;
-            try {
-                const userConfig = {
-                  apiKey: "AIzaSyAqbDeVLDBRDEIfi4RliLMC-3Qrwh8p96k",
-                  authDomain: "logsheet-5r.firebaseapp.com",
-                  projectId: "logsheet-5r",
-                  storageBucket: "logsheet-5r.firebasestorage.app",
-                  messagingSenderId: "358725557740",
-                  appId: "1:358725557740:web:664cca8d2ae984221ff4c9"
+                window.appState = {
+                    app: null, auth: null, db: null,
+                    sessionUser: null, appProfile: null,
+                    unsubscribeReports: null, unsubscribeUsers: null, unsubscribeSettings: null,
+                    reportsData: [], appId: 'default-app-id',
+                    stagingMap: {},
+                    loginMode: 'user',
+                    pendingEditId: null,
+                    dailyAuthCode: 'OPS2025' // Default fallback
                 };
-                if (userConfig) { firebaseConfig = userConfig; isCustomConfig = true; }
-                else if (typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config);
-                if (typeof __app_id !== 'undefined') window.appState.appId = __app_id;
-            } catch (e) { console.error(e); return; }
 
-            if (firebaseConfig) {
-                try {
-                    const app = initializeApp(firebaseConfig);
-                    const auth = getAuth(app);
-                    const db = getFirestore(app);
-                    window.appState.app = app; window.appState.auth = auth; window.appState.db = db;
+                // --- AUTH & INIT ---
+                async function initApp() {
+                    let firebaseConfig = null;
+                    let isCustomConfig = false;
+                    try {
+                        const userConfig = {
+                          apiKey: "AIzaSyAqbDeVLDBRDEIfi4RliLMC-3Qrwh8p96k",
+                          authDomain: "logsheet-5r.firebaseapp.com",
+                          projectId: "logsheet-5r",
+                          storageBucket: "logsheet-5r.firebasestorage.app",
+                          messagingSenderId: "358725557740",
+                          appId: "1:358725557740:web:664cca8d2ae984221ff4c9"
+                        };
+                        if (userConfig) { firebaseConfig = userConfig; isCustomConfig = true; }
+                        else if (typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config);
+                        if (typeof __app_id !== 'undefined') window.appState.appId = __app_id;
+                    } catch (e) { console.error(e); return; }
 
-                    const d = new Date();
-                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                    document.getElementById('banner-date').innerText = d.toLocaleDateString('id-ID', options);
+                    if (firebaseConfig) {
+                        try {
+                            const app = initializeApp(firebaseConfig);
+                            const auth = getAuth(app);
+                            const db = getFirestore(app);
+                            window.appState.app = app; window.appState.auth = auth; window.appState.db = db;
 
-                    document.getElementById('input-date').valueAsDate = new Date();
-                    generateBulkTable();
-                    
-                    if (isCustomConfig) await signInAnonymously(auth);
-                    else if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
-                    else await signInAnonymously(auth);
+                            const d = new Date();
+                            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                            document.getElementById('banner-date').innerText = d.toLocaleDateString('id-ID', options);
 
-                    onAuthStateChanged(auth, (user) => { if (user) setupSettingsListener(); });
+                            document.getElementById('input-date').valueAsDate = new Date();
+                            generateBulkTable();
+                            
+                            if (isCustomConfig) await signInAnonymously(auth);
+                            else if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+                            else await signInAnonymously(auth);
 
-                } catch (err) { console.error(err); window.showToast("DB Error", true); }
-            }
-        }
+                            onAuthStateChanged(auth, (user) => { if (user) setupSettingsListener(); });
 
-        // --- HELPERS ---
-        window.setTextSafe = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
-        window.formatNumberInput = (el) => {
-            let val = el.value.replace(/\./g, '').replace(/[^0-9]/g, '');
-            if(val) el.value = new Intl.NumberFormat('id-ID').format(val);
-            else el.value = '';
-        };
-
-        window.getRawValue = (elId) => {
-            const el = document.getElementById(elId);
-            if(!el || !el.value) return 0;
-            return parseInt(el.value.replace(/\./g, ''), 10) || 0;
-        };
-
-        window.showToast = (msg, err=false) => { 
-            const t = document.getElementById('toast'); 
-            document.getElementById('toast-msg').innerText = msg; 
-            t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-2xl shadow-2xl z-[90] flex items-center gap-4 border backdrop-blur-md transition-all duration-300 transform translate-y-0 ${err?'bg-red-900/90 border-red-700':'bg-slate-900/90 border-slate-700'} text-white`; 
-            t.classList.remove('hidden'); 
-            setTimeout(()=> {
-                 t.classList.add('translate-y-40');
-                 setTimeout(() => t.classList.add('hidden'), 300);
-            }, 3000); 
-        };
-
-        // --- SUBMIT ---
-        window.confirmSubmitReport = () => {
-            if(!window.appState.appProfile) return window.showToast("Sesi habis. Login ulang.", true);
-            let hasData = false;
-            SERVICES.forEach(svc => {
-                if (window.getRawValue(`input-${svc}-total`) > 0) hasData = true;
-                if (document.getElementById(`input-${svc}-fb-int`).value) hasData = true;
-                if (document.getElementById(`input-${svc}-fb-ext`).value) hasData = true;
-            });
-            if(!hasData) return window.showToast("Isi minimal satu data!", true);
-            
-            const actionText = document.getElementById('edit-doc-id').value ? "Update Laporan?" : "Kirim Laporan?";
-            window.showConfirm(actionText, "Pastikan data yang Anda masukkan sudah benar.", async () => { await window.submitReport(); });
-        };
-
-        window.submitReport = async () => {
-            const btn = document.getElementById('btn-submit');
-            btn.disabled = true; document.getElementById('btn-loader').classList.remove('hidden');
-            const editId = document.getElementById('edit-doc-id').value;
-
-            try {
-                const profile = window.appState.appProfile;
-                const role = window.appState.loginMode === 'admin' ? 'admin' : (profile.role || 'user');
-                const dateVal = document.getElementById('input-date').value;
-                const typeVal = document.getElementById('input-type-val').value;
-                
-                const commonData = { 
-                    date: dateVal, 
-                    type: typeVal, 
-                    username: profile.username, 
-                    timestamp: serverTimestamp() 
-                };
-                
-                if (role === 'admin') {
-                    commonData.staging = document.getElementById('input-staging-admin').value; 
-                    commonData.area = document.getElementById('input-area-admin').value; 
-                    commonData.leader = document.getElementById('input-leader-admin').value;
-                    if(!commonData.staging) throw new Error("Pilih Staging!");
-                } else {
-                    commonData.area = document.getElementById('input-area-user').value; 
-                    commonData.staging = document.getElementById('input-staging-user').value; 
-                    commonData.leader = document.getElementById('input-leader-user').value;
-                }
-
-                const colRef = collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports');
-                const isPickup = typeVal === 'Pickup';
-
-                // Check Duplicates if not editing
-                if(!editId) {
-                    const qCheck = query(colRef, where("date", "==", dateVal), where("type", "==", typeVal), where("staging", "==", commonData.staging));
-                    const snapCheck = await getDocs(qCheck);
-                    if(!snapCheck.empty) {
-                        let alreadyExists = false;
-                        SERVICES.forEach(svc => {
-                             if(window.getRawValue(`input-${svc}-total`) > 0) {
-                                 const found = snapCheck.docs.find(d => d.data().service === svc);
-                                 if(found) alreadyExists = true;
-                             }
-                        });
-                        if(alreadyExists) throw new Error("Data sudah ada untuk tanggal & tipe ini. Gunakan Menu Rekapan -> Edit.");
+                        } catch (err) { console.error(err); window.showToast("DB Error", true); }
                     }
                 }
-                
-                const promises = [];
-                if (editId) {
-                     let svcToUpdate = null;
-                     SERVICES.forEach(svc => { if(window.getRawValue(`input-${svc}-total`) > 0 || document.getElementById(`input-${svc}-fb-int`).value) svcToUpdate = svc; });
-                     
-                     if(svcToUpdate) {
-                         await updateDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports', editId), {
-                             ...commonData,
-                             service: svcToUpdate,
-                             metrics: { 
-                                total: window.getRawValue(`input-${svcToUpdate}-total`), 
-                                ok: window.getRawValue(`input-${svcToUpdate}-ok`), 
-                                progress: window.getRawValue(`input-${svcToUpdate}-prog`), 
-                                missedByHour: window.getRawValue(`input-${svcToUpdate}-miss-hr`),
-                                missed: window.getRawValue(`input-${svcToUpdate}-miss`), 
-                                claim: isPickup ? 0 : window.getRawValue(`input-${svcToUpdate}-claim`),
-                                internalPkg: window.getRawValue(`input-${svcToUpdate}-int`), 
-                                feedbackIn: document.getElementById(`input-${svcToUpdate}-fb-int`).value, 
-                                externalPkg: window.getRawValue(`input-${svcToUpdate}-ext`), 
-                                feedbackExt: document.getElementById(`input-${svcToUpdate}-fb-ext`).value 
-                            }
-                         });
-                         window.showToast("Laporan Berhasil Diupdate!");
-                         window.cancelEdit(); 
-                     }
-                } else {
+
+                // --- HELPERS ---
+                window.setTextSafe = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
+                window.formatNumberInput = (el) => {
+                    let val = el.value.replace(/\./g, '').replace(/[^0-9]/g, '');
+                    if(val) el.value = new Intl.NumberFormat('id-ID').format(val);
+                    else el.value = '';
+                };
+
+                window.getRawValue = (elId) => {
+                    const el = document.getElementById(elId);
+                    if(!el || !el.value) return 0;
+                    return parseInt(el.value.replace(/\./g, ''), 10) || 0;
+                };
+
+                window.showToast = (msg, err=false) => { 
+                    const t = document.getElementById('toast'); 
+                    document.getElementById('toast-msg').innerText = msg; 
+                    t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-2xl shadow-2xl z-[90] flex items-center gap-4 border backdrop-blur-md transition-all duration-300 transform translate-y-0 ${err?'bg-red-900/90 border-red-700':'bg-slate-900/90 border-slate-700'} text-white`; 
+                    t.classList.remove('hidden'); 
+                    setTimeout(()=> {
+                         t.classList.add('translate-y-40');
+                         setTimeout(() => t.classList.add('hidden'), 300);
+                    }, 3000); 
+                };
+
+                // --- SUBMIT ---
+                window.confirmSubmitReport = () => {
+                    if(!window.appState.appProfile) return window.showToast("Sesi habis. Login ulang.", true);
+                    let hasData = false;
                     SERVICES.forEach(svc => {
-                        const total = window.getRawValue(`input-${svc}-total`);
-                        const fbInt = document.getElementById(`input-${svc}-fb-int`).value;
-                        const fbExt = document.getElementById(`input-${svc}-fb-ext`).value;
-                        if (total > 0 || fbInt || fbExt) {
-                            promises.push(addDoc(colRef, { 
-                                ...commonData, 
-                                service: svc, 
-                                metrics: { 
-                                    total: total, 
-                                    ok: window.getRawValue(`input-${svc}-ok`), 
-                                    progress: window.getRawValue(`input-${svc}-prog`), 
-                                    missedByHour: window.getRawValue(`input-${svc}-miss-hr`),
-                                    missed: window.getRawValue(`input-${svc}-miss`), 
-                                    claim: isPickup ? 0 : window.getRawValue(`input-${svc}-claim`),
-                                    internalPkg: window.getRawValue(`input-${svc}-int`), 
-                                    feedbackIn: fbInt, 
-                                    externalPkg: window.getRawValue(`input-${svc}-ext`), 
-                                    feedbackExt: fbExt 
-                                } 
-                            }));
+                        if (window.getRawValue(`input-${svc}-total`) > 0) hasData = true;
+                        if (document.getElementById(`input-${svc}-fb-int`).value) hasData = true;
+                        if (document.getElementById(`input-${svc}-fb-ext`).value) hasData = true;
+                    });
+                    if(!hasData) return window.showToast("Isi minimal satu data!", true);
+                    
+                    const actionText = document.getElementById('edit-doc-id').value ? "Update Laporan?" : "Kirim Laporan?";
+                    window.showConfirm(actionText, "Pastikan data yang Anda masukkan sudah benar.", async () => { await window.submitReport(); });
+                };
+
+                window.submitReport = async () => {
+                    const btn = document.getElementById('btn-submit');
+                    btn.disabled = true; document.getElementById('btn-loader').classList.remove('hidden');
+                    const editId = document.getElementById('edit-doc-id').value;
+
+                    try {
+                        const profile = window.appState.appProfile;
+                        const role = window.appState.loginMode === 'admin' ? 'admin' : (profile.role || 'user');
+                        const dateVal = document.getElementById('input-date').value;
+                        const typeVal = document.getElementById('input-type-val').value;
+                        
+                        const commonData = { 
+                            date: dateVal, 
+                            type: typeVal, 
+                            username: profile.username, 
+                            timestamp: serverTimestamp() 
+                        };
+                        
+                        if (role === 'admin') {
+                            commonData.staging = document.getElementById('input-staging-admin').value; 
+                            commonData.area = document.getElementById('input-area-admin').value; 
+                            commonData.leader = document.getElementById('input-leader-admin').value;
+                            if(!commonData.staging) throw new Error("Pilih Staging!");
+                        } else {
+                            commonData.area = document.getElementById('input-area-user').value; 
+                            commonData.staging = document.getElementById('input-staging-user').value; 
+                            commonData.leader = document.getElementById('input-leader-user').value;
+                        }
+
+                        const colRef = collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports');
+                        const isPickup = typeVal === 'Pickup';
+
+                        // Check Duplicates if not editing
+                        if(!editId) {
+                            const qCheck = query(colRef, where("date", "==", dateVal), where("type", "==", typeVal), where("staging", "==", commonData.staging));
+                            const snapCheck = await getDocs(qCheck);
+                            if(!snapCheck.empty) {
+                                let alreadyExists = false;
+                                SERVICES.forEach(svc => {
+                                     if(window.getRawValue(`input-${svc}-total`) > 0) {
+                                         const found = snapCheck.docs.find(d => d.data().service === svc);
+                                         if(found) alreadyExists = true;
+                                     }
+                                });
+                                if(alreadyExists) throw new Error("Data sudah ada untuk tanggal & tipe ini. Gunakan Menu Rekapan -> Edit.");
+                            }
+                        }
+                        
+                        const promises = [];
+                        if (editId) {
+                             let svcToUpdate = null;
+                             SERVICES.forEach(svc => { if(window.getRawValue(`input-${svc}-total`) > 0 || document.getElementById(`input-${svc}-fb-int`).value) svcToUpdate = svc; });
+                             
+                             if(svcToUpdate) {
+                                 await updateDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports', editId), {
+                                     ...commonData,
+                                     service: svcToUpdate,
+                                     metrics: { 
+                                        total: window.getRawValue(`input-${svcToUpdate}-total`), 
+                                        ok: window.getRawValue(`input-${svcToUpdate}-ok`), 
+                                        progress: window.getRawValue(`input-${svcToUpdate}-prog`), 
+                                        missedByHour: window.getRawValue(`input-${svcToUpdate}-miss-hr`),
+                                        missed: window.getRawValue(`input-${svcToUpdate}-miss`), 
+                                        claim: isPickup ? 0 : window.getRawValue(`input-${svcToUpdate}-claim`),
+                                        internalPkg: window.getRawValue(`input-${svcToUpdate}-int`), 
+                                        feedbackIn: document.getElementById(`input-${svcToUpdate}-fb-int`).value, 
+                                        externalPkg: window.getRawValue(`input-${svcToUpdate}-ext`), 
+                                        feedbackExt: document.getElementById(`input-${svcToUpdate}-fb-ext`).value 
+                                    }
+                                 });
+                                 window.showToast("Laporan Berhasil Diupdate!");
+                                 window.cancelEdit(); 
+                             }
+                        } else {
+                            SERVICES.forEach(svc => {
+                                const total = window.getRawValue(`input-${svc}-total`);
+                                const fbInt = document.getElementById(`input-${svc}-fb-int`).value;
+                                const fbExt = document.getElementById(`input-${svc}-fb-ext`).value;
+                                if (total > 0 || fbInt || fbExt) {
+                                    promises.push(addDoc(colRef, { 
+                                        ...commonData, 
+                                        service: svc, 
+                                        metrics: { 
+                                            total: total, 
+                                            ok: window.getRawValue(`input-${svc}-ok`), 
+                                            progress: window.getRawValue(`input-${svc}-prog`), 
+                                            missedByHour: window.getRawValue(`input-${svc}-miss-hr`),
+                                            missed: window.getRawValue(`input-${svc}-miss`), 
+                                            claim: isPickup ? 0 : window.getRawValue(`input-${svc}-claim`),
+                                            internalPkg: window.getRawValue(`input-${svc}-int`), 
+                                            feedbackIn: fbInt, 
+                                            externalPkg: window.getRawValue(`input-${svc}-ext`), 
+                                            feedbackExt: fbExt 
+                                        } 
+                                    }));
+                                }
+                            });
+                            await Promise.all(promises);
+                            window.showToast("Laporan Berhasil Dikirim!", false);
+                            SERVICES.forEach(svc => { ['total','ok','prog','miss-hr','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => document.getElementById(`input-${svc}-${f}`).value = ''); });
+                        }
+                    } catch(err) { console.error(err); window.showToast(err.message || "Gagal kirim.", true); } 
+                    finally { btn.disabled = false; document.getElementById('btn-loader').classList.add('hidden'); }
+                };
+
+                // --- EDIT WITH TOKEN LOGIC ---
+                window.promptEdit = (docId) => {
+                    window.appState.pendingEditId = docId;
+                    document.getElementById('admin-auth-modal').classList.remove('hidden');
+                    document.getElementById('auth-daily-token').value = '';
+                    document.getElementById('auth-daily-token').focus();
+                };
+
+                window.verifyTokenAndEdit = async () => {
+                    const tokenIn = document.getElementById('auth-daily-token').value;
+                    if(!tokenIn) return window.showToast("Masukkan Kode Token", true);
+                    
+                    // Check against stored settings
+                    const validToken = window.appState.dailyAuthCode;
+                    
+                    // Also allow 'admin123' as universal fallback just in case, or remove in production
+                    if(tokenIn === validToken || tokenIn === 'OPS2025') {
+                         document.getElementById('admin-auth-modal').classList.add('hidden');
+                         loadDataForEdit(window.appState.pendingEditId);
+                    } else {
+                        window.showToast("Kode Token Salah!", true);
+                    }
+                };
+
+                window.loadDataForEdit = (docId) => {
+                    const data = window.appState.reportsData.find(r => r.id === docId);
+                    if(!data) return;
+                    window.switchTab('form');
+                    document.getElementById('edit-doc-id').value = docId;
+                    document.getElementById('input-form-title').innerText = "Edit Laporan (Mode Edit)";
+                    document.getElementById('input-form-title').classList.add('text-amber-600');
+                    document.getElementById('btn-text').innerText = "Update Laporan";
+                    document.getElementById('btn-cancel-edit').classList.remove('hidden');
+
+                    document.getElementById('input-date').value = data.date;
+                    if(data.type === 'Delivery') { document.getElementById('type-delivery').click(); }
+                    else { document.getElementById('type-pickup').click(); }
+
+                    SERVICES.forEach(svc => { ['total','ok','prog','miss-hr','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => document.getElementById(`input-${svc}-${f}`).value = ''); });
+
+                    const s = data.service;
+                    const m = data.metrics;
+                    if(SERVICES.includes(s)) {
+                        document.getElementById(`input-${s}-total`).value = m.total;
+                        document.getElementById(`input-${s}-ok`).value = m.ok;
+                        document.getElementById(`input-${s}-prog`).value = m.progress;
+                        document.getElementById(`input-${s}-miss-hr`).value = m.missedByHour || 0;
+                        document.getElementById(`input-${s}-miss`).value = m.missed;
+                        document.getElementById(`input-${s}-claim`).value = m.claim;
+                        document.getElementById(`input-${s}-int`).value = m.internalPkg || 0;
+                        document.getElementById(`input-${s}-fb-int`).value = m.feedbackIn || '';
+                        document.getElementById(`input-${s}-ext`).value = m.externalPkg || 0;
+                        document.getElementById(`input-${s}-fb-ext`).value = m.feedbackExt || '';
+                        
+                        ['total','ok','prog','miss-hr','miss','claim','int','ext'].forEach(f => window.formatNumberInput(document.getElementById(`input-${s}-${f}`)));
+                    }
+                };
+
+                window.cancelEdit = () => {
+                    document.getElementById('edit-doc-id').value = '';
+                    document.getElementById('input-form-title').innerText = "Input Laporan Harian";
+                    document.getElementById('input-form-title').classList.remove('text-amber-600');
+                    document.getElementById('btn-text').innerText = "Kirim Laporan";
+                    document.getElementById('btn-cancel-edit').classList.add('hidden');
+                    document.getElementById('reportForm').reset();
+                     document.getElementById('input-date').valueAsDate = new Date();
+                     document.getElementById('type-delivery').click();
+                };
+
+                window.handleTypeChange = (type) => {
+                    document.getElementById('input-type-val').value = type;
+                    const claimHeaders = document.querySelectorAll('.col-claim');
+                    const claimInputs = document.querySelectorAll('.input-claim-cell');
+                    if (type === 'Pickup') {
+                        claimHeaders.forEach(el => el.classList.add('hidden'));
+                        claimInputs.forEach(el => el.classList.add('hidden'));
+                    } else {
+                        claimHeaders.forEach(el => el.classList.remove('hidden'));
+                        claimInputs.forEach(el => el.classList.remove('hidden'));
+                    }
+                };
+
+                // --- UI HANDLERS ---
+                window.switchLoginMode = (mode) => {
+                    window.appState.loginMode = mode;
+                    const tabBg = document.getElementById('login-tab-bg');
+                    const tabUser = document.getElementById('tab-user');
+                    const tabAdmin = document.getElementById('tab-admin');
+                    const fieldUser = document.getElementById('field-username');
+                    const btnText = document.getElementById('btn-login-text');
+
+                    if(mode === 'user') {
+                        tabBg.style.transform = 'translateX(0)';
+                        tabUser.classList.replace('text-slate-400', 'text-brand-600');
+                        tabAdmin.classList.replace('text-brand-600', 'text-slate-400');
+                        fieldUser.classList.remove('hidden', 'opacity-0', 'h-0'); fieldUser.classList.add('opacity-100', 'h-auto');
+                        document.getElementById('login-username').required = true; btnText.innerText = "Masuk Aplikasi";
+                    } else {
+                        tabBg.style.transform = 'translateX(100%)';
+                        tabUser.classList.replace('text-brand-600', 'text-slate-400');
+                        tabAdmin.classList.replace('text-slate-400', 'text-brand-600');
+                        fieldUser.classList.remove('opacity-100', 'h-auto'); fieldUser.classList.add('opacity-0', 'h-0');
+                        setTimeout(() => fieldUser.classList.add('hidden'), 300);
+                        document.getElementById('login-username').required = false; btnText.innerText = "Masuk Admin";
+                    }
+                };
+
+                window.handleLogout = () => {
+                    if(window.appState.unsubscribeReports) window.appState.unsubscribeReports();
+                    if(window.appState.unsubscribeUsers) window.appState.unsubscribeUsers();
+                    if(window.appState.unsubscribeSettings) window.appState.unsubscribeSettings();
+                    window.appState.appProfile = null;
+                    document.getElementById('reportForm').reset();
+                    window.cancelEdit();
+                    document.getElementById('app-layout').classList.add('hidden-section');
+                    document.getElementById('section-login').classList.remove('hidden');
+                    document.getElementById('section-login').style.display = 'flex';
+                    document.getElementById('login-username').value = '';
+                    document.getElementById('login-password').value = '';
+                    window.switchLoginMode('user');
+                };
+
+                window.switchTab = (tabName) => {
+                    if(tabName === 'settings' && window.appState.appProfile?.role !== 'admin') {
+                        window.showToast("Akses hanya untuk Admin!", true);
+                        return;
+                    }
+
+                    ['form', 'dashboard', 'settings', 'recap'].forEach(t => {
+                        const sec = document.getElementById(`section-${t}`);
+                        const btn = document.getElementById(`nav-${t}`);
+                        if(t === tabName) {
+                            sec.classList.remove('hidden-section');
+                            if(btn) btn.classList.add('active-tab'); 
+                            if(tabName === 'dashboard') {
+                                document.getElementById('welcome-banner').classList.remove('hidden-section');
+                                updateDashboard();
+                            } else if(tabName === 'recap') {
+                                document.getElementById('welcome-banner').classList.add('hidden-section');
+                                updateRecapTable();
+                            } else {
+                                document.getElementById('welcome-banner').classList.add('hidden-section');
+                            }
+                        } else {
+                            sec.classList.add('hidden-section');
+                            if(btn) btn.classList.remove('active-tab'); 
                         }
                     });
-                    await Promise.all(promises);
-                    window.showToast("Laporan Berhasil Dikirim!", false);
-                    SERVICES.forEach(svc => { ['total','ok','prog','miss-hr','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => document.getElementById(`input-${svc}-${f}`).value = ''); });
-                }
-            } catch(err) { console.error(err); window.showToast(err.message || "Gagal kirim.", true); } 
-            finally { btn.disabled = false; document.getElementById('btn-loader').classList.add('hidden'); }
-        };
-
-        // --- EDIT WITH TOKEN LOGIC ---
-        window.promptEdit = (docId) => {
-            window.appState.pendingEditId = docId;
-            document.getElementById('admin-auth-modal').classList.remove('hidden');
-            document.getElementById('auth-daily-token').value = '';
-            document.getElementById('auth-daily-token').focus();
-        };
-
-        window.verifyTokenAndEdit = async () => {
-            const tokenIn = document.getElementById('auth-daily-token').value;
-            if(!tokenIn) return window.showToast("Masukkan Kode Token", true);
-            
-            // Check against stored settings
-            const validToken = window.appState.dailyAuthCode;
-            
-            // Also allow 'admin123' as universal fallback just in case, or remove in production
-            if(tokenIn === validToken || tokenIn === 'OPS2025') {
-                 document.getElementById('admin-auth-modal').classList.add('hidden');
-                 loadDataForEdit(window.appState.pendingEditId);
-            } else {
-                window.showToast("Kode Token Salah!", true);
-            }
-        };
-
-        window.loadDataForEdit = (docId) => {
-            const data = window.appState.reportsData.find(r => r.id === docId);
-            if(!data) return;
-            window.switchTab('form');
-            document.getElementById('edit-doc-id').value = docId;
-            document.getElementById('input-form-title').innerText = "Edit Laporan (Mode Edit)";
-            document.getElementById('input-form-title').classList.add('text-amber-600');
-            document.getElementById('btn-text').innerText = "Update Laporan";
-            document.getElementById('btn-cancel-edit').classList.remove('hidden');
-
-            document.getElementById('input-date').value = data.date;
-            if(data.type === 'Delivery') { document.getElementById('type-delivery').click(); }
-            else { document.getElementById('type-pickup').click(); }
-
-            SERVICES.forEach(svc => { ['total','ok','prog','miss-hr','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => document.getElementById(`input-${svc}-${f}`).value = ''); });
-
-            const s = data.service;
-            const m = data.metrics;
-            if(SERVICES.includes(s)) {
-                document.getElementById(`input-${s}-total`).value = m.total;
-                document.getElementById(`input-${s}-ok`).value = m.ok;
-                document.getElementById(`input-${s}-prog`).value = m.progress;
-                document.getElementById(`input-${s}-miss-hr`).value = m.missedByHour || 0;
-                document.getElementById(`input-${s}-miss`).value = m.missed;
-                document.getElementById(`input-${s}-claim`).value = m.claim;
-                document.getElementById(`input-${s}-int`).value = m.internalPkg || 0;
-                document.getElementById(`input-${s}-fb-int`).value = m.feedbackIn || '';
-                document.getElementById(`input-${s}-ext`).value = m.externalPkg || 0;
-                document.getElementById(`input-${s}-fb-ext`).value = m.feedbackExt || '';
-                
-                ['total','ok','prog','miss-hr','miss','claim','int','ext'].forEach(f => window.formatNumberInput(document.getElementById(`input-${s}-${f}`)));
-            }
-        };
-
-        window.cancelEdit = () => {
-            document.getElementById('edit-doc-id').value = '';
-            document.getElementById('input-form-title').innerText = "Input Laporan Harian";
-            document.getElementById('input-form-title').classList.remove('text-amber-600');
-            document.getElementById('btn-text').innerText = "Kirim Laporan";
-            document.getElementById('btn-cancel-edit').classList.add('hidden');
-            document.getElementById('reportForm').reset();
-             document.getElementById('input-date').valueAsDate = new Date();
-             document.getElementById('type-delivery').click();
-        };
-
-        window.handleTypeChange = (type) => {
-            document.getElementById('input-type-val').value = type;
-            const claimHeaders = document.querySelectorAll('.col-claim');
-            const claimInputs = document.querySelectorAll('.input-claim-cell');
-            if (type === 'Pickup') {
-                claimHeaders.forEach(el => el.classList.add('hidden'));
-                claimInputs.forEach(el => el.classList.add('hidden'));
-            } else {
-                claimHeaders.forEach(el => el.classList.remove('hidden'));
-                claimInputs.forEach(el => el.classList.remove('hidden'));
-            }
-        };
-
-        // --- UI HANDLERS ---
-        window.switchLoginMode = (mode) => {
-            window.appState.loginMode = mode;
-            const tabBg = document.getElementById('login-tab-bg');
-            const tabUser = document.getElementById('tab-user');
-            const tabAdmin = document.getElementById('tab-admin');
-            const fieldUser = document.getElementById('field-username');
-            const btnText = document.getElementById('btn-login-text');
-
-            if(mode === 'user') {
-                tabBg.style.transform = 'translateX(0)';
-                tabUser.classList.replace('text-slate-400', 'text-brand-600');
-                tabAdmin.classList.replace('text-brand-600', 'text-slate-400');
-                fieldUser.classList.remove('hidden', 'opacity-0', 'h-0'); fieldUser.classList.add('opacity-100', 'h-auto');
-                document.getElementById('login-username').required = true; btnText.innerText = "Masuk Aplikasi";
-            } else {
-                tabBg.style.transform = 'translateX(100%)';
-                tabUser.classList.replace('text-brand-600', 'text-slate-400');
-                tabAdmin.classList.replace('text-slate-400', 'text-brand-600');
-                fieldUser.classList.remove('opacity-100', 'h-auto'); fieldUser.classList.add('opacity-0', 'h-0');
-                setTimeout(() => fieldUser.classList.add('hidden'), 300);
-                document.getElementById('login-username').required = false; btnText.innerText = "Masuk Admin";
-            }
-        };
-
-        window.handleLogout = () => {
-            if(window.appState.unsubscribeReports) window.appState.unsubscribeReports();
-            if(window.appState.unsubscribeUsers) window.appState.unsubscribeUsers();
-            if(window.appState.unsubscribeSettings) window.appState.unsubscribeSettings();
-            window.appState.appProfile = null;
-            document.getElementById('reportForm').reset();
-            window.cancelEdit();
-            document.getElementById('app-layout').classList.add('hidden-section');
-            document.getElementById('section-login').classList.remove('hidden');
-            document.getElementById('section-login').style.display = 'flex';
-            document.getElementById('login-username').value = '';
-            document.getElementById('login-password').value = '';
-            window.switchLoginMode('user');
-        };
-
-        window.switchTab = (tabName) => {
-            if(tabName === 'settings' && window.appState.appProfile?.role !== 'admin') {
-                window.showToast("Akses hanya untuk Admin!", true);
-                return;
-            }
-
-            ['form', 'dashboard', 'settings', 'recap'].forEach(t => {
-                const sec = document.getElementById(`section-${t}`);
-                const btn = document.getElementById(`nav-${t}`);
-                if(t === tabName) {
-                    sec.classList.remove('hidden-section');
-                    if(btn) btn.classList.add('active-tab'); 
-                    if(tabName === 'dashboard') {
-                        document.getElementById('welcome-banner').classList.remove('hidden-section');
-                        updateDashboard();
-                    } else if(tabName === 'recap') {
-                        document.getElementById('welcome-banner').classList.add('hidden-section');
-                        updateRecapTable();
-                    } else {
-                        document.getElementById('welcome-banner').classList.add('hidden-section');
-                    }
-                } else {
-                    sec.classList.add('hidden-section');
-                    if(btn) btn.classList.remove('active-tab'); 
-                }
-            });
-        };
-
-        window.resetFilters = () => { ['filter-date-start', 'filter-date-end', 'filter-staging', 'filter-service', 'filter-type'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; }); window.updateDashboard(); };
-        window.calcTotal = (svc) => { const ok = window.getRawValue(`input-${svc}-ok`); const prog = window.getRawValue(`input-${svc}-prog`); const missHr = window.getRawValue(`input-${svc}-miss-hr`); const miss = window.getRawValue(`input-${svc}-miss`); const claim = window.getRawValue(`input-${svc}-claim`); const total = ok + prog + missHr + miss + claim; document.getElementById(`input-${svc}-total`).value = total > 0 ? new Intl.NumberFormat('id-ID').format(total) : ''; };
-        window.autoFillAdminData = () => {
-            const staging = document.getElementById('input-staging-admin').value; const areaIn = document.getElementById('input-area-admin'); const leaderIn = document.getElementById('input-leader-admin');
-            if(staging && window.appState.stagingMap && window.appState.stagingMap[staging]) { const info = window.appState.stagingMap[staging]; areaIn.value = info.area; leaderIn.value = info.leader; } else { areaIn.value = ''; leaderIn.value = ''; }
-        };
-        window.openUserModal = (id = null, uName = '', uPass = '', uArea = '', uStg = '', uLead = '', uRole = 'user') => {
-            document.getElementById('userModal').classList.remove('hidden'); const content = document.getElementById('userModalContent'); content.classList.remove('scale-95'); content.classList.add('scale-100');
-            document.getElementById('edit-user-id').value = id || ''; document.getElementById('modalTitle').innerText = id ? 'Edit User' : 'Tambah User'; document.getElementById('modal-username').value = uName; document.getElementById('modal-username').disabled = !!id; document.getElementById('modal-password').value = uPass; document.getElementById('modal-area').value = uArea; document.getElementById('modal-staging').value = uStg; document.getElementById('modal-leader').value = uLead; document.getElementById('modal-role').value = uRole;
-        };
-        window.closeUserModal = () => { const content = document.getElementById('userModalContent'); content.classList.remove('scale-100'); content.classList.add('scale-95'); setTimeout(() => { document.getElementById('userModal').classList.add('hidden'); document.getElementById('userForm').reset(); }, 200); };
-        window.deleteUser = async (id) => { 
-            window.showConfirm("Hapus User?", "Tindakan ini tidak dapat dibatalkan.", async () => {
-                await deleteDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users', id)); window.showToast("User dihapus."); 
-            });
-        };
-        window.editUser = (id, uname, pass, area, stg, lead, role) => { window.openUserModal(id, uname, pass, area, stg, lead, role); };
-        
-        window.saveAdminFirstTime = async () => {
-            const newPass = document.getElementById('setup-new-pass').value;
-            if(newPass.length < 6) return window.showToast("Password minimal 6 karakter", true);
-            const btn = document.getElementById('btn-save-setup'); btn.disabled = true; btn.innerText = "Menyimpan...";
-            try {
-                const colRef = collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users');
-                const qAdmin = query(colRef, where("role", "==", "admin"));
-                const snap = await getDocs(qAdmin);
-                let profile = { username: 'admin', role: 'admin', name: 'Administrator', area: 'HQ', staging: 'HQ', leader: 'SuperAdmin', password: newPass, createdAt: serverTimestamp() };
-                if (!snap.empty) { const docId = snap.docs[0].id; await updateDoc(doc(colRef, docId), { password: newPass }); profile = { ...snap.docs[0].data(), id: docId, password: newPass, role: 'admin' }; } 
-                else { const ref = await addDoc(colRef, profile); profile.id = ref.id; }
-                window.appState.appProfile = profile;
-                document.getElementById('setup-admin-modal').classList.add('hidden');
-                finishLogin();
-                switchTab('settings');
-                window.showToast("Password berhasil dibuat. Selamat Datang!");
-            } catch(e) { console.error(e); window.showToast("Gagal menyimpan password", true); btn.disabled = false; btn.innerText = "Simpan Password"; }
-        };
-
-        function generateBulkTable() {
-            const tbody = document.getElementById('bulk-input-body'); tbody.innerHTML = '';
-            SERVICES.forEach(svc => {
-                const row = document.createElement('tr'); row.className = "hover:bg-slate-50 transition-colors group";
-                const fmt = `onkeyup="formatNumberInput(this); calcTotal('${svc}')"`;
-                let displaySvc = svc === 'SDS' ? 'SD/SDS' : svc;
-                row.innerHTML = `
-                    <td class="sticky-col px-4 py-4 font-bold text-slate-700 bg-white border-r border-slate-100 shadow-sm z-10 text-xs">${displaySvc}</td>
-                    <td class="p-2"><input type="text" id="input-${svc}-total" readonly class="w-full min-w-[60px] rounded-lg border-slate-200 text-center font-bold bg-slate-100 py-2.5 text-xs text-slate-600 focus:ring-0" placeholder="0"></td>
-                    <td class="p-2"><input type="text" id="input-${svc}-ok" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-green-700 py-2.5 text-xs placeholder-green-200/50" placeholder="0"></td>
-                    <td class="p-2"><input type="text" id="input-${svc}-prog" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-yellow-700 py-2.5 text-xs placeholder-yellow-200/50" placeholder="0"></td>
-                    <td class="p-2"><input type="text" id="input-${svc}-miss-hr" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-orange-700 py-2.5 text-xs placeholder-orange-200/50" placeholder="0"></td>
-                    <td class="p-2"><input type="text" id="input-${svc}-miss" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-red-700 py-2.5 text-xs placeholder-red-200/50" placeholder="0"></td>
-                    <td class="p-2 col-claim input-claim-cell"><input type="text" id="input-${svc}-claim" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-slate-600 py-2.5 text-xs placeholder-slate-300" placeholder="0"></td>
-                    <td class="p-2 border-l border-slate-100"><input type="text" id="input-${svc}-int" onkeyup="formatNumberInput(this)" class="table-input w-full min-w-[50px] rounded-lg text-center text-xs py-2.5 placeholder-slate-300" placeholder="0"></td>
-                    <td class="p-2"><input type="text" id="input-${svc}-fb-int" class="table-input w-full min-w-[140px] rounded-lg text-xs py-2.5 px-2 placeholder-slate-300" placeholder="F/B Int..."></td>
-                    <td class="p-2 border-l border-slate-100"><input type="text" id="input-${svc}-ext" onkeyup="formatNumberInput(this)" class="table-input w-full min-w-[50px] rounded-lg text-center text-xs py-2.5 placeholder-slate-300" placeholder="0"></td>
-                    <td class="p-2"><input type="text" id="input-${svc}-fb-ext" class="table-input w-full min-w-[140px] rounded-lg text-xs py-2.5 px-2 placeholder-slate-300" placeholder="F/B Ext..."></td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        // --- LOGIN ---
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!window.appState.db) return window.showToast("Tunggu database...", true);
-            const mode = window.appState.loginMode; const passIn = document.getElementById('login-password').value.trim();
-            const btn = document.getElementById('btn-login'); const loader = document.getElementById('login-loader'); const errorBox = document.getElementById('login-error');
-            btn.disabled = true; loader.classList.remove('hidden'); errorBox.classList.add('hidden');
-
-            try {
-                const userInInput = document.getElementById('login-username').value.trim();
-                const isAdminOverride = (mode === 'admin') || (userInInput === 'admin');
-
-                if (isAdminOverride) {
-                    const qAdmin = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), where("role", "==", "admin"));
-                    const snapAdmin = await getDocs(qAdmin);
-                    let adminDoc = null;
-                    if(!snapAdmin.empty) { const d = snapAdmin.docs[0].data(); if(d.password === passIn) adminDoc = { ...d, id: snapAdmin.docs[0].id }; }
-                    
-                    if((!adminDoc && passIn === 'admin123') || (adminDoc && adminDoc.password === 'admin123' && passIn === 'admin123')) {
-                        document.getElementById('setup-admin-modal').classList.remove('hidden'); btn.disabled = false; loader.classList.add('hidden'); return;
-                    }
-                    if(adminDoc && adminDoc.password === passIn) { 
-                        window.appState.appProfile = adminDoc; 
-                        window.appState.appProfile.role = 'admin'; 
-                        window.appState.loginMode = 'admin'; 
-                        finishLogin(); return; 
-                    }
-                    throw new Error("Password Admin Salah.");
-                }
-
-                const userIn = document.getElementById('login-username').value.trim();
-                const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), where("username", "==", userIn), where("password", "==", passIn));
-                const snap = await getDocs(q);
-                if (!snap.empty) { const docData = snap.docs[0].data(); window.appState.appProfile = { ...docData, id: snap.docs[0].id }; finishLogin(); } else { throw new Error("Username atau Password salah."); }
-
-            } catch (err) { errorBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <span>${err.message || "Login gagal."}</span>`; errorBox.classList.remove('hidden'); } 
-            finally { btn.disabled = false; loader.classList.add('hidden'); }
-        });
-
-        function finishLogin() {
-            document.getElementById('section-login').classList.add('hidden'); document.getElementById('section-login').style.setProperty('display', 'none', 'important');
-            document.getElementById('app-layout').classList.remove('hidden-section');
-            const profile = window.appState.appProfile;
-            
-            const role = window.appState.loginMode === 'admin' ? 'admin' : (profile.role || 'user'); // FORCE ROLE
-            
-            // PERBAIKAN: Gunakan Nama Leader (PIC) untuk sapaan user, Admin pakai Nama/Username
-            let displayName = profile.name || profile.username;
-            if (role !== 'admin' && profile.leader) {
-                displayName = profile.leader;
-            }
-            
-            window.setTextSafe('banner-name', displayName);
-            window.setTextSafe('banner-role', role.toUpperCase());
-            
-            const settingsBtn = document.getElementById('nav-settings');
-            if (role === 'admin') {
-                if(settingsBtn) { settingsBtn.classList.remove('hidden-section'); settingsBtn.style.display = 'inline-flex'; }
-                document.getElementById('admin-identity-view').classList.remove('hidden'); document.getElementById('user-identity-view').classList.add('hidden');
-                const adminDisp = document.getElementById('admin-display-name'); if(adminDisp) adminDisp.value = profile.name || '';
-                const stgAdmin = document.getElementById('input-staging-admin'); if(stgAdmin) stgAdmin.innerHTML = '<option value="">Pilih Staging...</option>';
-                window.setupAdminListener();
-            } else {
-                if(settingsBtn) { settingsBtn.classList.add('hidden-section'); settingsBtn.style.display = 'none'; }
-                document.getElementById('admin-identity-view').classList.add('hidden'); document.getElementById('user-identity-view').classList.remove('hidden');
-                window.setTextSafe('display-identity', `${profile.staging} | ${profile.leader}`);
-                const stgUser = document.getElementById('input-staging-user'); if(stgUser) stgUser.value = profile.staging;
-                const areaUser = document.getElementById('input-area-user'); if(areaUser) areaUser.value = profile.area;
-                const leadUser = document.getElementById('input-leader-user'); if(leadUser) leadUser.value = profile.leader;
-            }
-            window.setupReportListener();
-            // Default to DASHBOARD (DATA)
-            window.switchTab('dashboard');
-        }
-
-        window.setupSettingsListener = function() {
-            const docRef = doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config');
-            window.appState.unsubscribeSettings = onSnapshot(docRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if(data.appTitle) { 
-                        window.setTextSafe('login-app-title', data.appTitle);
-                        window.setTextSafe('nav-app-title', data.appTitle);
-                        const settingTitle = document.getElementById('setting-app-title'); if(settingTitle) settingTitle.value = data.appTitle;
-                    }
-                    if(data.dailyAuthCode) {
-                        window.appState.dailyAuthCode = data.dailyAuthCode;
-                        const settingCode = document.getElementById('setting-daily-code'); if(settingCode) settingCode.value = data.dailyAuthCode;
-                    }
-                }
-            });
-        };
-        window.saveAppSetting = async () => { const title = document.getElementById('setting-app-title').value; if(!title) return; await setDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config'), { appTitle: title }, { merge: true }); window.showToast("Judul tersimpan!"); };
-        window.saveDailyCode = async () => { const code = document.getElementById('setting-daily-code').value; if(!code) return; await setDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config'), { dailyAuthCode: code }, { merge: true }); window.showToast("Token Harian tersimpan!"); };
-        
-        window.setupAdminListener = function() {
-            const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), orderBy('createdAt', 'desc'));
-            window.appState.unsubscribeUsers = onSnapshot(q, (snap) => {
-                const tbody = document.getElementById('user-list-body'); tbody.innerHTML = ''; window.appState.stagingMap = {}; 
-                const selectStg = document.getElementById('input-staging-admin');
-                if(selectStg) {
-                    const currentVal = selectStg.value; selectStg.innerHTML = '<option value="">Pilih Staging...</option>'; const uniqueStagings = [];
-                    snap.forEach(d => {
-                        const u = d.data();
-                        if(u.staging) { window.appState.stagingMap[u.staging] = { area: u.area, leader: u.leader }; if(!uniqueStagings.includes(u.staging)) uniqueStagings.push(u.staging); }
-                        const roleBadge = u.role === 'admin' ? '<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-[10px] font-bold">ADMIN</span>' : '<span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-[10px] font-bold">USER</span>';
-                        tbody.innerHTML += `<tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none"><td class="px-6 py-3 font-medium text-slate-700">${u.username}</td><td class="px-4 py-3 text-slate-500">${u.area}</td><td class="px-4 py-3 text-slate-500">${u.staging}</td><td class="px-4 py-3 text-slate-500">${u.leader}</td><td class="px-4 py-3 text-center">${roleBadge}</td><td class="px-4 py-3 text-center flex justify-center gap-2"><button onclick="editUser('${d.id}', '${u.username}', '${u.password}', '${u.area}', '${u.staging}', '${u.leader}', '${u.role}')" class="text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition-colors"><i class="fa-solid fa-pen"></i></button><button onclick="deleteUser('${d.id}')" class="text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-                    });
-                    uniqueStagings.sort().forEach(s => { const opt = document.createElement('option'); opt.value = s; opt.text = s; selectStg.add(opt); });
-                    if(uniqueStagings.includes(currentVal)) selectStg.value = currentVal;
-                }
-            });
-        };
-        window.setupReportListener = function() {
-            const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports'), orderBy('date', 'desc'));
-            window.appState.unsubscribeReports = onSnapshot(q, (snap) => {
-                window.appState.reportsData = []; snap.forEach(d => window.appState.reportsData.push({id: d.id, ...d.data()}));
-                const s = new Set(window.appState.reportsData.map(r=>r.staging).filter(Boolean)); const el = document.getElementById('filter-staging');
-                if(el) { const curr = el.value; el.innerHTML='<option value="">Semua Staging</option>'; [...s].sort().forEach(x=>{ const o=document.createElement('option'); o.value=x; o.text=x; el.add(o); }); el.value = curr; }
-                if(window.updateDashboard) window.updateDashboard();
-                if(window.updateRecapTable) window.updateRecapTable();
-            });
-        };
-
-        window.updateRecapTable = () => {
-             const d = window.appState.reportsData;
-             const tbody = document.getElementById('recap-body');
-             if(!tbody) return;
-             tbody.innerHTML = '';
-             
-             const currUser = window.appState.appProfile;
-             let filtered = d;
-             if(currUser && currUser.role !== 'admin') {
-                 filtered = d.filter(r => r.username === currUser.username);
-             }
-
-             if(filtered.length === 0) {
-                 tbody.innerHTML = '<tr><td colspan="11" class="p-4 text-center text-slate-400 text-xs">Belum ada data input.</td></tr>';
-                 return;
-             }
-
-             filtered.forEach(r => {
-                 const m = r.metrics;
-                 const slaRaw = m.total ? ((m.ok / m.total) * 100) : 0;
-                 const slaPct = slaRaw.toFixed(1) + '%';
-                 const slaColor = slaRaw >= 95 ? 'text-green-600' : (slaRaw >= 93 ? 'text-yellow-600' : 'text-red-600');
-                 const claimVal = r.type === 'Pickup' ? '-' : (m.claim || 0);
-                 const missedHr = m.missedByHour || 0;
-
-                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-50">
-                        <td class="px-6 py-4 font-bold text-slate-700">${r.date}</td>
-                        <td class="px-4 py-4 text-slate-500">${r.staging}</td>
-                        <td class="px-4 py-4 text-slate-500"><span class="bg-slate-100 px-2 py-1 rounded text-[10px] uppercase font-bold">${r.type}</span></td>
-                        <td class="px-4 py-4 text-slate-500 font-bold">${r.service}</td>
-                        <td class="px-4 py-4 text-center font-bold text-slate-800">${m.total}</td>
-                        <td class="px-4 py-4 text-center text-green-600">${m.ok}</td>
-                        <td class="px-4 py-4 text-center font-bold ${slaColor}">${slaPct}</td>
-                        <td class="px-4 py-4 text-center text-orange-600">${missedHr}</td>
-                        <td class="px-4 py-4 text-center text-red-600">${m.missed}</td>
-                        <td class="px-4 py-4 text-center text-slate-500">${claimVal}</td>
-                        <td class="px-4 py-4 text-center">
-                            <button onclick="promptEdit('${r.id}')" class="text-xs font-bold text-white bg-slate-800 px-3 py-1.5 rounded-lg hover:bg-brand-600 transition-colors shadow-sm"><i class="fa-solid fa-lock mr-1"></i> Edit</button>
-                        </td>
-                    </tr>
-                 `;
-             });
-        };
-
-        window.updateDashboard = () => {
-             const d = window.appState.reportsData; if(!d) return;
-             const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
-             if (!document.getElementById('filter-date-start')) return;
-            const fStart = getVal('filter-date-start'); const fEnd = getVal('filter-date-end'); const fStaging = getVal('filter-staging'); const fService = getVal('filter-service'); const fType = getVal('filter-type');
-            const filtered = d.filter(r => {
-                const rd = new Date(r.date);
-                if(fStart && rd < new Date(fStart)) return false; if(fEnd && rd > new Date(fEnd)) return false; if(fStaging && r.staging!==fStaging) return false; if(fService && r.service!==fService) return false; if(fType && r.type!==fType) return false; return true;
-            });
-            let tot=0, ok=0, prg=0, mis=0, clm=0;
-            const stgMap={}, svcMap={}, fbMapInt={}, fbMapExt={};
-            
-            filtered.forEach(r => {
-                const m = r.metrics; tot+=m.total; ok+=m.ok; prg+=m.progress; mis+=m.missed; clm+=(m.claim||0);
-                const mh = m.missedByHour || 0;
-                
-                const s = r.staging||'Unk'; if(!stgMap[s]) stgMap[s]={t:0,o:0,p:0,m:0,c:0,mh:0, l:r.leader||'-'}; stgMap[s].t+=m.total; stgMap[s].o+=m.ok; stgMap[s].p+=m.progress; stgMap[s].m+=m.missed; stgMap[s].c+=(m.claim||0); stgMap[s].mh+=mh;
-                const sv = r.service||'Oth'; if(!svcMap[sv]) svcMap[sv]={t:0,o:0,p:0,m:0,c:0,mh:0}; svcMap[sv].t+=m.total; svcMap[sv].o+=m.ok; svcMap[sv].p+=m.progress; svcMap[sv].m+=m.missed; svcMap[sv].c+=(m.claim||0); svcMap[sv].mh+=mh;
-                
-                // Group Feedback Logic
-                if(m.feedbackIn && m.feedbackIn.trim() !== '') {
-                    const msg = m.feedbackIn.trim().toUpperCase();
-                    if(!fbMapInt[msg]) fbMapInt[msg] = 0;
-                    fbMapInt[msg] += (m.internalPkg || 0);
-                }
-                if(m.feedbackExt && m.feedbackExt.trim() !== '') {
-                    const msg = m.feedbackExt.trim().toUpperCase();
-                    if(!fbMapExt[msg]) fbMapExt[msg] = 0;
-                    fbMapExt[msg] += (m.externalPkg || 0);
-                }
-            });
-
-            const fmt = n => n.toLocaleString();
-            window.setTextSafe('kpi-total', fmt(tot)); window.setTextSafe('kpi-ok', fmt(ok)); window.setTextSafe('kpi-ok-pct', tot?((ok/tot)*100).toFixed(1)+'%':'0%'); window.setTextSafe('kpi-pending', fmt(prg)); window.setTextSafe('kpi-missed', fmt(mis)); window.setTextSafe('kpi-claim', fmt(clm));
-            const getColorClass = (val, typeFilter) => {
-                if (typeFilter === 'Pickup') { if (val < 93) return 'text-red-600 bg-red-50'; if (val <= 95) return 'text-yellow-600 bg-yellow-50'; return 'text-green-600 bg-green-50'; } 
-                else { if (val < 95) return 'text-red-600 bg-red-50'; if (val <= 96.3) return 'text-yellow-600 bg-yellow-50'; return 'text-green-600 bg-green-50'; }
-            };
-            const renderTab = (id, map, isSvc) => {
-                const tb = document.getElementById(id); if(!tb) return; tb.innerHTML='';
-                const keys = Object.keys(map).sort((a,b) => map[b].t - map[a].t);
-                let gT=0, gO=0, gP=0, gM=0, gC=0, gMH=0;
-                keys.forEach(k=>{
-                    const x=map[k]; gT+=x.t; gO+=x.o; gP+=x.p; gM+=x.m; gC+=x.c; gMH+=x.mh;
-                    const pRaw = x.t ? (x.o/x.t)*100 : 0; const p = pRaw.toFixed(1)+'%'; const colorClass = getColorClass(pRaw, fType);
-                    
-                    // Warning Logic
-                    let warnIcon = '';
-                    if(!isSvc && pRaw < 95) warnIcon = '<i class="fa-solid fa-triangle-exclamation text-red-500 ml-2 animate-pulse" title="SLA < 95%"></i>';
-
-                    let c1 = k; 
-                    if(!isSvc) c1 = `<div class="font-bold text-slate-700 flex items-center">${k} ${warnIcon}</div><div class="text-[10px] text-slate-400 font-normal">${x.l}</div>`; 
-                    else c1 = `<div class="font-bold text-slate-700">${k}</div>`;
-                    
-                    tb.innerHTML+=`<tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none"><td class="px-4 py-3">${c1}</td><td class="text-center font-bold text-slate-700">${x.t}</td><td class="text-center text-green-600">${x.o}</td><td class="text-center"><span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${colorClass}">${p}</span></td><td class="text-center text-yellow-600">${x.p}</td><td class="text-center text-orange-600">${x.mh}</td><td class="text-center text-red-600">${x.m}</td><td class="text-center text-slate-400">${x.c}</td></tr>`;
-                });
-                if(keys.length > 0) {
-                     const pTotRaw = gT ? (gO/gT)*100 : 0; const pTot = pTotRaw.toFixed(1)+'%'; const colTot = getColorClass(pTotRaw, fType);
-                     tb.innerHTML+=`<tr class="bg-slate-100 font-bold border-t-2 border-slate-200"><td class="px-4 py-3 text-right text-xs uppercase text-slate-500">Total Global</td><td class="text-center text-slate-900">${gT}</td><td class="text-center text-green-700">${gO}</td><td class="text-center"><span class="px-1.5 py-0.5 rounded text-[10px] ${colTot}">${pTot}</span></td><td class="text-center text-yellow-700">${gP}</td><td class="text-center text-orange-700">${gMH}</td><td class="text-center text-red-700">${gM}</td><td class="text-center text-slate-600">${gC}</td></tr>`;
-                }
-            };
-            renderTab('staging-breakdown-body', stgMap, false); renderTab('service-breakdown-body', svcMap, true);
-            const tbFb = document.getElementById('feedback-recap-body'); if(tbFb) { tbFb.innerHTML=''; 
-                // Sum Totals
-                let sumInt = 0; Object.values(fbMapInt).forEach(v => sumInt += v);
-                let sumExt = 0; Object.values(fbMapExt).forEach(v => sumExt += v);
-
-                // Build Lists
-                const buildList = (map) => {
-                    const sortedKeys = Object.keys(map).sort((a,b) => map[b] - map[a]);
-                    if(sortedKeys.length === 0) return '<p class="text-slate-400 italic">Tidak ada feedback</p>';
-                    return `<ul class="list-disc pl-4 marker:text-brand-400 space-y-1">${sortedKeys.map(k => `<li><span class="font-bold text-slate-700">[${map[k]}]</span> <span class="text-sm text-slate-600">${k}</span></li>`).join('')}</ul>`;
                 };
+
+                window.resetFilters = () => { ['filter-date-start', 'filter-date-end', 'filter-staging', 'filter-service', 'filter-type'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; }); window.updateDashboard(); };
+                window.calcTotal = (svc) => { const ok = window.getRawValue(`input-${svc}-ok`); const prog = window.getRawValue(`input-${svc}-prog`); const missHr = window.getRawValue(`input-${svc}-miss-hr`); const miss = window.getRawValue(`input-${svc}-miss`); const claim = window.getRawValue(`input-${svc}-claim`); const total = ok + prog + missHr + miss + claim; document.getElementById(`input-${svc}-total`).value = total > 0 ? new Intl.NumberFormat('id-ID').format(total) : ''; };
+                window.autoFillAdminData = () => {
+                    const staging = document.getElementById('input-staging-admin').value; const areaIn = document.getElementById('input-area-admin'); const leaderIn = document.getElementById('input-leader-admin');
+                    if(staging && window.appState.stagingMap && window.appState.stagingMap[staging]) { const info = window.appState.stagingMap[staging]; areaIn.value = info.area; leaderIn.value = info.leader; } else { areaIn.value = ''; leaderIn.value = ''; }
+                };
+                window.openUserModal = (id = null, uName = '', uPass = '', uArea = '', uStg = '', uLead = '', uRole = 'user') => {
+                    document.getElementById('userModal').classList.remove('hidden'); const content = document.getElementById('userModalContent'); content.classList.remove('scale-95'); content.classList.add('scale-100');
+                    document.getElementById('edit-user-id').value = id || ''; document.getElementById('modalTitle').innerText = id ? 'Edit User' : 'Tambah User'; document.getElementById('modal-username').value = uName; document.getElementById('modal-username').disabled = !!id; document.getElementById('modal-password').value = uPass; document.getElementById('modal-area').value = uArea; document.getElementById('modal-staging').value = uStg; document.getElementById('modal-leader').value = uLead; document.getElementById('modal-role').value = uRole;
+                };
+                window.closeUserModal = () => { const content = document.getElementById('userModalContent'); content.classList.remove('scale-100'); content.classList.add('scale-95'); setTimeout(() => { document.getElementById('userModal').classList.add('hidden'); document.getElementById('userForm').reset(); }, 200); };
+                window.deleteUser = async (id) => { 
+                    window.showConfirm("Hapus User?", "Tindakan ini tidak dapat dibatalkan.", async () => {
+                        await deleteDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users', id)); window.showToast("User dihapus."); 
+                    });
+                };
+                window.editUser = (id, uname, pass, area, stg, lead, role) => { window.openUserModal(id, uname, pass, area, stg, lead, role); };
                 
-                tbFb.innerHTML = `
-                    <tr class="align-top">
-                        <td class="px-6 py-5 border-r border-slate-50 w-1/2">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div class="bg-blue-50 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg">${sumInt}</div>
-                                <div><p class="text-xs font-bold text-slate-400 uppercase">Total Paket</p><p class="text-sm font-bold text-slate-800">Internal Issue</p></div>
-                            </div>
-                            <div class="text-sm text-slate-600 leading-relaxed">${buildList(fbMapInt)}</div>
-                        </td>
-                        <td class="px-6 py-5 w-1/2">
-                             <div class="flex items-center gap-3 mb-4">
-                                <div class="bg-indigo-50 text-indigo-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg">${sumExt}</div>
-                                <div><p class="text-xs font-bold text-slate-400 uppercase">Total Paket</p><p class="text-sm font-bold text-slate-800">External Issue</p></div>
-                            </div>
-                            <div class="text-sm text-slate-600 leading-relaxed">${buildList(fbMapExt)}</div>
-                        </td>
-                    </tr>
-                `;
-            }
-            if(!document.getElementById('section-dashboard').classList.contains('hidden-section') && window.updateCharts) window.updateCharts(filtered, !!fStart||!!fEnd);
-        };
-        window.updateCharts = (data, filterActive) => {
+                window.saveAdminFirstTime = async () => {
+                    const newPass = document.getElementById('setup-new-pass').value;
+                    if(newPass.length < 6) return window.showToast("Password minimal 6 karakter", true);
+                    const btn = document.getElementById('btn-save-setup'); btn.disabled = true; btn.innerText = "Menyimpan...";
+                    try {
+                        const colRef = collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users');
+                        const qAdmin = query(colRef, where("role", "==", "admin"));
+                        const snap = await getDocs(qAdmin);
+                        let profile = { username: 'admin', role: 'admin', name: 'Administrator', area: 'HQ', staging: 'HQ', leader: 'SuperAdmin', password: newPass, createdAt: serverTimestamp() };
+                        if (!snap.empty) { const docId = snap.docs[0].id; await updateDoc(doc(colRef, docId), { password: newPass }); profile = { ...snap.docs[0].data(), id: docId, password: newPass, role: 'admin' }; } 
+                        else { const ref = await addDoc(colRef, profile); profile.id = ref.id; }
+                        window.appState.appProfile = profile;
+                        document.getElementById('setup-admin-modal').classList.add('hidden');
+                        finishLogin();
+                        switchTab('settings');
+                        window.showToast("Password berhasil dibuat. Selamat Datang!");
+                    } catch(e) { console.error(e); window.showToast("Gagal menyimpan password", true); btn.disabled = false; btn.innerText = "Simpan Password"; }
+                };
+
+                function generateBulkTable() {
+                    const tbody = document.getElementById('bulk-input-body'); tbody.innerHTML = '';
+                    SERVICES.forEach(svc => {
+                        const row = document.createElement('tr'); row.className = "hover:bg-slate-50 transition-colors group";
+                        const fmt = `onkeyup="formatNumberInput(this); calcTotal('${svc}')"`;
+                        let displaySvc = svc === 'SDS' ? 'SD/SDS' : svc;
+                        row.innerHTML = `
+                            <td class="sticky-col px-4 py-4 font-bold text-slate-700 bg-white border-r border-slate-100 shadow-sm z-10 text-xs">${displaySvc}</td>
+                            <td class="p-2"><input type="text" id="input-${svc}-total" readonly class="w-full min-w-[60px] rounded-lg border-slate-200 text-center font-bold bg-slate-100 py-2.5 text-xs text-slate-600 focus:ring-0" placeholder="0"></td>
+                            <td class="p-2"><input type="text" id="input-${svc}-ok" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-green-700 py-2.5 text-xs placeholder-green-200/50" placeholder="0"></td>
+                            <td class="p-2"><input type="text" id="input-${svc}-prog" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-yellow-700 py-2.5 text-xs placeholder-yellow-200/50" placeholder="0"></td>
+                            <td class="p-2"><input type="text" id="input-${svc}-miss-hr" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-orange-700 py-2.5 text-xs placeholder-orange-200/50" placeholder="0"></td>
+                            <td class="p-2"><input type="text" id="input-${svc}-miss" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-red-700 py-2.5 text-xs placeholder-red-200/50" placeholder="0"></td>
+                            <td class="p-2 col-claim input-claim-cell"><input type="text" id="input-${svc}-claim" ${fmt} class="table-input w-full min-w-[60px] rounded-lg text-center font-medium text-slate-600 py-2.5 text-xs placeholder-slate-300" placeholder="0"></td>
+                            <td class="p-2 border-l border-slate-100"><input type="text" id="input-${svc}-int" onkeyup="formatNumberInput(this)" class="table-input w-full min-w-[50px] rounded-lg text-center text-xs py-2.5 placeholder-slate-300" placeholder="0"></td>
+                            <td class="p-2"><input type="text" id="input-${svc}-fb-int" class="table-input w-full min-w-[140px] rounded-lg text-xs py-2.5 px-2 placeholder-slate-300" placeholder="F/B Int..."></td>
+                            <td class="p-2 border-l border-slate-100"><input type="text" id="input-${svc}-ext" onkeyup="formatNumberInput(this)" class="table-input w-full min-w-[50px] rounded-lg text-center text-xs py-2.5 placeholder-slate-300" placeholder="0"></td>
+                            <td class="p-2"><input type="text" id="input-${svc}-fb-ext" class="table-input w-full min-w-[140px] rounded-lg text-xs py-2.5 px-2 placeholder-slate-300" placeholder="F/B Ext..."></td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+
+                // --- LOGIN ---
+                document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (!window.appState.db) return window.showToast("Tunggu database...", true);
+                    const mode = window.appState.loginMode; const passIn = document.getElementById('login-password').value.trim();
+                    const btn = document.getElementById('btn-login'); const loader = document.getElementById('login-loader'); const errorBox = document.getElementById('login-error');
+                    btn.disabled = true; loader.classList.remove('hidden'); errorBox.classList.add('hidden');
+
+                    try {
+                        const userInInput = document.getElementById('login-username').value.trim();
+                        const isAdminOverride = (mode === 'admin') || (userInInput === 'admin');
+
+                        if (isAdminOverride) {
+                            const qAdmin = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), where("role", "==", "admin"));
+                            const snapAdmin = await getDocs(qAdmin);
+                            let adminDoc = null;
+                            if(!snapAdmin.empty) { const d = snapAdmin.docs[0].data(); if(d.password === passIn) adminDoc = { ...d, id: snapAdmin.docs[0].id }; }
+                            
+                            if((!adminDoc && passIn === 'admin123') || (adminDoc && adminDoc.password === 'admin123' && passIn === 'admin123')) {
+                                document.getElementById('setup-admin-modal').classList.remove('hidden'); btn.disabled = false; loader.classList.add('hidden'); return;
+                            }
+                            if(adminDoc && adminDoc.password === passIn) { 
+                                window.appState.appProfile = adminDoc; 
+                                window.appState.appProfile.role = 'admin'; 
+                                window.appState.loginMode = 'admin'; 
+                                finishLogin(); return; 
+                            }
+                            throw new Error("Password Admin Salah.");
+                        }
+
+                        const userIn = document.getElementById('login-username').value.trim();
+                        const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), where("username", "==", userIn), where("password", "==", passIn));
+                        const snap = await getDocs(q);
+                        if (!snap.empty) { const docData = snap.docs[0].data(); window.appState.appProfile = { ...docData, id: snap.docs[0].id }; finishLogin(); } else { throw new Error("Username atau Password salah."); }
+
+                    } catch (err) { errorBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <span>${err.message || "Login gagal."}</span>`; errorBox.classList.remove('hidden'); } 
+                    finally { btn.disabled = false; loader.classList.add('hidden'); }
+                });
+
+                function finishLogin() {
+                    document.getElementById('section-login').classList.add('hidden'); document.getElementById('section-login').style.setProperty('display', 'none', 'important');
+                    document.getElementById('app-layout').classList.remove('hidden-section');
+                    const profile = window.appState.appProfile;
+                    const displayName = profile.name || profile.username;
+                    const role = window.appState.loginMode === 'admin' ? 'admin' : (profile.role || 'user'); // FORCE ROLE
+                    
+                    window.setTextSafe('banner-name', displayName);
+                    window.setTextSafe('banner-role', role.toUpperCase());
+                    
+                    const settingsBtn = document.getElementById('nav-settings');
+                    if (role === 'admin') {
+                        if(settingsBtn) { settingsBtn.classList.remove('hidden-section'); settingsBtn.style.display = 'inline-flex'; }
+                        document.getElementById('admin-identity-view').classList.remove('hidden'); document.getElementById('user-identity-view').classList.add('hidden');
+                        const adminDisp = document.getElementById('admin-display-name'); if(adminDisp) adminDisp.value = profile.name || '';
+                        const stgAdmin = document.getElementById('input-staging-admin'); if(stgAdmin) stgAdmin.innerHTML = '<option value="">Pilih Staging...</option>';
+                        window.setupAdminListener();
+                    } else {
+                        if(settingsBtn) { settingsBtn.classList.add('hidden-section'); settingsBtn.style.display = 'none'; }
+                        document.getElementById('admin-identity-view').classList.add('hidden'); document.getElementById('user-identity-view').classList.remove('hidden');
+                        window.setTextSafe('display-identity', `${profile.staging} | ${profile.leader}`);
+                        const stgUser = document.getElementById('input-staging-user'); if(stgUser) stgUser.value = profile.staging;
+                        const areaUser = document.getElementById('input-area-user'); if(areaUser) areaUser.value = profile.area;
+                        const leadUser = document.getElementById('input-leader-user'); if(leadUser) leadUser.value = profile.leader;
+                    }
+                    window.setupReportListener();
+                    // Default to DASHBOARD (DATA)
+                    window.switchTab('dashboard');
+                }
+
+                window.setupSettingsListener = function() {
+                    const docRef = doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config');
+                    window.appState.unsubscribeSettings = onSnapshot(docRef, (docSnap) => {
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            if(data.appTitle) { 
+                                window.setTextSafe('login-app-title', data.appTitle);
+                                window.setTextSafe('nav-app-title', data.appTitle);
+                                const settingTitle = document.getElementById('setting-app-title'); if(settingTitle) settingTitle.value = data.appTitle;
+                            }
+                            if(data.dailyAuthCode) {
+                                window.appState.dailyAuthCode = data.dailyAuthCode;
+                                const settingCode = document.getElementById('setting-daily-code'); if(settingCode) settingCode.value = data.dailyAuthCode;
+                            }
+                        }
+                    });
+                };
+                window.saveAppSetting = async () => { const title = document.getElementById('setting-app-title').value; if(!title) return; await setDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config'), { appTitle: title }, { merge: true }); window.showToast("Judul tersimpan!"); };
+                window.saveDailyCode = async () => { const code = document.getElementById('setting-daily-code').value; if(!code) return; await setDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config'), { dailyAuthCode: code }, { merge: true }); window.showToast("Token Harian tersimpan!"); };
+                
+                window.setupAdminListener = function() {
+                    const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), orderBy('createdAt', 'desc'));
+                    window.appState.unsubscribeUsers = onSnapshot(q, (snap) => {
+                        const tbody = document.getElementById('user-list-body'); tbody.innerHTML = ''; window.appState.stagingMap = {}; 
+                        const selectStg = document.getElementById('input-staging-admin');
+                        if(selectStg) {
+                            const currentVal = selectStg.value; selectStg.innerHTML = '<option value="">Pilih Staging...</option>'; const uniqueStagings = [];
+                            snap.forEach(d => {
+                                const u = d.data();
+                                if(u.staging) { window.appState.stagingMap[u.staging] = { area: u.area, leader: u.leader }; if(!uniqueStagings.includes(u.staging)) uniqueStagings.push(u.staging); }
+                                const roleBadge = u.role === 'admin' ? '<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-[10px] font-bold">ADMIN</span>' : '<span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-[10px] font-bold">USER</span>';
+                                tbody.innerHTML += `<tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none"><td class="px-6 py-3 font-medium text-slate-700">${u.username}</td><td class="px-4 py-3 text-slate-500">${u.area}</td><td class="px-4 py-3 text-slate-500">${u.staging}</td><td class="px-4 py-3 text-slate-500">${u.leader}</td><td class="px-4 py-3 text-center">${roleBadge}</td><td class="px-4 py-3 text-center flex justify-center gap-2"><button onclick="editUser('${d.id}', '${u.username}', '${u.password}', '${u.area}', '${u.staging}', '${u.leader}', '${u.role}')" class="text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition-colors"><i class="fa-solid fa-pen"></i></button><button onclick="deleteUser('${d.id}')" class="text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                            });
+                            uniqueStagings.sort().forEach(s => { const opt = document.createElement('option'); opt.value = s; opt.text = s; selectStg.add(opt); });
+                            if(uniqueStagings.includes(currentVal)) selectStg.value = currentVal;
+                        }
+                    });
+                };
+                window.setupReportListener = function() {
+                    const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports'), orderBy('date', 'desc'));
+                    window.appState.unsubscribeReports = onSnapshot(q, (snap) => {
+                        window.appState.reportsData = []; snap.forEach(d => window.appState.reportsData.push({id: d.id, ...d.data()}));
+                        const s = new Set(window.appState.reportsData.map(r=>r.staging).filter(Boolean)); const el = document.getElementById('filter-staging');
+                        if(el) { const curr = el.value; el.innerHTML='<option value="">Semua Staging</option>'; [...s].sort().forEach(x=>{ const o=document.createElement('option'); o.value=x; o.text=x; el.add(o); }); el.value = curr; }
+                        if(window.updateDashboard) window.updateDashboard();
+                        if(window.updateRecapTable) window.updateRecapTable();
+                    });
+                };
+
+                window.updateRecapTable = () => {
+                     const d = window.appState.reportsData;
+                     const tbody = document.getElementById('recap-body');
+                     if(!tbody) return;
+                     tbody.innerHTML = '';
+                     
+                     const currUser = window.appState.appProfile;
+                     let filtered = d;
+                     if(currUser && currUser.role !== 'admin') {
+                         filtered = d.filter(r => r.username === currUser.username);
+                     }
+
+                     if(filtered.length === 0) {
+                         tbody.innerHTML = '<tr><td colspan="11" class="p-4 text-center text-slate-400 text-xs">Belum ada data input.</td></tr>';
+                         return;
+                     }
+
+                     filtered.forEach(r => {
+                         const m = r.metrics;
+                         const slaRaw = m.total ? ((m.ok / m.total) * 100) : 0;
+                         const slaPct = slaRaw.toFixed(1) + '%';
+                         const slaColor = slaRaw >= 95 ? 'text-green-600' : (slaRaw >= 93 ? 'text-yellow-600' : 'text-red-600');
+                         const claimVal = r.type === 'Pickup' ? '-' : (m.claim || 0);
+                         const missedHr = m.missedByHour || 0;
+
+                         tbody.innerHTML += `
+                            <tr class="hover:bg-slate-50 transition-colors border-b border-slate-50">
+                                <td class="px-6 py-4 font-bold text-slate-700">${r.date}</td>
+                                <td class="px-4 py-4 text-slate-500">${r.staging}</td>
+                                <td class="px-4 py-4 text-slate-500"><span class="bg-slate-100 px-2 py-1 rounded text-[10px] uppercase font-bold">${r.type}</span></td>
+                                <td class="px-4 py-4 text-slate-500 font-bold">${r.service}</td>
+                                <td class="px-4 py-4 text-center font-bold text-slate-800">${m.total}</td>
+                                <td class="px-4 py-4 text-center text-green-600">${m.ok}</td>
+                                <td class="px-4 py-4 text-center font-bold ${slaColor}">${slaPct}</td>
+                                <td class="px-4 py-4 text-center text-orange-600">${missedHr}</td>
+                                <td class="px-4 py-4 text-center text-red-600">${m.missed}</td>
+                                <td class="px-4 py-4 text-center text-slate-500">${claimVal}</td>
+                                <td class="px-4 py-4 text-center">
+                                    <button onclick="promptEdit('${r.id}')" class="text-xs font-bold text-white bg-slate-800 px-3 py-1.5 rounded-lg hover:bg-brand-600 transition-colors shadow-sm"><i class="fa-solid fa-lock mr-1"></i> Edit</button>
+                                </td>
+                            </tr>
+                         `;
+                     });
+                };
+
+                window.updateDashboard = () => {
+                     const d = window.appState.reportsData; if(!d) return;
+                     const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+                     if (!document.getElementById('filter-date-start')) return;
+                    const fStart = getVal('filter-date-start'); const fEnd = getVal('filter-date-end'); const fStaging = getVal('filter-staging'); const fService = getVal('filter-service'); const fType = getVal('filter-type');
+                    const filtered = d.filter(r => {
+                        const rd = new Date(r.date);
+                        if(fStart && rd < new Date(fStart)) return false; if(fEnd && rd > new Date(fEnd)) return false; if(fStaging && r.staging!==fStaging) return false; if(fService && r.service!==fService) return false; if(fType && r.type!==fType) return false; return true;
+                    });
+                    let tot=0, ok=0, prg=0, mis=0, clm=0;
+                    const stgMap={}, svcMap={}, fbMapInt={}, fbMapExt={};
+                    
+                    filtered.forEach(r => {
+                        const m = r.metrics; tot+=m.total; ok+=m.ok; prg+=m.progress; mis+=m.missed; clm+=(m.claim||0);
+                        const mh = m.missedByHour || 0;
+                        
+                        const s = r.staging||'Unk'; if(!stgMap[s]) stgMap[s]={t:0,o:0,p:0,m:0,c:0,mh:0, l:r.leader||'-'}; stgMap[s].t+=m.total; stgMap[s].o+=m.ok; stgMap[s].p+=m.progress; stgMap[s].m+=m.missed; stgMap[s].c+=(m.claim||0); stgMap[s].mh+=mh;
+                        const sv = r.service||'Oth'; if(!svcMap[sv]) svcMap[sv]={t:0,o:0,p:0,m:0,c:0,mh:0}; svcMap[sv].t+=m.total; svcMap[sv].o+=m.ok; svcMap[sv].p+=m.progress; svcMap[sv].m+=m.missed; svcMap[sv].c+=(m.claim||0); svcMap[sv].mh+=mh;
+                        
+                        // Group Feedback Logic
+                        if(m.feedbackIn && m.feedbackIn.trim() !== '') {
+                            const msg = m.feedbackIn.trim().toUpperCase();
+                            if(!fbMapInt[msg]) fbMapInt[msg] = 0;
+                            fbMapInt[msg] += (m.internalPkg || 0);
+                        }
+                        if(m.feedbackExt && m.feedbackExt.trim() !== '') {
+                            const msg = m.feedbackExt.trim().toUpperCase();
+                            if(!fbMapExt[msg]) fbMapExt[msg] = 0;
+                            fbMapExt[msg] += (m.externalPkg || 0);
+                        }
+                    });
+
+                    const fmt = n => n.toLocaleString();
+                    window.setTextSafe('kpi-total', fmt(tot)); window.setTextSafe('kpi-ok', fmt(ok)); window.setTextSafe('kpi-ok-pct', tot?((ok/tot)*100).toFixed(1)+'%':'0%'); window.setTextSafe('kpi-pending', fmt(prg)); window.setTextSafe('kpi-missed', fmt(mis)); window.setTextSafe('kpi-claim', fmt(clm));
+                    const getColorClass = (val, typeFilter) => {
+                        if (typeFilter === 'Pickup') { if (val < 93) return 'text-red-600 bg-red-50'; if (val <= 95) return 'text-yellow-600 bg-yellow-50'; return 'text-green-600 bg-green-50'; } 
+                        else { if (val < 95) return 'text-red-600 bg-red-50'; if (val <= 96.3) return 'text-yellow-600 bg-yellow-50'; return 'text-green-600 bg-green-50'; }
+                    };
+                    const renderTab = (id, map, isSvc) => {
+                        const tb = document.getElementById(id); if(!tb) return; tb.innerHTML='';
+                        const keys = Object.keys(map).sort((a,b) => map[b].t - map[a].t);
+                        let gT=0, gO=0, gP=0, gM=0, gC=0, gMH=0;
+                        keys.forEach(k=>{
+                            const x=map[k]; gT+=x.t; gO+=x.o; gP+=x.p; gM+=x.m; gC+=x.c; gMH+=x.mh;
+                            const pRaw = x.t ? (x.o/x.t)*100 : 0; const p = pRaw.toFixed(1)+'%'; const colorClass = getColorClass(pRaw, fType);
+                            
+                            // Warning Logic
+                            let warnIcon = '';
+                            if(!isSvc && pRaw < 95) warnIcon = '<i class="fa-solid fa-triangle-exclamation text-red-500 ml-2 animate-pulse" title="SLA < 95%"></i>';
+
+                            let c1 = k; 
+                            if(!isSvc) c1 = `<div class="font-bold text-slate-700 flex items-center">${k} ${warnIcon}</div><div class="text-[10px] text-slate-400 font-normal">${x.l}</div>`; 
+                            else c1 = `<div class="font-bold text-slate-700">${k}</div>`;
+                            
+                            tb.innerHTML+=`<tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none"><td class="px-4 py-3">${c1}</td><td class="text-center font-bold text-slate-700">${x.t}</td><td class="text-center text-green-600">${x.o}</td><td class="text-center"><span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${colorClass}">${p}</span></td><td class="text-center text-yellow-600">${x.p}</td><td class="text-center text-orange-600">${x.mh}</td><td class="text-center text-red-600">${x.m}</td><td class="text-center text-slate-400">${x.c}</td></tr>`;
+                        });
+                        if(keys.length > 0) {
+                             const pTotRaw = gT ? (gO/gT)*100 : 0; const pTot = pTotRaw.toFixed(1)+'%'; const colTot = getColorClass(pTotRaw, fType);
+                             tb.innerHTML+=`<tr class="bg-slate-100 font-bold border-t-2 border-slate-200"><td class="px-4 py-3 text-right text-xs uppercase text-slate-500">Total Global</td><td class="text-center text-slate-900">${gT}</td><td class="text-center text-green-700">${gO}</td><td class="text-center"><span class="px-1.5 py-0.5 rounded text-[10px] ${colTot}">${pTot}</span></td><td class="text-center text-yellow-700">${gP}</td><td class="text-center text-orange-700">${gMH}</td><td class="text-center text-red-700">${gM}</td><td class="text-center text-slate-600">${gC}</td></tr>`;
+                        }
+                    };
+                    renderTab('staging-breakdown-body', stgMap, false); renderTab('service-breakdown-body', svcMap, true);
+                    const tbFb = document.getElementById('feedback-recap-body'); if(tbFb) { tbFb.innerHTML=''; 
+                        // Sum Totals
+                        let sumInt = 0; Object.values(fbMapInt).forEach(v => sumInt += v);
+                        let sumExt = 0; Object.values(fbMapExt).forEach(v => sumExt += v);
+
+                        // Build Lists
+                        const buildList = (map) => {
+                            const sortedKeys = Object.keys(map).sort((a,b) => map[b] - map[a]);
+                            if(sortedKeys.length === 0) return '<p class="text-slate-400 italic">Tidak ada feedback</p>';
+                            return `<ul class="list-disc pl-4 marker:text-brand-400 space-y-1">${sortedKeys.map(k => `<li><span class="font-bold text-slate-700">[${map[k]}]</span> <span class="text-sm text-slate-600">${k}</span></li>`).join('')}</ul>`;
+                        };
+                        
+                        tbFb.innerHTML = `
+                            <tr class="align-top">
+                                <td class="px-6 py-5 border-r border-slate-50 w-1/2">
+                                    <div class="flex items-center gap-3 mb-4">
+                                        <div class="bg-blue-50 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg">${sumInt}</div>
+                                        <div><p class="text-xs font-bold text-slate-400 uppercase">Total Paket</p><p class="text-sm font-bold text-slate-800">Internal Issue</p></div>
+                                    </div>
+                                    <div class="text-sm text-slate-600 leading-relaxed">${buildList(fbMapInt)}</div>
+                                </td>
+                                <td class="px-6 py-5 w-1/2">
+                                     <div class="flex items-center gap-3 mb-4">
+                                        <div class="bg-indigo-50 text-indigo-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg">${sumExt}</div>
+                                        <div><p class="text-xs font-bold text-slate-400 uppercase">Total Paket</p><p class="text-sm font-bold text-slate-800">External Issue</p></div>
+                                    </div>
+                                    <div class="text-sm text-slate-600 leading-relaxed">${buildList(fbMapExt)}</div>
+                                </td>
+                            </tr>
+                        `;
+                    }
+                    if(!document.getElementById('section-dashboard').classList.contains('hidden-section') && window.updateCharts) window.updateCharts(filtered, !!fStart||!!fEnd);
+                };
+                window.updateCharts = (data, filterActive) => {
             if(!window.Chart || !data) return;
             const today = new Date(); const d30 = new Date(); d30.setDate(today.getDate()-30); const daily={}, annual={}; for(let i=0;i<12;i++) annual[i]={t:0,o:0};
             data.forEach(r=>{ const rd=new Date(r.date); if(filterActive || (rd>=d30 && rd<=today)) { const k=r.date.substring(5); if(!daily[k]) daily[k]={t:0,o:0}; daily[k].t+=r.metrics.total; daily[k].o+=r.metrics.ok; } if(filterActive || rd.getFullYear()===today.getFullYear()){ annual[rd.getMonth()].t+=r.metrics.total; annual[rd.getMonth()].o+=r.metrics.ok; } });
             
-            // LOGIKA WARNA DINAMIS (REVISI)
+            // LOGIKA WARNA DINAMIS
             const typeFilter = document.getElementById('filter-type') ? document.getElementById('filter-type').value : '';
             
             const getColor = (val) => {
                 if (typeFilter === 'Pickup') {
-                    // Standar Pickup
                     if (val < 93) return '#dc2626'; // Merah (< 93%)
                     if (val <= 95) return '#d97706'; // Kuning (93% - 95%)
                     return '#059669'; // Hijau (> 95%)
                 } else {
-                    // Standar Delivery (Default)
                     if (val < 95) return '#dc2626'; // Merah (< 95%)
                     if (val <= 96.3) return '#d97706'; // Kuning (95% - 96.3%)
                     return '#059669'; // Hijau (> 96.3%)
@@ -1335,20 +1233,23 @@
                 plugins: { 
                     legend: { display: false }, 
                     datalabels: { 
+                        // SETTING BACKGROUND LABEL
+                        backgroundColor: (context) => {
+                             if(context.dataset.type === 'line') return getColor(context.raw);
+                             return '#f1f5f9'; // Warna default bar
+                        },
                         color: (context) => context.dataset.type === 'line' ? 'white' : '#1e293b', 
                         anchor: 'end', 
                         align: (context) => context.dataset.type === 'line' ? 'top' : 'end',
-                        backgroundColor: (context) => {
-                             if(context.dataset.type === 'line') return getColor(context.raw);
-                             return '#f1f5f9'; // Slate-100 for bars
-                        },
-                        borderRadius: 4,
-                        padding: { top:2, bottom:2, left:4, right:4 },
-                        font: { weight: 'bold', size: 10 }, 
-                        formatter: Math.round 
+                        borderRadius: 6, // Radius sudut kotak
+                        padding: { top:4, bottom:4, left:6, right:6 }, // Padding dalam kotak
+                        font: { weight: 'bold', size: 11 }, 
+                        formatter: Math.round,
+                        offset: 0
                     } 
                 }, 
-                scales: { y: { display: false }, x: { grid: { display: false } }, y1: { display: false, grid: {drawOnChartArea: false} } } 
+                scales: { y: { display: false }, x: { grid: { display: false } }, y1: { display: false, grid: {drawOnChartArea: false} } },
+                layout: { padding: { top: 25 } } // Tambah padding atas chart agar label tidak terpotong
             };
             
             const draw = (id, labels, dTot, dOk) => { 
@@ -1367,19 +1268,15 @@
                                 backgroundColor:'#818cf8', 
                                 borderRadius: 4, 
                                 order:2, 
-                                datalabels:{anchor:'end', align:'end', offset: -4} 
+                                datalabels:{anchor:'end', align:'end', offset: -4, backgroundColor: '#f1f5f9', color: '#1e293b'} 
                             }, 
                             { 
                                 type:'line', 
                                 label:'%OK', 
                                 data: dOk, 
-                                // Warna Garis Dinamis (Segment)
-                                segment: {
-                                    borderColor: ctx => getColor(ctx.p1.parsed.y)
-                                },
-                                // Fallback color
+                                segment: { borderColor: ctx => getColor(ctx.p1.parsed.y) },
                                 borderColor: '#94a3b8',
-                                pointBackgroundColor: (ctx) => getColor(ctx.raw), // Warna Titik
+                                pointBackgroundColor: (ctx) => getColor(ctx.raw),
                                 pointBorderColor: '#fff',
                                 borderWidth:2, 
                                 pointRadius:4, 
@@ -1387,7 +1284,7 @@
                                 datalabels:{
                                     color:'white', 
                                     align:'top', 
-                                    offset: 4, 
+                                    offset: 8, // Geser label sedikit ke atas dari titik
                                     formatter:(v)=>Math.round(v)+'%'
                                 } 
                             } 
@@ -1400,47 +1297,50 @@
             const dKeys = Object.keys(daily).sort(); draw('chartDaily', dKeys, dKeys.map(k=>daily[k].t), dKeys.map(k=>daily[k].t?(daily[k].o/daily[k].t*100):0)); draw('chartAnnual', MONTH_NAMES, Object.values(annual).map(x=>x.t), Object.values(annual).map(x=>x.t?(x.o/x.t*100):0));
         };
         window.showToast = (msg, err=false) => { 
-             const t = document.getElementById('toast'); 
-             document.getElementById('toast-msg').innerText = msg; 
-             t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-2xl shadow-2xl z-[90] flex items-center gap-4 border backdrop-blur-md transition-all duration-300 transform translate-y-0 ${err?'bg-red-900/90 border-red-700':'bg-slate-900/90 border-slate-700'} text-white`; 
-             t.classList.remove('hidden'); 
-             setTimeout(()=> { t.classList.add('translate-y-40'); setTimeout(() => t.classList.add('hidden'), 300); }, 3000); 
-        };
-        
-        window.saveUser = async () => {
-            const getV = (id) => document.getElementById(id).value;
-            const data = {
-                username: getV('modal-username'),
-                password: getV('modal-password'),
-                area: getV('modal-area'),
-                staging: getV('modal-staging'),
-                leader: getV('modal-leader'),
-                role: getV('modal-role'),
-                name: getV('modal-username'),
-                createdAt: serverTimestamp()
-            };
-            if(!data.username || !data.password) return window.showToast("Username & Password wajib diisi", true);
+                     const t = document.getElementById('toast'); 
+                     document.getElementById('toast-msg').innerText = msg; 
+                     t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-2xl shadow-2xl z-[90] flex items-center gap-4 border backdrop-blur-md transition-all duration-300 transform translate-y-0 ${err?'bg-red-900/90 border-red-700':'bg-slate-900/90 border-slate-700'} text-white`; 
+                     t.classList.remove('hidden'); 
+                     setTimeout(()=> { t.classList.add('translate-y-40'); setTimeout(() => t.classList.add('hidden'), 300); }, 3000); 
+                };
+                
+                window.saveUser = async () => {
+                    const getV = (id) => document.getElementById(id).value;
+                    const data = {
+                        username: getV('modal-username'),
+                        password: getV('modal-password'),
+                        area: getV('modal-area'),
+                        staging: getV('modal-staging'),
+                        leader: getV('modal-leader'),
+                        role: getV('modal-role'),
+                        name: getV('modal-username'),
+                        createdAt: serverTimestamp()
+                    };
+                    if(!data.username || !data.password) return window.showToast("Username & Password wajib diisi", true);
 
-            const id = document.getElementById('edit-user-id').value;
-            const colRef = collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users');
-            
-            try {
-                if(id) {
-                    delete data.username; delete data.createdAt;
-                    await updateDoc(doc(colRef, id), data);
-                    window.showToast("User Berhasil Diupdate!");
-                } else {
-                    const q = query(colRef, where("username", "==", data.username));
-                    const snap = await getDocs(q);
-                    if(!snap.empty) return window.showToast("Username sudah dipakai!", true);
-                    await addDoc(colRef, data);
-                    window.showToast("User Baru Berhasil Ditambah!");
-                }
-                window.closeUserModal();
-            } catch(err) { console.error(err); window.showToast("Gagal menyimpan data user", true); }
-        };
+                    const id = document.getElementById('edit-user-id').value;
+                    const colRef = collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users');
+                    
+                    try {
+                        if(id) {
+                            delete data.username; delete data.createdAt;
+                            await updateDoc(doc(colRef, id), data);
+                            window.showToast("User Berhasil Diupdate!");
+                        } else {
+                            const q = query(colRef, where("username", "==", data.username));
+                            const snap = await getDocs(q);
+                            if(!snap.empty) return window.showToast("Username sudah dipakai!", true);
+                            await addDoc(colRef, data);
+                            window.showToast("User Baru Berhasil Ditambah!");
+                        }
+                        window.closeUserModal();
+                    } catch(err) { console.error(err); window.showToast("Gagal menyimpan data user", true); }
+                };
 
-        initApp();
+                initApp();
+            </script>
+        </body>
+        </html>
     </script>
 </body>
 </html>
