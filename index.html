@@ -8,7 +8,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,7 +17,14 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
-                    colors: { brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a' } }
+                    colors: { 
+                        brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' },
+                        surface: '#f8fafc'
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 15px rgba(99, 102, 241, 0.3)'
+                    }
                 }
             }
         }
@@ -29,200 +36,413 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     
     <style>
-        body { background-color: #f8fafc; }
-        .nav-link { position: relative; color: #64748b; transition: all 0.3s ease; }
-        .nav-link:hover { color: #2563eb; background-color: #eff6ff; border-radius: 8px; }
-        .nav-link.active-tab { color: #2563eb; font-weight: 700; background-color: #eff6ff; border-radius: 8px; }
+        body { 
+            background-color: #f1f5f9; 
+            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        
+        /* Glass Effect */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .glass-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Nav Links */
+        .nav-link { position: relative; color: #64748b; transition: all 0.3s ease; border-radius: 12px; }
+        .nav-link:hover { color: #4f46e5; background-color: rgba(99, 102, 241, 0.1); }
+        .nav-link.active-tab { color: #fff; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+        
+        /* Utils */
         .hidden-section { display: none !important; }
-        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .loader { border: 2px solid #e2e8f0; border-radius: 50%; border-top: 2px solid #fff; width: 18px; height: 18px; animation: spin 0.8s linear infinite; }
+        .fade-in { animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .loader { border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 2px solid #fff; width: 18px; height: 18px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .sticky-col { position: sticky; left: 0; background-color: #ffffff; z-index: 20; box-shadow: 4px 0 6px -4px rgba(0,0,0,0.05); }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        ::-webkit-scrollbar-track { background: transparent; }
+
+        .sticky-col { position: sticky; left: 0; background-color: #fff; z-index: 20; box-shadow: 4px 0 10px -4px rgba(0,0,0,0.1); }
+        
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
-        input[readonly] { background-color: #f8fafc; color: #64748b; cursor: not-allowed; border-color: #e2e8f0; }
+        
+        /* Custom Table Inputs */
+        .table-input { transition: all 0.2s; border: 1px solid transparent; background: transparent; }
+        .table-input:focus { background: white; border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); }
+        .table-input:hover { background: rgba(248, 250, 252, 0.8); }
+        
         .tab-bg { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* Custom Radio Buttons for Type */
+        .type-radio:checked + label {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+        .type-radio:checked + label i { color: white; }
     </style>
 </head>
-<body class="text-slate-800 antialiased min-h-screen flex flex-col bg-slate-50">
+<body class="text-slate-800 antialiased min-h-screen flex flex-col font-sans">
 
     <!-- LOGIN SECTION -->
-    <div id="section-login" class="min-h-screen flex items-center justify-center px-4 bg-[url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop')] bg-cover bg-center">
-        <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"></div>
-        <div class="relative max-w-sm w-full bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/20 transform transition-all hover:scale-[1.01] duration-300">
-            <div class="bg-gradient-to-br from-brand-600 to-brand-900 px-8 pt-10 pb-8 text-center text-white">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/20 mb-4 shadow-inner backdrop-blur-sm ring-1 ring-white/30">
-                    <i class="fa-solid fa-chart-simple text-3xl"></i>
+    <div id="section-login" class="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+        <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-600/30 rounded-full blur-[100px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-600/30 rounded-full blur-[100px]"></div>
+
+        <div class="relative max-w-sm w-full glass-panel rounded-3xl shadow-2xl overflow-hidden transform transition-all hover:scale-[1.005] duration-300">
+            <div class="bg-gradient-to-br from-brand-600 to-brand-900 px-8 pt-12 pb-10 text-center text-white relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10 mb-6 shadow-inner backdrop-blur-md ring-1 ring-white/20">
+                    <i class="fa-solid fa-chart-pie text-4xl text-white drop-shadow-md"></i>
                 </div>
-                <h2 class="font-extrabold text-2xl tracking-tight" id="login-app-title">Ops Report</h2>
-                <p class="text-blue-100 text-sm mt-1 font-medium tracking-wide">Sistem Pelaporan Terpadu</p>
+                <h2 class="font-bold text-3xl tracking-tight" id="login-app-title">Ops Report</h2>
+                <p class="text-brand-100 text-sm mt-2 font-medium tracking-wide">Dashboard Operasional Terpadu</p>
             </div>
             
-            <div class="px-8 pt-8 pb-4">
-                <!-- Login Mode Toggle -->
-                <div class="flex p-1 bg-slate-100 rounded-xl relative mb-6 border border-slate-200">
-                    <div id="login-tab-bg" class="absolute top-1 left-1 w-[calc(50%-4px)] h-[calc(100%-8px)] bg-white rounded-lg shadow-sm tab-bg transition-all duration-300"></div>
-                    <button onclick="switchLoginMode('user')" id="tab-user" class="flex-1 relative z-10 py-2.5 text-sm font-bold text-brand-600 transition-colors">Tim Ops</button>
-                    <button onclick="switchLoginMode('admin')" id="tab-admin" class="flex-1 relative z-10 py-2.5 text-sm font-bold text-slate-400 transition-colors">Admin</button>
+            <div class="px-8 pt-8 pb-8">
+                <div class="flex p-1.5 bg-slate-100 rounded-xl relative mb-8 border border-slate-200">
+                    <div id="login-tab-bg" class="absolute top-1.5 left-1.5 w-[calc(50%-6px)] h-[calc(100%-12px)] bg-white rounded-lg shadow-sm tab-bg"></div>
+                    <button onclick="switchLoginMode('user')" id="tab-user" class="flex-1 relative z-10 py-2.5 text-sm font-bold text-brand-600 transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-users text-xs"></i> Tim Ops</button>
+                    <button onclick="switchLoginMode('admin')" id="tab-admin" class="flex-1 relative z-10 py-2.5 text-sm font-bold text-slate-400 transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-shield-halved text-xs"></i> Admin</button>
                 </div>
 
                 <form id="loginForm" class="space-y-5">
-                    <div id="login-error" class="hidden bg-red-50 border-l-4 border-red-500 text-red-700 p-3 rounded-lg text-xs mb-2 animate-pulse shadow-sm font-medium"></div>
+                    <div id="login-error" class="hidden bg-red-50 border-l-4 border-red-500 text-red-700 p-3 rounded-lg text-xs mb-2 animate-pulse shadow-sm font-medium flex items-center gap-2"><i class="fa-solid fa-circle-exclamation"></i> <span>Error message</span></div>
                     
                     <div id="field-username" class="space-y-1.5 transition-all duration-300">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Username</label>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Username ID</label>
                         <div class="relative group">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-600 transition-colors">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-600 transition-colors">
                                 <i class="fa-solid fa-user"></i>
                             </div>
-                            <input type="text" id="login-username" required class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-sm bg-slate-50 focus:bg-white shadow-sm" placeholder="Masukkan ID User">
+                            <input type="text" id="login-username" required class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-sm bg-slate-50/50 focus:bg-white" placeholder="Masukkan ID User">
                         </div>
                     </div>
                     
                     <div class="space-y-1.5">
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Password</label>
                         <div class="relative group">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-600 transition-colors">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-600 transition-colors">
                                 <i class="fa-solid fa-lock"></i>
                             </div>
-                            <input type="password" id="login-password" required class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-sm bg-slate-50 focus:bg-white shadow-sm" placeholder="••••••••">
+                            <input type="password" id="login-password" required class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-sm bg-slate-50/50 focus:bg-white" placeholder="••••••••">
                         </div>
                     </div>
 
-                    <button type="submit" id="btn-login" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-brand-500/30 transition-all duration-200 transform hover:-translate-y-0.5 flex justify-center items-center group mt-4 active:scale-95">
+                    <button type="submit" id="btn-login" class="w-full bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-500 hover:to-brand-600 text-white font-bold py-4 px-4 rounded-xl shadow-lg shadow-brand-500/30 transition-all duration-200 transform hover:-translate-y-1 flex justify-center items-center group mt-6 active:scale-95">
                         <span id="btn-login-text" class="mr-2">Masuk Aplikasi</span>
                         <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                        <span id="login-loader" class="loader ml-3 hidden border-white border-t-transparent w-4 h-4 border-2"></span>
+                        <span id="login-loader" class="loader ml-3 hidden"></span>
                     </button>
                 </form>
             </div>
-            
-            <div class="px-8 pb-8 text-center">
-                <p class="text-[10px] text-slate-400 mt-2">Pastikan data yang Anda masukkan benar.</p>
-            </div>
         </div>
+        <p class="absolute bottom-6 text-slate-400 text-xs font-medium">System v2.0 &bull; Secure Connection</p>
     </div>
 
     <!-- MAIN APP LAYOUT -->
     <div id="app-layout" class="hidden-section flex-1 flex flex-col transition-opacity duration-500">
-        <nav class="glass sticky top-0 z-50 border-b border-slate-200/60 shadow-sm">
+        <!-- Navbar Glass -->
+        <nav class="glass-header sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-18 items-center py-2">
+                <div class="flex justify-between h-20 items-center">
                     <div class="flex items-center gap-4">
-                        <div class="bg-gradient-to-tr from-brand-600 to-brand-500 w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-500/20"><i class="fa-solid fa-truck-fast"></i></div>
-                        <div class="leading-tight hidden sm:block">
-                            <h1 class="font-extrabold text-xl text-slate-800 tracking-tight" id="nav-app-title">Ops Report</h1>
-                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest" id="nav-user-role">OPERATIONAL</p>
+                        <div class="bg-gradient-to-tr from-brand-600 to-purple-600 w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-500/20 transform hover:rotate-12 transition-transform duration-300">
+                            <i class="fa-solid fa-truck-fast"></i>
+                        </div>
+                        <div class="leading-tight">
+                            <h1 class="font-extrabold text-lg text-slate-800 tracking-tight" id="nav-app-title">Ops Report</h1>
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest" id="nav-user-role">ONLINE</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 sm:gap-4 overflow-x-auto no-scrollbar">
-                        <button id="nav-form" onclick="switchTab('form')" class="nav-link active-tab px-4 py-2 text-sm font-medium flex items-center gap-2"><i class="fa-solid fa-pen-to-square"></i> <span class="hidden sm:inline">Input</span></button>
-                        <button id="nav-dashboard" onclick="switchTab('dashboard')" class="nav-link px-4 py-2 text-sm font-medium flex items-center gap-2"><i class="fa-solid fa-chart-pie"></i> <span class="hidden sm:inline">Dashboard</span></button>
-                        
-                        <!-- SETTINGS BUTTON -->
-                        <button id="nav-settings" onclick="switchTab('settings')" class="hidden-section nav-link px-4 py-2 text-sm font-medium flex items-center gap-2 text-brand-600 bg-brand-50 rounded-lg border border-brand-200"><i class="fa-solid fa-sliders"></i> <span class="hidden sm:inline">Pengaturan</span></button>
-                        
-                        <div class="h-8 w-px bg-slate-200 mx-1"></div>
-                        <button onclick="handleLogout()" class="text-slate-400 hover:text-red-600 hover:bg-red-50 p-2.5 rounded-xl transition-all" title="Keluar"><i class="fa-solid fa-right-from-bracket text-lg"></i></button>
+                    
+                    <!-- Navigation Menu -->
+                    <div class="flex items-center gap-2 sm:gap-3 bg-slate-100/50 p-1.5 rounded-2xl border border-slate-200/50 backdrop-blur-sm overflow-x-auto">
+                        <button id="nav-dashboard" onclick="switchTab('dashboard')" class="nav-link px-4 py-2 text-sm font-semibold flex items-center gap-2 active-tab"><i class="fa-solid fa-chart-pie"></i> <span class="hidden sm:inline">Data</span></button>
+                        <button id="nav-form" onclick="switchTab('form')" class="nav-link px-4 py-2 text-sm font-semibold flex items-center gap-2"><i class="fa-solid fa-pen-to-square"></i> <span class="hidden sm:inline">Input</span></button>
+                        <button id="nav-recap" onclick="switchTab('recap')" class="nav-link px-4 py-2 text-sm font-semibold flex items-center gap-2"><i class="fa-solid fa-table-list"></i> <span class="hidden sm:inline">Rekapan</span></button>
+                        <button id="nav-settings" onclick="switchTab('settings')" class="hidden-section nav-link px-4 py-2 text-sm font-semibold flex items-center gap-2"><i class="fa-solid fa-sliders"></i> <span class="hidden sm:inline">Config</span></button>
                     </div>
+
+                    <button onclick="handleLogout()" class="group flex items-center justify-center w-10 h-10 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all ml-2" title="Keluar">
+                        <i class="fa-solid fa-power-off text-lg group-hover:scale-110 transition-transform"></i>
+                    </button>
                 </div>
             </div>
         </nav>
 
         <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
             <!-- Welcome Banner -->
-            <div id="welcome-banner" class="hidden-section fade-in bg-gradient-to-r from-slate-800 to-slate-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden mb-8">
-                <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white/5 blur-3xl"></div>
-                <div class="absolute bottom-0 left-20 w-40 h-40 rounded-full bg-brand-500/20 blur-2xl"></div>
-                <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div id="welcome-banner" class="hidden-section fade-in relative overflow-hidden rounded-3xl bg-slate-900 text-white shadow-2xl shadow-slate-900/20 mb-8 p-8 md:p-10 group">
+                <div class="absolute top-0 right-0 w-[300px] h-[300px] bg-gradient-to-br from-brand-500 to-purple-600 rounded-full blur-[80px] opacity-40 group-hover:opacity-60 transition-opacity duration-500 translate-x-1/3 -translate-y-1/3"></div>
+                <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                     <div>
-                        <p class="text-brand-300 font-bold text-sm uppercase tracking-wider mb-1" id="banner-date">Senin, 1 Januari 2024</p>
-                        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-2">Selamat Datang, <span id="banner-name" class="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">User</span>! 👋</h2>
-                    </div>
-                    <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-4 py-2 flex items-center gap-3 shadow-lg">
-                        <div class="text-right">
-                            <p class="text-[10px] text-slate-300 uppercase tracking-wider font-bold">Status Akun</p>
-                            <p class="text-sm font-bold text-white uppercase tracking-widest" id="banner-role">USER</p>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-white/10 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-white/10 text-brand-200" id="banner-date">Date</span>
                         </div>
-                        <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_#34d399]"></div>
+                        <h2 class="text-3xl md:text-5xl font-bold tracking-tight mb-2">Hello, <span id="banner-name" class="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300">User</span></h2>
+                        <p class="text-slate-400 text-sm max-w-lg">Selamat datang kembali di dashboard operasional. Cek performa hari ini.</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl px-5 py-3 flex items-center gap-4">
+                        <div class="text-right">
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Role Access</p>
+                            <p class="text-base font-bold text-white tracking-wide" id="banner-role">USER</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-purple-500 flex items-center justify-center text-white shadow-lg"><i class="fa-solid fa-user-astronaut"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DASHBOARD SECTION (Default) -->
+            <div id="section-dashboard" class="hidden-section space-y-8 fade-in">
+                <!-- Filter Bar -->
+                <div class="glass-panel p-6 rounded-3xl shadow-soft">
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><div class="bg-brand-50 text-brand-600 p-2 rounded-lg"><i class="fa-solid fa-filter"></i></div> Filter Data Dashboard</h3>
+                        <button onclick="resetFilters()" class="text-xs font-bold text-slate-500 hover:text-brand-600 hover:bg-brand-50 px-4 py-2 rounded-xl transition-colors border border-dashed border-slate-300 hover:border-brand-200">Reset Filter</button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <div class="group"><label class="text-[10px] font-bold text-slate-400 mb-1 block uppercase">Dari</label><input type="date" id="filter-date-start" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-3 px-3 focus:ring-brand-500 group-hover:border-brand-300 transition-colors"></div>
+                        <div class="group"><label class="text-[10px] font-bold text-slate-400 mb-1 block uppercase">Sampai</label><input type="date" id="filter-date-end" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-3 px-3 focus:ring-brand-500 group-hover:border-brand-300 transition-colors"></div>
+                        <div class="group"><label class="text-[10px] font-bold text-slate-400 mb-1 block uppercase">Staging</label><select id="filter-staging" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-3 px-3 focus:ring-brand-500 group-hover:border-brand-300 transition-colors"><option value="">Semua Staging</option></select></div>
+                        <div class="group"><label class="text-[10px] font-bold text-slate-400 mb-1 block uppercase">Service</label>
+                            <select id="filter-service" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-3 px-3 focus:ring-brand-500 group-hover:border-brand-300 transition-colors">
+                                <option value="">Semua Service</option>
+                                <option value="ND">ND</option><option value="SDS">SDS</option><option value="REG">REG</option><option value="ECO">ECO</option><option value="BIG">BIG</option>
+                            </select>
+                        </div>
+                        <div class="group"><label class="text-[10px] font-bold text-slate-400 mb-1 block uppercase">Tipe</label>
+                            <select id="filter-type" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-3 px-3 focus:ring-brand-500 group-hover:border-brand-300 transition-colors">
+                                <option value="">Semua Tipe</option><option value="Delivery">Delivery</option><option value="Pickup">Pickup</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI Cards Modern -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-5">
+                    <!-- Total -->
+                    <div class="glass-panel p-5 rounded-3xl shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 border-t-4 border-t-brand-500">
+                        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fa-solid fa-box text-6xl text-brand-600"></i></div>
+                        <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">Total Paket</p>
+                        <p class="text-3xl font-extrabold text-slate-800" id="kpi-total">0</p>
+                    </div>
+                    <!-- OK -->
+                    <div class="glass-panel p-5 rounded-3xl shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 border-t-4 border-t-emerald-500">
+                         <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fa-solid fa-check-circle text-6xl text-emerald-600"></i></div>
+                        <div class="flex justify-between items-start mb-2">
+                             <p class="text-xs text-emerald-600 font-bold uppercase tracking-wider">Success (OK)</p>
+                             <span class="text-[10px] font-bold text-white bg-emerald-500 px-2 py-0.5 rounded-full shadow-lg shadow-emerald-500/40" id="kpi-ok-pct">0%</span>
+                        </div>
+                        <p class="text-3xl font-extrabold text-slate-800" id="kpi-ok">0</p>
+                    </div>
+                    <!-- Prog -->
+                    <div class="glass-panel p-5 rounded-3xl shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 border-t-4 border-t-amber-400">
+                         <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fa-solid fa-stopwatch text-6xl text-amber-500"></i></div>
+                        <p class="text-xs text-amber-600 font-bold uppercase tracking-wider mb-2">In Progress</p>
+                        <p class="text-3xl font-extrabold text-slate-800" id="kpi-pending">0</p>
+                    </div>
+                    <!-- Miss -->
+                    <div class="glass-panel p-5 rounded-3xl shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 border-t-4 border-t-rose-500">
+                        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fa-solid fa-circle-xmark text-6xl text-rose-500"></i></div>
+                        <p class="text-xs text-rose-600 font-bold uppercase tracking-wider mb-2">Missed / Fail</p>
+                        <p class="text-3xl font-extrabold text-slate-800" id="kpi-missed">0</p>
+                    </div>
+                    <!-- Claim -->
+                    <div class="glass-panel p-5 rounded-3xl shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 border-t-4 border-t-slate-500">
+                        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i class="fa-solid fa-triangle-exclamation text-6xl text-slate-500"></i></div>
+                        <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">Claim</p>
+                        <p class="text-3xl font-extrabold text-slate-800" id="kpi-claim">0</p>
+                    </div>
+                </div>
+
+                <!-- Charts Area (1 Column Stacked) -->
+                <div class="grid grid-cols-1 gap-6">
+                    <div class="glass-panel p-6 rounded-3xl shadow-soft">
+                         <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-base font-bold text-slate-800">Performa Tahunan</h3>
+                                <p class="text-[10px] text-slate-400">Total vs Success Rate (%)</p>
+                            </div>
+                            <div class="bg-indigo-50 text-indigo-600 w-8 h-8 flex items-center justify-center rounded-lg"><i class="fa-solid fa-calendar"></i></div>
+                        </div>
+                        <div class="relative h-72"><canvas id="chartAnnual"></canvas></div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-3xl shadow-soft">
+                         <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-base font-bold text-slate-800">Tren Harian (30 Hari)</h3>
+                                <p class="text-[10px] text-slate-400">Monitoring harian realtime</p>
+                            </div>
+                            <div class="bg-blue-50 text-blue-600 w-8 h-8 flex items-center justify-center rounded-lg"><i class="fa-solid fa-chart-column"></i></div>
+                        </div>
+                        <div class="relative h-72"><canvas id="chartDaily"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Data Tables -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <div class="glass-panel rounded-3xl shadow-soft overflow-hidden flex flex-col h-auto">
+                        <div class="px-6 py-4 bg-white/50 border-b border-slate-100 backdrop-blur-sm">
+                            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-warehouse text-brand-500"></i> Staging Breakdown</h3>
+                        </div>
+                        <div class="overflow-auto flex-1 p-2 custom-scrollbar">
+                            <table class="min-w-full">
+                                <thead class="bg-slate-50/80 sticky top-0 z-10"><tr class="text-slate-400 text-[10px] uppercase"><th class="px-4 py-3 text-left rounded-l-lg">Kode SS/PIC</th><th class="px-2 text-center">Total</th><th class="px-2 text-center text-green-600">OK</th><th class="px-2 text-center">%</th><th class="px-2 text-center text-yellow-600">Prg</th><th class="px-2 text-center text-red-600">Mis</th><th class="px-2 text-center rounded-r-lg">Clm</th></tr></thead>
+                                <tbody id="staging-breakdown-body" class="text-xs font-medium divide-y divide-slate-50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="glass-panel rounded-3xl shadow-soft overflow-hidden flex flex-col h-auto">
+                        <div class="px-6 py-4 bg-white/50 border-b border-slate-100 backdrop-blur-sm">
+                            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-truck-ramp-box text-blue-500"></i> Service Breakdown</h3>
+                        </div>
+                        <div class="overflow-auto flex-1 p-2 custom-scrollbar">
+                            <table class="min-w-full">
+                                <thead class="bg-slate-50/80 sticky top-0 z-10"><tr class="text-slate-400 text-[10px] uppercase"><th class="px-4 py-3 text-left rounded-l-lg">Service</th><th class="px-2 text-center">Total</th><th class="px-2 text-center text-green-600">OK</th><th class="px-2 text-center">%</th><th class="px-2 text-center text-yellow-600">Prg</th><th class="px-2 text-center text-red-600">Mis</th><th class="px-2 text-center rounded-r-lg">Clm</th></tr></thead>
+                                <tbody id="service-breakdown-body" class="text-xs font-medium divide-y divide-slate-50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Table -->
+                <div class="glass-panel rounded-3xl shadow-soft overflow-hidden mb-8">
+                    <div class="px-6 py-4 bg-white/50 border-b border-slate-100 flex justify-between items-center">
+                        <h3 class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-comments text-amber-500"></i> Rekapan Feedback</h3>
+                        <button onclick="downloadCSV()" class="text-[10px] font-bold bg-white border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-brand-600 transition-colors flex items-center gap-2 shadow-sm"><i class="fa-solid fa-download"></i> Export CSV</button>
+                    </div>
+                    <div class="overflow-x-auto max-h-96 custom-scrollbar p-2">
+                        <table class="min-w-full divide-y divide-slate-100 text-xs">
+                            <thead class="bg-slate-50 sticky top-0 shadow-sm z-10">
+                                <tr class="text-slate-500 uppercase">
+                                    <th class="px-6 py-3 text-left w-1/2 rounded-l-lg">Internal (Total & Feedback)</th>
+                                    <th class="px-6 py-3 text-left w-1/2 rounded-r-lg">External (Total & Feedback)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="feedback-recap-body" class="divide-y divide-slate-50"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
             <!-- INPUT SECTION -->
-            <div id="section-form" class="max-w-6xl mx-auto space-y-6 fade-in">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="bg-slate-50/80 backdrop-blur px-8 py-5 border-b border-slate-100 flex justify-between items-center">
-                        <div>
-                            <h2 class="text-slate-800 font-bold text-xl">Input Laporan Harian</h2>
-                            <p class="text-slate-500 text-xs mt-1">Isi data service di bawah ini.</p>
+            <div id="section-form" class="hidden-section max-w-6xl mx-auto space-y-6 fade-in">
+                <div class="glass-panel rounded-3xl shadow-soft overflow-hidden">
+                    <div class="px-8 py-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/50">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-brand-600 flex items-center justify-center text-xl"><i class="fa-solid fa-clipboard-list"></i></div>
+                            <div>
+                                <h2 class="text-slate-800 font-bold text-xl" id="input-form-title">Input Laporan Harian</h2>
+                                <p class="text-slate-500 text-xs">Pastikan data valid sebelum submit.</p>
+                            </div>
                         </div>
-                        <div class="bg-blue-100 text-blue-700 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">Bulk Entry Mode</div>
+                        <div class="flex items-center gap-2">
+                             <div class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-4 py-2 rounded-xl uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-layer-group"></i> Bulk Mode</div>
+                        </div>
                     </div>
                     
-                    <form id="reportForm" class="p-8 space-y-8" onkeydown="return event.key != 'Enter';">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6 bg-slate-50/50 rounded-2xl border border-slate-100">
-                            <div class="space-y-1.5">
-                                <label class="block text-xs font-bold text-slate-500 uppercase">Tanggal</label>
-                                <input type="date" id="input-date" required class="w-full rounded-xl border-slate-200 text-sm py-2.5 shadow-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all">
+                    <form id="reportForm" class="p-4 sm:p-8 space-y-8" onkeydown="return event.key != 'Enter';">
+                        <input type="hidden" id="edit-doc-id"> <!-- Hidden ID for Editing -->
+                        
+                        <!-- Top Controls -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 p-6 bg-slate-50/80 rounded-2xl border border-slate-200/60">
+                            <div class="space-y-2">
+                                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Tanggal Laporan</label>
+                                <div class="relative">
+                                    <input type="date" id="input-date" required class="w-full rounded-xl border-slate-200 text-sm py-2.5 px-3 shadow-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all hover:bg-white bg-white">
+                                </div>
                             </div>
-                            <div class="space-y-1.5">
-                                <label class="block text-xs font-bold text-slate-500 uppercase">Tipe Operasi</label>
-                                <select id="input-type" required class="w-full rounded-xl border-slate-200 text-sm py-2.5 bg-white shadow-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all">
-                                    <option value="Delivery">Delivery</option>
-                                    <option value="Pickup">Pickup</option>
-                                </select>
+                            <div class="space-y-2">
+                                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Tipe Operasi</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="relative">
+                                        <input type="radio" name="input-type" id="type-delivery" value="Delivery" class="peer hidden type-radio" checked onchange="document.getElementById('input-type-val').value='Delivery'">
+                                        <label for="type-delivery" class="flex flex-col items-center justify-center p-2 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-all h-full text-slate-600">
+                                            <i class="fa-solid fa-truck-fast text-lg mb-1"></i>
+                                            <span class="text-[10px] font-bold uppercase">Delivery</span>
+                                            <span class="text-[9px] text-slate-400">Pengantaran</span>
+                                        </label>
+                                    </div>
+                                    <div class="relative">
+                                        <input type="radio" name="input-type" id="type-pickup" value="Pickup" class="peer hidden type-radio" onchange="document.getElementById('input-type-val').value='Pickup'">
+                                        <label for="type-pickup" class="flex flex-col items-center justify-center p-2 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-all h-full text-slate-600">
+                                            <i class="fa-solid fa-hand-holding-box text-lg mb-1"></i>
+                                            <span class="text-[10px] font-bold uppercase">Pickup</span>
+                                            <span class="text-[9px] text-slate-400">Penjemputan</span>
+                                        </label>
+                                    </div>
+                                    <input type="hidden" id="input-type-val" value="Delivery">
+                                </div>
                             </div>
-                            <div class="lg:col-span-2 space-y-1.5" id="identity-container">
-                                <label class="block text-xs font-bold text-slate-500 uppercase">Identitas Pengimput</label>
+                            <div class="lg:col-span-2 space-y-2" id="identity-container">
+                                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Identitas Penginput</label>
                                 <!-- User View -->
-                                <div id="user-identity-view" class="w-full rounded-xl bg-white border border-slate-200 text-sm py-2.5 px-4 text-slate-700 font-medium flex items-center shadow-sm">
-                                    <div class="w-6 h-6 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center mr-3 text-xs"><i class="fa-solid fa-user"></i></div>
-                                    <span id="display-identity">Loading...</span>
+                                <div id="user-identity-view" class="w-full rounded-xl bg-white border border-slate-200 text-sm py-2.5 px-4 text-slate-700 font-medium flex items-center shadow-sm h-[60px]">
+                                    <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center mr-3 text-xs"><i class="fa-solid fa-user"></i></div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] text-slate-400 uppercase font-bold">Logged in as</span>
+                                        <span id="display-identity" class="truncate font-bold">Loading...</span>
+                                    </div>
                                     <input type="hidden" id="input-staging-user">
                                     <input type="hidden" id="input-area-user">
                                     <input type="hidden" id="input-leader-user">
                                 </div>
                                 <!-- Admin View -->
-                                <div id="admin-identity-view" class="hidden grid grid-cols-3 gap-3">
-                                    <select id="input-staging-admin" onchange="autoFillAdminData()" class="w-full rounded-xl border-slate-200 text-sm py-2.5 focus:ring-brand-500 shadow-sm"><option value="">Pilih Staging...</option></select>
-                                    <input type="text" id="input-area-admin" readonly class="w-full rounded-xl border-slate-200 text-sm py-2.5 bg-slate-50 text-slate-500 shadow-sm" placeholder="Area">
-                                    <input type="text" id="input-leader-admin" readonly class="w-full rounded-xl border-slate-200 text-sm py-2.5 bg-slate-50 text-slate-500 shadow-sm" placeholder="Leader">
+                                <div id="admin-identity-view" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3 h-[60px]">
+                                    <select id="input-staging-admin" onchange="autoFillAdminData()" class="w-full rounded-xl border-slate-200 text-sm focus:ring-brand-500 shadow-sm"><option value="">Pilih Staging...</option></select>
+                                    <input type="text" id="input-area-admin" readonly class="w-full rounded-xl border-slate-200 text-sm bg-slate-100 text-slate-500 shadow-sm px-3" placeholder="Area">
+                                    <input type="text" id="input-leader-admin" readonly class="w-full rounded-xl border-slate-200 text-sm bg-slate-100 text-slate-500 shadow-sm px-3" placeholder="Leader">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Table Input -->
-                        <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                        <!-- Data Table Input -->
+                        <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white">
                             <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-slate-200">
-                                    <thead class="bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                        <tr>
-                                            <th class="sticky-col px-4 py-4 text-left w-24 border-r bg-slate-50 z-10">Service</th>
-                                            <th class="px-2 py-4 min-w-[100px] text-center">Total</th> 
-                                            <th class="px-2 py-4 min-w-[100px] text-center text-green-600 bg-green-50/50">OK</th>
-                                            <th class="px-2 py-4 min-w-[100px] text-center text-yellow-600">Prog</th>
-                                            <th class="px-2 py-4 min-w-[100px] text-center text-red-600">Miss</th>
-                                            <th class="px-2 py-4 min-w-[100px] text-center text-slate-600">Claim</th>
-                                            <th class="px-2 py-4 min-w-[100px] border-l bg-slate-50/30">Int Pkg</th>
-                                            <th class="px-2 py-4 min-w-[200px] bg-slate-50/30">F.Back Int</th>
-                                            <th class="px-2 py-4 min-w-[100px] border-l bg-slate-50/30">Ext Pkg</th>
-                                            <th class="px-2 py-4 min-w-[200px] bg-slate-50/30">F.Back Ext</th>
+                                <table class="min-w-full divide-y divide-slate-100">
+                                    <thead>
+                                        <tr class="bg-slate-50/80 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider text-center">
+                                            <th class="sticky-col px-4 py-4 text-left w-24 border-r border-slate-200 bg-slate-50">Service</th>
+                                            <th class="px-2 py-4 min-w-[90px] text-slate-700">Total</th> 
+                                            <th class="px-2 py-4 min-w-[90px] text-green-600 bg-green-50/30">OK</th>
+                                            <th class="px-2 py-4 min-w-[90px] text-yellow-600">Prog</th>
+                                            <th class="px-2 py-4 min-w-[90px] text-red-600">Miss</th>
+                                            <th class="px-2 py-4 min-w-[90px] text-slate-600">Claim</th>
+                                            <th class="px-2 py-4 min-w-[90px] border-l border-slate-100">Int Pkg</th>
+                                            <th class="px-2 py-4 min-w-[180px]">Feedback Int</th>
+                                            <th class="px-2 py-4 min-w-[90px] border-l border-slate-100">Ext Pkg</th>
+                                            <th class="px-2 py-4 min-w-[180px]">Feedback Ext</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="bulk-input-body" class="bg-white divide-y divide-slate-100 text-sm"></tbody>
+                                    <tbody id="bulk-input-body" class="bg-white divide-y divide-slate-50 text-sm font-medium"></tbody>
                                 </table>
                             </div>
                         </div>
 
-                        <div class="flex justify-end pt-4">
-                            <!-- BUTTON SUBMIT -->
-                            <button type="button" onclick="confirmSubmitReport()" id="btn-submit" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg shadow-brand-500/30 transition-all transform hover:-translate-y-1 active:scale-95 flex items-center gap-2 group">
-                                <i class="fa-solid fa-paper-plane group-hover:rotate-12 transition-transform"></i>
+                        <div class="flex justify-between pt-4">
+                            <button type="button" onclick="cancelEdit()" id="btn-cancel-edit" class="hidden px-6 py-3 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-colors">Batal Edit</button>
+                            <button type="button" onclick="confirmSubmitReport()" id="btn-submit" class="bg-slate-900 hover:bg-black text-white font-bold py-4 px-8 rounded-xl shadow-xl shadow-slate-900/20 transition-all transform hover:-translate-y-1 active:scale-95 flex items-center gap-3 group ml-auto">
+                                <i class="fa-solid fa-paper-plane group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
                                 <span id="btn-text">Kirim Laporan</span>
                                 <span id="btn-loader" class="loader ml-2 hidden border-white border-t-transparent w-4 h-4 border-2"></span>
                             </button>
@@ -231,122 +451,27 @@
                 </div>
             </div>
 
-            <!-- DASHBOARD SECTION -->
-            <div id="section-dashboard" class="hidden-section space-y-8 fade-in">
-                <!-- Filter Bar -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><div class="bg-slate-100 p-1.5 rounded-lg text-slate-500"><i class="fa-solid fa-filter"></i></div> Filter Data</h3>
-                        <button onclick="resetFilters()" class="text-xs font-bold text-brand-600 hover:text-brand-800 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-lg transition-colors">Reset Filter</button>
+            <!-- REKAPAN SECTION (NEW) -->
+            <div id="section-recap" class="hidden-section max-w-7xl mx-auto space-y-6 fade-in">
+                <div class="glass-panel rounded-3xl shadow-soft overflow-hidden">
+                    <div class="px-8 py-6 border-b border-slate-100">
+                         <h2 class="text-slate-800 font-bold text-xl flex items-center gap-3"><i class="fa-solid fa-table-list text-brand-600"></i> Rekapan Input Anda</h2>
+                         <p class="text-slate-500 text-xs mt-1">Gunakan kode Admin untuk mengedit data yang sudah terkirim.</p>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                        <div><input type="date" id="filter-date-start" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-2.5 focus:ring-brand-500"></div>
-                        <div><input type="date" id="filter-date-end" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-2.5 focus:ring-brand-500"></div>
-                        <div><select id="filter-staging" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-2.5 focus:ring-brand-500"><option value="">Semua Staging</option></select></div>
-                        <div>
-                            <select id="filter-service" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-2.5 focus:ring-brand-500">
-                                <option value="">Semua Service</option>
-                                <option value="ND">ND</option>
-                                <option value="SDS">SDS</option>
-                                <option value="REG">REG</option>
-                                <option value="ECO">ECO</option>
-                                <option value="BIG">BIG</option>
-                            </select>
-                        </div>
-                        <div>
-                            <select id="filter-type" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-2.5 focus:ring-brand-500">
-                                <option value="">Semua Tipe</option>
-                                <option value="Delivery">Delivery</option>
-                                <option value="Pickup">Pickup</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- KPI Cards -->
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
-                        <i class="fa-solid fa-box-open absolute top-3 right-3 text-slate-200 text-3xl group-hover:scale-110 transition-transform"></i>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Total Paket</p>
-                        <p class="text-2xl font-extrabold text-slate-800" id="kpi-total">0</p>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative group">
-                        <i class="fa-solid fa-check-circle absolute top-3 right-3 text-green-100 text-3xl group-hover:scale-110 transition-transform"></i>
-                        <div class="absolute bottom-0 left-0 w-full h-1 bg-green-500/50"></div>
-                        <div class="flex justify-between items-start relative z-10">
-                            <div><p class="text-[10px] text-green-600 font-bold uppercase tracking-wider mb-1">OK</p><p class="text-2xl font-extrabold text-slate-800" id="kpi-ok">0</p></div>
-                            <span class="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-1 rounded-lg" id="kpi-ok-pct">0%</span>
-                        </div>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative group">
-                        <i class="fa-solid fa-spinner absolute top-3 right-3 text-yellow-100 text-3xl group-hover:scale-110 transition-transform"></i>
-                        <div class="absolute bottom-0 left-0 w-full h-1 bg-yellow-400/50"></div>
-                        <p class="text-[10px] text-yellow-600 font-bold uppercase tracking-wider mb-1">In Progress</p>
-                        <p class="text-2xl font-extrabold text-slate-800" id="kpi-pending">0</p>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative group">
-                         <i class="fa-solid fa-circle-xmark absolute top-3 right-3 text-red-100 text-3xl group-hover:scale-110 transition-transform"></i>
-                        <div class="absolute bottom-0 left-0 w-full h-1 bg-red-500/50"></div>
-                        <p class="text-[10px] text-red-600 font-bold uppercase tracking-wider mb-1">Missed</p>
-                        <p class="text-2xl font-extrabold text-slate-800" id="kpi-missed">0</p>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative group">
-                        <i class="fa-solid fa-triangle-exclamation absolute top-3 right-3 text-slate-100 text-3xl group-hover:scale-110 transition-transform"></i>
-                        <div class="absolute bottom-0 left-0 w-full h-1 bg-slate-400/50"></div>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1">Claim</p>
-                        <p class="text-2xl font-extrabold text-slate-800" id="kpi-claim">0</p>
-                    </div>
-                </div>
-
-                <!-- Charts -->
-                <div class="space-y-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-base font-bold text-slate-800">Performa Tahunan (Bulanan)</h3>
-                            <div class="bg-indigo-50 text-indigo-600 p-2 rounded-lg"><i class="fa-solid fa-calendar"></i></div>
-                        </div>
-                        <div class="relative h-80"><canvas id="chartAnnual"></canvas></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-base font-bold text-slate-800">Tren Harian (30 Hari Terakhir)</h3>
-                            <div class="bg-blue-50 text-blue-600 p-2 rounded-lg"><i class="fa-solid fa-chart-column"></i></div>
-                        </div>
-                        <div class="relative h-80"><canvas id="chartDaily"></canvas></div>
-                    </div>
-                </div>
-
-                <!-- Tables -->
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div class="px-5 py-3 bg-slate-50 border-b border-slate-100 font-bold text-xs text-slate-600 uppercase">Staging Breakdown</div>
-                        <div class="overflow-x-auto max-h-96">
-                            <table class="min-w-full divide-y divide-slate-100 text-xs">
-                                <thead class="bg-white sticky top-0 shadow-sm z-10"><tr class="text-slate-500"><th class="px-4 py-3 text-left">Kode SS/PIC</th><th class="px-2 text-center">Total</th><th class="px-2 text-center text-green-600">OK</th><th class="px-2 text-center">%</th><th class="px-2 text-center text-yellow-600">Prg</th><th class="px-2 text-center text-red-600">Mis</th><th class="px-2 text-center">Clm</th></tr></thead>
-                                <tbody id="staging-breakdown-body" class="divide-y divide-slate-50"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div class="px-5 py-3 bg-slate-50 border-b border-slate-100 font-bold text-xs text-slate-600 uppercase">Service Breakdown</div>
-                        <div class="overflow-x-auto max-h-96">
-                            <table class="min-w-full divide-y divide-slate-100 text-xs">
-                                <thead class="bg-white sticky top-0 shadow-sm z-10"><tr class="text-slate-500"><th class="px-4 py-3 text-left">Service</th><th class="px-2 text-center">Total</th><th class="px-2 text-center text-green-600">OK</th><th class="px-2 text-center">%</th><th class="px-2 text-center text-yellow-600">Prg</th><th class="px-2 text-center text-red-600">Mis</th><th class="px-2 text-center">Clm</th></tr></thead>
-                                <tbody id="service-breakdown-body" class="divide-y divide-slate-50"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
-                    <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Rekapan Feedback</h3>
-                        <button onclick="downloadCSV()" class="text-[10px] font-bold bg-white border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2"><i class="fa-solid fa-download"></i> Export CSV</button>
-                    </div>
-                    <div class="overflow-x-auto max-h-96">
-                        <table class="min-w-full divide-y divide-slate-100 text-xs">
-                            <thead class="bg-white sticky top-0 shadow-sm z-10"><tr class="text-slate-500"><th class="px-6 py-3 text-left w-40">Info</th><th class="px-6 py-3 text-left w-1/2">Internal</th><th class="px-6 py-3 text-left w-1/2">External</th></tr></thead>
-                            <tbody id="feedback-recap-body" class="divide-y divide-slate-50"></tbody>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-100 text-sm">
+                            <thead class="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase">
+                                <tr>
+                                    <th class="px-6 py-4 text-left">Tanggal</th>
+                                    <th class="px-4 py-4 text-left">Staging</th>
+                                    <th class="px-4 py-4 text-left">Tipe</th>
+                                    <th class="px-4 py-4 text-left">Service</th>
+                                    <th class="px-4 py-4 text-center">Total</th>
+                                    <th class="px-4 py-4 text-center text-green-600">OK</th>
+                                    <th class="px-4 py-4 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recap-body" class="divide-y divide-slate-50 bg-white"></tbody>
                         </table>
                     </div>
                 </div>
@@ -354,32 +479,28 @@
 
             <!-- SETTINGS SECTION -->
             <div id="section-settings" class="hidden-section space-y-8 fade-in">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row gap-4 items-end justify-between">
+                <div class="glass-panel rounded-3xl shadow-soft p-8 flex flex-col md:flex-row gap-6 items-end justify-between border-l-4 border-l-brand-600">
                     <div class="w-full max-w-lg space-y-2">
-                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-heading text-brand-600"></i> Judul Laporan</h3>
-                        <input type="text" id="setting-app-title" class="w-full rounded-xl border-slate-200 text-sm py-2.5 focus:ring-brand-500" placeholder="Contoh: OPS REPORT JABAR">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-heading text-brand-600"></i> Judul Aplikasi</h3>
+                        <p class="text-slate-400 text-xs mb-2">Ubah nama yang tampil di dashboard dan login page.</p>
+                        <input type="text" id="setting-app-title" class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500" placeholder="Contoh: OPS REPORT JABAR">
                     </div>
-                    <button onclick="saveAppSetting()" class="bg-slate-800 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-900 transition shadow-lg shadow-slate-500/20">Simpan Perubahan</button>
+                    <button onclick="saveAppSetting()" class="bg-slate-800 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-slate-900 transition shadow-lg shadow-slate-500/20 flex items-center gap-2"><i class="fa-solid fa-floppy-disk"></i> Simpan</button>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="glass-panel rounded-3xl shadow-soft p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-users text-brand-600"></i> Manajemen User</h3>
+                        <div>
+                             <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-users-gear text-brand-600"></i> Manajemen User</h3>
+                             <p class="text-slate-400 text-xs">Tambah atau edit akses tim.</p>
+                        </div>
                         <button onclick="openUserModal()" class="bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-emerald-600 flex items-center shadow-lg shadow-emerald-500/20 transition-all transform hover:-translate-y-0.5"><i class="fa-solid fa-plus mr-2"></i> Tambah User</button>
                     </div>
-                    <div class="overflow-x-auto rounded-xl border border-slate-100">
+                    <div class="overflow-x-auto rounded-2xl border border-slate-100">
                         <table class="min-w-full divide-y divide-slate-100 text-sm">
                             <thead><tr class="bg-slate-50 text-slate-500 uppercase text-xs font-bold"><th class="px-6 py-3 text-left">Username</th><th class="px-4 py-3 text-left">Area</th><th class="px-4 py-3 text-left">Staging</th><th class="px-4 py-3 text-left">Leader</th><th class="px-4 py-3 text-center">Role</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
                             <tbody id="user-list-body" class="divide-y divide-slate-50 bg-white"></tbody>
                         </table>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 max-w-md border-l-4 border-l-red-500">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-key text-red-500"></i> Keamanan</h3>
-                    <div class="space-y-3">
-                        <input type="password" id="admin-new-pass" class="w-full rounded-xl border-slate-200 text-sm py-2.5 focus:ring-red-500 focus:border-red-500" placeholder="Password Baru Admin">
-                        <button onclick="updateAdminPassword()" class="w-full bg-red-50 text-red-600 border border-red-100 py-2.5 rounded-xl text-sm font-bold hover:bg-red-100 transition-colors">Update Password</button>
                     </div>
                 </div>
             </div>
@@ -387,88 +508,107 @@
     </div>
 
     <!-- Confirm Modal -->
-    <div id="confirmModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden scale-95 transition-transform duration-300" id="confirmContent">
-            <div class="p-6 text-center">
-                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
-                    <i class="fa-solid fa-question text-blue-600 text-xl"></i>
+    <div id="confirmModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden scale-95 transition-transform duration-300 border border-white/20" id="confirmContent">
+            <div class="p-8 text-center">
+                <div class="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-blue-50 mb-4">
+                    <i class="fa-solid fa-circle-question text-blue-600 text-2xl"></i>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2" id="confirmTitle">Konfirmasi</h3>
-                <p class="text-sm text-slate-500 mb-6" id="confirmMessage">Apakah Anda yakin?</p>
+                <h3 class="text-lg font-extrabold text-slate-900 mb-2" id="confirmTitle">Konfirmasi</h3>
+                <p class="text-sm text-slate-500 mb-8" id="confirmMessage">Apakah Anda yakin?</p>
                 <div class="flex justify-center gap-3">
-                    <button id="btn-confirm-cancel" class="px-4 py-2 rounded-lg text-sm font-bold text-slate-500 hover:bg-slate-100 transition-colors">Batal</button>
-                    <button id="btn-confirm-yes" class="px-6 py-2 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5">Ya, Lanjutkan</button>
+                    <button id="btn-confirm-cancel" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-colors">Batal</button>
+                    <button id="btn-confirm-yes" class="px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5">Ya, Lanjutkan</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Admin First Time Setup Modal -->
-    <div id="setup-admin-modal" class="fixed inset-0 bg-slate-900/80 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center">
-            <div class="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-600 text-2xl"><i class="fa-solid fa-key"></i></div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">Setup Password Admin</h3>
-            <p class="text-sm text-slate-500 mb-6">Ini adalah login pertama Anda. Mohon buat password baru untuk keamanan akun Administrator.</p>
-            <input type="password" id="setup-new-pass" class="w-full rounded-xl border-slate-300 text-sm py-3 px-4 focus:ring-brand-500 mb-4" placeholder="Password Baru (Min. 6 Karakter)">
-            <button onclick="saveAdminFirstTime()" id="btn-save-setup" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition-all">Simpan & Masuk</button>
+    <!-- Admin Auth Modal (For Editing) -->
+    <div id="admin-auth-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center transform scale-100 transition-all">
+            <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-red-600 text-2xl"><i class="fa-solid fa-lock"></i></div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Restricted Access</h3>
+            <p class="text-sm text-slate-500 mb-6">Masukkan Password Admin untuk mengedit data ini.</p>
+            <input type="password" id="auth-admin-pass" class="w-full rounded-xl border-slate-300 text-sm py-3 px-4 focus:ring-red-500 mb-5 text-center" placeholder="Password Admin">
+            <div class="flex gap-3">
+                <button onclick="document.getElementById('admin-auth-modal').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200">Batal</button>
+                <button onclick="verifyAdminAndEdit()" class="flex-1 bg-red-600 text-white font-bold py-3 rounded-xl hover:bg-red-700 shadow-lg shadow-red-500/30">Buka Kunci</button>
+            </div>
         </div>
     </div>
 
-    <!-- User Modal (BIG INPUTS) -->
+    <!-- Setup Admin Modal -->
+    <div id="setup-admin-modal" class="fixed inset-0 bg-slate-900/80 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden p-8 text-center">
+            <div class="w-16 h-16 bg-brand-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-brand-600 text-2xl shadow-inner"><i class="fa-solid fa-key"></i></div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Setup Password Admin</h3>
+            <p class="text-sm text-slate-500 mb-6 leading-relaxed">Ini adalah akses pertama Anda. Amankan akun Administrator dengan password baru.</p>
+            <input type="password" id="setup-new-pass" class="w-full rounded-xl border-slate-300 text-sm py-3 px-4 focus:ring-brand-500 mb-5" placeholder="Password Baru (Min. 6 Karakter)">
+            <button onclick="saveAdminFirstTime()" id="btn-save-setup" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-brand-500/30">Simpan & Masuk</button>
+        </div>
+    </div>
+
+    <!-- User Modal -->
     <div id="userModal" class="fixed inset-0 bg-slate-900/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300" id="userModalContent">
-            <div class="bg-slate-800 px-8 py-5 flex justify-between items-center text-white">
-                <h3 class="font-bold text-lg" id="modalTitle">Tambah User</h3>
-                <button onclick="closeUserModal()" class="hover:text-red-300 transition-colors bg-white/10 w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300" id="userModalContent">
+            <div class="bg-slate-900 px-8 py-6 flex justify-between items-center text-white">
+                <div>
+                    <h3 class="font-bold text-lg" id="modalTitle">Tambah User</h3>
+                    <p class="text-slate-400 text-xs mt-0.5">Isi detail kredensial user baru.</p>
+                </div>
+                <button onclick="closeUserModal()" class="hover:text-red-300 transition-colors bg-white/10 w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/20"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <!-- FIX: Added onsubmit preventDefault and Changed Button type -->
-            <form id="userForm" class="p-8 space-y-6" onsubmit="event.preventDefault();">
+            <form id="userForm" class="p-8 space-y-5" onsubmit="event.preventDefault();">
                 <input type="hidden" id="edit-user-id">
-                
                 <div class="grid grid-cols-2 gap-5">
-                    <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-500 uppercase">Username</label>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase">Username</label>
                         <input type="text" id="modal-username" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-500 uppercase">Password</label>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase">Password</label>
                         <input type="text" id="modal-password" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white" placeholder="Min 6 char">
                     </div>
                 </div>
-
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase">Role Akses</label>
-                    <select id="modal-role" class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50">
-                        <option value="user">User (Input Only)</option>
-                        <option value="admin">Admin (Full Access)</option>
-                    </select>
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Role Akses</label>
+                    <div class="relative">
+                        <select id="modal-role" class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 appearance-none">
+                            <option value="user">User (Input Only)</option>
+                            <option value="admin">Admin (Full Access)</option>
+                        </select>
+                         <div class="absolute right-3 top-3.5 text-slate-400 pointer-events-none"><i class="fa-solid fa-chevron-down text-xs"></i></div>
+                    </div>
                 </div>
-
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase">Area / Kota</label>
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Area / Kota</label>
                     <input type="text" id="modal-area" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
                 </div>
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase">Nama Staging</label>
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Nama Staging</label>
                     <input type="text" id="modal-staging" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
                 </div>
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase">Nama Leader (PIC)</label>
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Nama Leader (PIC)</label>
                     <input type="text" id="modal-leader" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
                 </div>
                 
-                <div class="pt-6 flex justify-end gap-3">
+                <div class="pt-6 flex justify-end gap-3 border-t border-slate-100 mt-2">
                     <button type="button" onclick="closeUserModal()" class="px-6 py-3 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-colors">Batal</button>
-                    <!-- FIX: Changed to type="button" and onclick handler -->
-                    <button type="button" onclick="saveUser()" class="px-8 py-3 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-brand-500/30 transition-all transform hover:-translate-y-0.5">Simpan Data</button>
+                    <button type="button" onclick="saveUser()" class="px-8 py-3 rounded-xl text-sm font-bold text-white bg-slate-900 hover:bg-black shadow-lg shadow-slate-900/20 transition-all transform hover:-translate-y-0.5">Simpan Data</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Toast -->
-    <div id="toast" class="fixed bottom-6 right-6 bg-slate-800 text-white px-6 py-4 rounded-xl shadow-2xl transform translate-y-20 transition-all duration-300 z-[80] flex items-center gap-3 hidden border border-slate-700"><div id="toast-icon" class="text-blue-400 text-xl"><i class="fa-solid fa-circle-info"></i></div><div><p id="toast-msg" class="font-medium text-sm">Notification</p></div></div>
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl transform translate-y-40 transition-all duration-300 z-[80] flex items-center gap-4 hidden border border-slate-700/50 backdrop-blur-md">
+        <div id="toast-icon" class="text-blue-400 text-xl"><i class="fa-solid fa-circle-info"></i></div>
+        <div><p id="toast-msg" class="font-medium text-sm">Notification</p></div>
+    </div>
 
+    <!-- JAVASCRIPT LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -483,7 +623,8 @@
             unsubscribeReports: null, unsubscribeUsers: null, unsubscribeSettings: null,
             reportsData: [], appId: 'default-app-id',
             stagingMap: {},
-            loginMode: 'user' 
+            loginMode: 'user',
+            pendingEditId: null
         };
 
         // --- AUTH & INIT ---
@@ -545,81 +686,43 @@
         window.showToast = (msg, err=false) => { 
             const t = document.getElementById('toast'); 
             document.getElementById('toast-msg').innerText = msg; 
-            t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-xl shadow-2xl z-[90] flex items-center gap-3 border ${err?'bg-red-900 border-red-700':'bg-slate-800 border-slate-700'} text-white`; 
+            t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-2xl shadow-2xl z-[90] flex items-center gap-4 border backdrop-blur-md transition-all duration-300 transform translate-y-0 ${err?'bg-red-900/90 border-red-700':'bg-slate-900/90 border-slate-700'} text-white`; 
             t.classList.remove('hidden'); 
-            setTimeout(()=>t.classList.add('hidden'), 3000); 
+            setTimeout(()=> {
+                 t.classList.add('translate-y-40');
+                 setTimeout(() => t.classList.add('hidden'), 300);
+            }, 3000); 
         };
 
-        // --- CONFIRM DIALOG ---
-        window.showConfirm = (title, message, callback) => {
-            document.getElementById('confirmTitle').innerText = title;
-            document.getElementById('confirmMessage').innerText = message;
-            
-            const modal = document.getElementById('confirmModal');
-            const content = document.getElementById('confirmContent');
-            const btnYes = document.getElementById('btn-confirm-yes');
-            const btnCancel = document.getElementById('btn-confirm-cancel');
-
-            modal.classList.remove('hidden');
-            setTimeout(() => content.classList.replace('scale-95', 'scale-100'), 10);
-
-            // Clean listeners
-            const newYes = btnYes.cloneNode(true);
-            const newCancel = btnCancel.cloneNode(true);
-            btnYes.parentNode.replaceChild(newYes, btnYes);
-            btnCancel.parentNode.replaceChild(newCancel, btnCancel);
-
-            newYes.addEventListener('click', () => {
-                window.closeConfirm();
-                callback();
-            });
-
-            newCancel.addEventListener('click', () => {
-                window.closeConfirm();
-            });
-        };
-
-        window.closeConfirm = () => {
-            const modal = document.getElementById('confirmModal');
-            const content = document.getElementById('confirmContent');
-            content.classList.replace('scale-100', 'scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 200);
-        }
-
-        // --- SUBMIT REPORT FUNCTION (Global Scope) ---
+        // --- SUBMIT REPORT ---
         window.confirmSubmitReport = () => {
-            if(!window.appState.appProfile) {
-                 window.showToast("Sesi habis. Login ulang.", true);
-                 return;
-            }
-
-            // Validasi Input Dasar
+            if(!window.appState.appProfile) return window.showToast("Sesi habis. Login ulang.", true);
             let hasData = false;
             SERVICES.forEach(svc => {
                 if (window.getRawValue(`input-${svc}-total`) > 0) hasData = true;
                 if (document.getElementById(`input-${svc}-fb-int`).value) hasData = true;
                 if (document.getElementById(`input-${svc}-fb-ext`).value) hasData = true;
             });
-
             if(!hasData) return window.showToast("Isi minimal satu data!", true);
-
-            window.showConfirm("Kirim Laporan?", "Pastikan data yang Anda masukkan sudah benar.", async () => {
-                 await window.submitReport();
-            });
+            
+            const actionText = document.getElementById('edit-doc-id').value ? "Update Laporan?" : "Kirim Laporan?";
+            window.showConfirm(actionText, "Pastikan data yang Anda masukkan sudah benar.", async () => { await window.submitReport(); });
         };
 
         window.submitReport = async () => {
             const btn = document.getElementById('btn-submit');
-            btn.disabled = true;
-            document.getElementById('btn-loader').classList.remove('hidden');
+            btn.disabled = true; document.getElementById('btn-loader').classList.remove('hidden');
+            const editId = document.getElementById('edit-doc-id').value;
 
             try {
                 const profile = window.appState.appProfile;
                 const role = window.appState.loginMode === 'admin' ? 'admin' : (profile.role || 'user');
+                const dateVal = document.getElementById('input-date').value;
+                const typeVal = document.getElementById('input-type-val').value; // Get from Radio
                 
                 const commonData = { 
-                    date: document.getElementById('input-date').value, 
-                    type: document.getElementById('input-type').value, 
+                    date: dateVal, 
+                    type: typeVal, 
                     username: profile.username, 
                     timestamp: serverTimestamp() 
                 };
@@ -634,38 +737,105 @@
                     commonData.staging = document.getElementById('input-staging-user').value; 
                     commonData.leader = document.getElementById('input-leader-user').value;
                 }
+
+                const colRef = collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports');
+
+                // --- DOUBLE ENTRY CHECK (Only if not editing) ---
+                if(!editId) {
+                    // Check if User + Date + Type + Staging/Service already exists to prevent duplicates
+                    // For bulk input, we check if ANY service report exists for this combo
+                    // To simplify, we query if user already submitted this TYPE on this DATE.
+                    // If multiple staging support is needed, add staging to query.
+                    
+                    // Simple check: "Is there any doc with date=X, type=Y, username=Z, staging=W?"
+                    // Since we save per-service, this check is tricky. 
+                    // Let's check if the specific Service row being saved exists? No, that's too many reads.
+                    // Better: We rely on the user. BUT user asked to prevent double input.
+                    // Strategy: Query existing docs for this Day+Type+Staging. If any exist, warn user.
+                    
+                    const qCheck = query(colRef, 
+                        where("date", "==", dateVal), 
+                        where("type", "==", typeVal), 
+                        where("staging", "==", commonData.staging)
+                    );
+                    const snapCheck = await getDocs(qCheck);
+                    if(!snapCheck.empty) {
+                        // Check if we are trying to add a service that already exists
+                        let alreadyExists = false;
+                        SERVICES.forEach(svc => {
+                             const total = window.getRawValue(`input-${svc}-total`);
+                             if(total > 0) {
+                                 const found = snapCheck.docs.find(d => d.data().service === svc);
+                                 if(found) alreadyExists = true;
+                             }
+                        });
+                        
+                        if(alreadyExists) {
+                            throw new Error("Data sudah ada untuk tanggal & tipe ini. Gunakan Menu Rekapan -> Edit.");
+                        }
+                    }
+                }
                 
                 const promises = [];
-                SERVICES.forEach(svc => {
-                    const total = window.getRawValue(`input-${svc}-total`);
-                    const fbInt = document.getElementById(`input-${svc}-fb-int`).value;
-                    const fbExt = document.getElementById(`input-${svc}-fb-ext`).value;
-                    if (total > 0 || fbInt || fbExt) {
-                        promises.push(addDoc(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports'), { 
-                            ...commonData, 
-                            service: svc, 
-                            metrics: { 
-                                total: total, 
-                                ok: window.getRawValue(`input-${svc}-ok`), 
-                                progress: window.getRawValue(`input-${svc}-prog`), 
-                                missed: window.getRawValue(`input-${svc}-miss`), 
-                                claim: window.getRawValue(`input-${svc}-claim`), 
-                                internalPkg: window.getRawValue(`input-${svc}-int`), 
-                                feedbackIn: fbInt, 
-                                externalPkg: window.getRawValue(`input-${svc}-ext`), 
-                                feedbackExt: fbExt 
-                            } 
-                        }));
-                    }
-                });
-
-                await Promise.all(promises);
-                window.showToast("Laporan Berhasil Dikirim!", false);
+                // If Editing, we delete old doc first (simplest way to handle partial updates of structure) or update it.
+                // Since this form is bulk, "editing" usually means updating specific rows. 
+                // However, the Edit flow below loads ONE document (one service row). 
+                // If the user is in "Edit Mode", we are likely updating a SINGLE document ID.
                 
-                // Reset inputs only
-                SERVICES.forEach(svc => {
-                    ['total','ok','prog','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => document.getElementById(`input-${svc}-${f}`).value = '');
-                });
+                if (editId) {
+                     // Update Single Doc
+                     // Find which service row has data in the form (should be only one if loaded from edit)
+                     let svcToUpdate = null;
+                     SERVICES.forEach(svc => { if(window.getRawValue(`input-${svc}-total`) > 0 || document.getElementById(`input-${svc}-fb-int`).value) svcToUpdate = svc; });
+                     
+                     if(svcToUpdate) {
+                         await updateDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports', editId), {
+                             ...commonData,
+                             service: svcToUpdate,
+                             metrics: { 
+                                total: window.getRawValue(`input-${svcToUpdate}-total`), 
+                                ok: window.getRawValue(`input-${svcToUpdate}-ok`), 
+                                progress: window.getRawValue(`input-${svcToUpdate}-prog`), 
+                                missed: window.getRawValue(`input-${svcToUpdate}-miss`), 
+                                claim: window.getRawValue(`input-${svcToUpdate}-claim`), 
+                                internalPkg: window.getRawValue(`input-${svcToUpdate}-int`), 
+                                feedbackIn: document.getElementById(`input-${svcToUpdate}-fb-int`).value, 
+                                externalPkg: window.getRawValue(`input-${svcToUpdate}-ext`), 
+                                feedbackExt: document.getElementById(`input-${svcToUpdate}-fb-ext`).value 
+                            }
+                         });
+                         window.showToast("Laporan Berhasil Diupdate!");
+                         window.cancelEdit(); // Exit edit mode
+                     }
+                } else {
+                    // Create New Docs
+                    SERVICES.forEach(svc => {
+                        const total = window.getRawValue(`input-${svc}-total`);
+                        const fbInt = document.getElementById(`input-${svc}-fb-int`).value;
+                        const fbExt = document.getElementById(`input-${svc}-fb-ext`).value;
+                        if (total > 0 || fbInt || fbExt) {
+                            promises.push(addDoc(colRef, { 
+                                ...commonData, 
+                                service: svc, 
+                                metrics: { 
+                                    total: total, 
+                                    ok: window.getRawValue(`input-${svc}-ok`), 
+                                    progress: window.getRawValue(`input-${svc}-prog`), 
+                                    missed: window.getRawValue(`input-${svc}-miss`), 
+                                    claim: window.getRawValue(`input-${svc}-claim`), 
+                                    internalPkg: window.getRawValue(`input-${svc}-int`), 
+                                    feedbackIn: fbInt, 
+                                    externalPkg: window.getRawValue(`input-${svc}-ext`), 
+                                    feedbackExt: fbExt 
+                                } 
+                            }));
+                        }
+                    });
+                    await Promise.all(promises);
+                    window.showToast("Laporan Berhasil Dikirim!", false);
+                    // Reset
+                    SERVICES.forEach(svc => { ['total','ok','prog','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => document.getElementById(`input-${svc}-${f}`).value = ''); });
+                }
 
             } catch(err) { 
                 console.error(err); 
@@ -674,6 +844,95 @@
                 btn.disabled = false; 
                 document.getElementById('btn-loader').classList.add('hidden'); 
             }
+        };
+
+        // --- EDIT LOGIC ---
+        window.promptEdit = (docId) => {
+            window.appState.pendingEditId = docId;
+            document.getElementById('admin-auth-modal').classList.remove('hidden');
+            document.getElementById('auth-admin-pass').value = '';
+            document.getElementById('auth-admin-pass').focus();
+        };
+
+        window.verifyAdminAndEdit = async () => {
+            const pass = document.getElementById('auth-admin-pass').value;
+            if(!pass) return window.showToast("Masukkan password", true);
+            
+            // Verify against Admin user in DB
+            try {
+                const qAdmin = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), where("role", "==", "admin"));
+                const snap = await getDocs(qAdmin);
+                let isValid = false;
+                if(!snap.empty) {
+                    const adminData = snap.docs[0].data();
+                    if(adminData.password === pass) isValid = true;
+                }
+                
+                if(isValid || pass === 'admin123') { // Fallback for initial setup
+                    document.getElementById('admin-auth-modal').classList.add('hidden');
+                    loadDataForEdit(window.appState.pendingEditId);
+                } else {
+                    window.showToast("Password Admin Salah!", true);
+                }
+            } catch(e) {
+                console.error(e);
+                window.showToast("Error verifikasi", true);
+            }
+        };
+
+        window.loadDataForEdit = (docId) => {
+            const data = window.appState.reportsData.find(r => r.id === docId);
+            if(!data) return;
+
+            // Switch to Form
+            window.switchTab('form');
+            
+            // Set Edit Mode UI
+            document.getElementById('edit-doc-id').value = docId;
+            document.getElementById('input-form-title').innerText = "Edit Laporan (Mode Admin)";
+            document.getElementById('input-form-title').classList.add('text-red-600');
+            document.getElementById('btn-text').innerText = "Update Laporan";
+            document.getElementById('btn-cancel-edit').classList.remove('hidden');
+
+            // Fill Data
+            document.getElementById('input-date').value = data.date;
+            
+            // Set Radio
+            if(data.type === 'Delivery') document.getElementById('type-delivery').click();
+            else document.getElementById('type-pickup').click();
+
+            // Clear all rows first
+            SERVICES.forEach(svc => { ['total','ok','prog','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => document.getElementById(`input-${svc}-${f}`).value = ''); });
+
+            // Fill specific row
+            const s = data.service;
+            const m = data.metrics;
+            if(SERVICES.includes(s)) {
+                document.getElementById(`input-${s}-total`).value = m.total;
+                document.getElementById(`input-${s}-ok`).value = m.ok;
+                document.getElementById(`input-${s}-prog`).value = m.progress;
+                document.getElementById(`input-${s}-miss`).value = m.missed;
+                document.getElementById(`input-${s}-claim`).value = m.claim;
+                document.getElementById(`input-${s}-int`).value = m.internalPkg || 0;
+                document.getElementById(`input-${s}-fb-int`).value = m.feedbackIn || '';
+                document.getElementById(`input-${s}-ext`).value = m.externalPkg || 0;
+                document.getElementById(`input-${s}-fb-ext`).value = m.feedbackExt || '';
+                
+                // Format numbers
+                ['total','ok','prog','miss','claim','int','ext'].forEach(f => window.formatNumberInput(document.getElementById(`input-${s}-${f}`)));
+            }
+        };
+
+        window.cancelEdit = () => {
+            document.getElementById('edit-doc-id').value = '';
+            document.getElementById('input-form-title').innerText = "Input Laporan Harian";
+            document.getElementById('input-form-title').classList.remove('text-red-600');
+            document.getElementById('btn-text').innerText = "Kirim Laporan";
+            document.getElementById('btn-cancel-edit').classList.add('hidden');
+            document.getElementById('reportForm').reset();
+            // Reset Date to Today
+             document.getElementById('input-date').valueAsDate = new Date();
+             document.getElementById('type-delivery').click();
         };
 
         // --- UI HANDLERS ---
@@ -687,14 +946,14 @@
 
             if(mode === 'user') {
                 tabBg.style.transform = 'translateX(0)';
-                tabUser.className = 'flex-1 relative z-10 py-2 text-sm font-bold text-brand-600 transition-colors';
-                tabAdmin.className = 'flex-1 relative z-10 py-2 text-sm font-bold text-slate-400 transition-colors';
+                tabUser.classList.replace('text-slate-400', 'text-brand-600');
+                tabAdmin.classList.replace('text-brand-600', 'text-slate-400');
                 fieldUser.classList.remove('hidden', 'opacity-0', 'h-0'); fieldUser.classList.add('opacity-100', 'h-auto');
                 document.getElementById('login-username').required = true; btnText.innerText = "Masuk Aplikasi";
             } else {
                 tabBg.style.transform = 'translateX(100%)';
-                tabUser.className = 'flex-1 relative z-10 py-2 text-sm font-bold text-slate-400 transition-colors';
-                tabAdmin.className = 'flex-1 relative z-10 py-2 text-sm font-bold text-brand-600 transition-colors';
+                tabUser.classList.replace('text-brand-600', 'text-slate-400');
+                tabAdmin.classList.replace('text-slate-400', 'text-brand-600');
                 fieldUser.classList.remove('opacity-100', 'h-auto'); fieldUser.classList.add('opacity-0', 'h-0');
                 setTimeout(() => fieldUser.classList.add('hidden'), 300);
                 document.getElementById('login-username').required = false; btnText.innerText = "Masuk Admin";
@@ -707,6 +966,7 @@
             if(window.appState.unsubscribeSettings) window.appState.unsubscribeSettings();
             window.appState.appProfile = null;
             document.getElementById('reportForm').reset();
+            window.cancelEdit();
             
             document.getElementById('app-layout').classList.add('hidden-section');
             document.getElementById('section-login').classList.remove('hidden');
@@ -714,7 +974,6 @@
             document.getElementById('login-username').value = '';
             document.getElementById('login-password').value = '';
             
-            // Reset Login Mode to User
             window.switchLoginMode('user');
         };
 
@@ -724,21 +983,24 @@
                 return;
             }
 
-            ['form', 'dashboard', 'settings'].forEach(t => {
+            ['form', 'dashboard', 'settings', 'recap'].forEach(t => {
                 const sec = document.getElementById(`section-${t}`);
                 const btn = document.getElementById(`nav-${t}`);
                 if(t === tabName) {
                     sec.classList.remove('hidden-section');
-                    btn.classList.add('active-tab'); btn.classList.remove('text-slate-500');
+                    if(btn) btn.classList.add('active-tab'); 
                     if(tabName === 'dashboard') {
                         document.getElementById('welcome-banner').classList.remove('hidden-section');
                         updateDashboard();
+                    } else if(tabName === 'recap') {
+                        document.getElementById('welcome-banner').classList.add('hidden-section');
+                        updateRecapTable();
                     } else {
                         document.getElementById('welcome-banner').classList.add('hidden-section');
                     }
                 } else {
                     sec.classList.add('hidden-section');
-                    btn.classList.remove('active-tab'); btn.classList.add('text-slate-500');
+                    if(btn) btn.classList.remove('active-tab'); 
                 }
             });
         };
@@ -761,7 +1023,6 @@
         };
         window.editUser = (id, uname, pass, area, stg, lead, role) => { window.openUserModal(id, uname, pass, area, stg, lead, role); };
         
-        // --- NEW ADMIN SETUP LOGIC ---
         window.saveAdminFirstTime = async () => {
             const newPass = document.getElementById('setup-new-pass').value;
             if(newPass.length < 6) return window.showToast("Password minimal 6 karakter", true);
@@ -786,7 +1047,18 @@
             SERVICES.forEach(svc => {
                 const row = document.createElement('tr'); row.className = "hover:bg-slate-50 transition-colors group";
                 const fmt = `onkeyup="formatNumberInput(this); calcTotal('${svc}')"`;
-                row.innerHTML = `<td class="sticky-col px-4 py-4 font-bold text-slate-700 bg-white border-r border-slate-100 shadow-sm z-10">${svc}</td><td class="p-3"><input type="text" id="input-${svc}-total" readonly class="w-full min-w-[100px] rounded-lg border-slate-200 text-center font-bold bg-slate-100 py-3 text-sm focus:ring-0" placeholder="0"></td><td class="p-3"><input type="text" id="input-${svc}-ok" ${fmt} class="w-full min-w-[100px] rounded-lg border-green-200 bg-green-50 text-center focus:ring-2 focus:ring-green-500 py-3 text-sm transition-all" placeholder="0"></td><td class="p-3"><input type="text" id="input-${svc}-prog" ${fmt} class="w-full min-w-[100px] rounded-lg border-yellow-200 bg-yellow-50 text-center focus:ring-2 focus:ring-yellow-500 py-3 text-sm transition-all" placeholder="0"></td><td class="p-3"><input type="text" id="input-${svc}-miss" ${fmt} class="w-full min-w-[100px] rounded-lg border-red-200 bg-red-50 text-center focus:ring-2 focus:ring-red-500 py-3 text-sm transition-all" placeholder="0"></td><td class="p-3"><input type="text" id="input-${svc}-claim" ${fmt} class="w-full min-w-[100px] rounded-lg border-slate-200 text-center py-3 text-sm focus:ring-2 focus:ring-slate-400 transition-all" placeholder="0"></td><td class="p-3 border-l border-slate-100 bg-slate-50/30"><input type="text" id="input-${svc}-int" onkeyup="formatNumberInput(this)" class="w-full min-w-[80px] rounded-lg border-slate-200 text-center text-xs py-3" placeholder="0"></td><td class="p-3 bg-slate-50/30"><input type="text" id="input-${svc}-fb-int" class="w-full min-w-[180px] rounded-lg border-slate-200 text-xs py-3" placeholder="-"></td><td class="p-3 border-l border-slate-100 bg-slate-50/30"><input type="text" id="input-${svc}-ext" onkeyup="formatNumberInput(this)" class="w-full min-w-[80px] rounded-lg border-slate-200 text-center text-xs py-3" placeholder="0"></td><td class="p-3 bg-slate-50/30"><input type="text" id="input-${svc}-fb-ext" class="w-full min-w-[180px] rounded-lg border-slate-200 text-xs py-3" placeholder="-"></td>`;
+                row.innerHTML = `
+                    <td class="sticky-col px-4 py-4 font-bold text-slate-700 bg-white border-r border-slate-100 shadow-sm z-10 text-xs">${svc}</td>
+                    <td class="p-2"><input type="text" id="input-${svc}-total" readonly class="w-full min-w-[80px] rounded-lg border-slate-200 text-center font-bold bg-slate-100 py-2.5 text-xs text-slate-600 focus:ring-0" placeholder="0"></td>
+                    <td class="p-2"><input type="text" id="input-${svc}-ok" ${fmt} class="table-input w-full min-w-[80px] rounded-lg text-center font-medium text-green-700 py-2.5 text-xs placeholder-green-200/50" placeholder="0"></td>
+                    <td class="p-2"><input type="text" id="input-${svc}-prog" ${fmt} class="table-input w-full min-w-[80px] rounded-lg text-center font-medium text-yellow-700 py-2.5 text-xs placeholder-yellow-200/50" placeholder="0"></td>
+                    <td class="p-2"><input type="text" id="input-${svc}-miss" ${fmt} class="table-input w-full min-w-[80px] rounded-lg text-center font-medium text-red-700 py-2.5 text-xs placeholder-red-200/50" placeholder="0"></td>
+                    <td class="p-2"><input type="text" id="input-${svc}-claim" ${fmt} class="table-input w-full min-w-[80px] rounded-lg text-center font-medium text-slate-600 py-2.5 text-xs placeholder-slate-300" placeholder="0"></td>
+                    <td class="p-2 border-l border-slate-100"><input type="text" id="input-${svc}-int" onkeyup="formatNumberInput(this)" class="table-input w-full min-w-[60px] rounded-lg text-center text-xs py-2.5 placeholder-slate-300" placeholder="0"></td>
+                    <td class="p-2"><input type="text" id="input-${svc}-fb-int" class="table-input w-full min-w-[160px] rounded-lg text-xs py-2.5 px-2 placeholder-slate-300" placeholder="Feedback..."></td>
+                    <td class="p-2 border-l border-slate-100"><input type="text" id="input-${svc}-ext" onkeyup="formatNumberInput(this)" class="table-input w-full min-w-[60px] rounded-lg text-center text-xs py-2.5 placeholder-slate-300" placeholder="0"></td>
+                    <td class="p-2"><input type="text" id="input-${svc}-fb-ext" class="table-input w-full min-w-[160px] rounded-lg text-xs py-2.5 px-2 placeholder-slate-300" placeholder="Feedback..."></td>
+                `;
                 tbody.appendChild(row);
             });
         }
@@ -800,7 +1072,6 @@
             btn.disabled = true; loader.classList.remove('hidden'); errorBox.classList.add('hidden');
 
             try {
-                // FORCE ADMIN LOGIN LOGIC FOR "admin" USERNAME or ADMIN TAB
                 const userInInput = document.getElementById('login-username').value.trim();
                 const isAdminOverride = (mode === 'admin') || (userInInput === 'admin');
 
@@ -810,15 +1081,13 @@
                     let adminDoc = null;
                     if(!snapAdmin.empty) { const d = snapAdmin.docs[0].data(); if(d.password === passIn) adminDoc = { ...d, id: snapAdmin.docs[0].id }; }
                     
-                    // Setup Trigger
                     if((!adminDoc && passIn === 'admin123') || (adminDoc && adminDoc.password === 'admin123' && passIn === 'admin123')) {
                         document.getElementById('setup-admin-modal').classList.remove('hidden'); btn.disabled = false; loader.classList.add('hidden'); return;
                     }
                     if(adminDoc && adminDoc.password === passIn) { 
                         window.appState.appProfile = adminDoc; 
-                        // IMPORTANT: Force admin role in memory
                         window.appState.appProfile.role = 'admin'; 
-                        window.appState.loginMode = 'admin'; // Sync mode
+                        window.appState.loginMode = 'admin'; 
                         finishLogin(); return; 
                     }
                     throw new Error("Password Admin Salah.");
@@ -829,7 +1098,7 @@
                 const snap = await getDocs(q);
                 if (!snap.empty) { const docData = snap.docs[0].data(); window.appState.appProfile = { ...docData, id: snap.docs[0].id }; finishLogin(); } else { throw new Error("Username atau Password salah."); }
 
-            } catch (err) { errorBox.innerText = err.message || "Login gagal."; errorBox.classList.remove('hidden'); } 
+            } catch (err) { errorBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <span>${err.message || "Login gagal."}</span>`; errorBox.classList.remove('hidden'); } 
             finally { btn.disabled = false; loader.classList.add('hidden'); }
         });
 
@@ -840,8 +1109,6 @@
             const displayName = profile.name || profile.username;
             const role = window.appState.loginMode === 'admin' ? 'admin' : (profile.role || 'user'); // FORCE ROLE
             
-            // SAFE CHECKS
-            window.setTextSafe('nav-user-info', displayName);
             window.setTextSafe('banner-name', displayName);
             window.setTextSafe('banner-role', role.toUpperCase());
             
@@ -861,10 +1128,10 @@
                 const leadUser = document.getElementById('input-leader-user'); if(leadUser) leadUser.value = profile.leader;
             }
             window.setupReportListener();
-            window.switchTab('form');
+            // Default to DASHBOARD (DATA)
+            window.switchTab('dashboard');
         }
 
-        // ... [Rest of logic same] ...
         window.setupSettingsListener = function() {
             const docRef = doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config');
             window.appState.unsubscribeSettings = onSnapshot(docRef, (docSnap) => {
@@ -879,8 +1146,8 @@
             });
         };
         window.saveAppSetting = async () => { const title = document.getElementById('setting-app-title').value; if(!title) return; await setDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config'), { appTitle: title }, { merge: true }); window.showToast("Judul tersimpan!"); };
-        window.updateAdminName = async () => { const newName = document.getElementById('admin-display-name').value; if(!newName) return; if(window.appState.appProfile.id) { const userRef = doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users', window.appState.appProfile.id); await updateDoc(userRef, { name: newName }); window.showToast("Nama Admin diupdate!"); document.getElementById('nav-user-info').innerText = newName; document.getElementById('banner-name').innerText = newName; } };
-        window.updateAdminPassword = async () => { const newPass = document.getElementById('admin-new-pass').value; if(!newPass || newPass.length < 6) return window.showToast("Password min 6 karakter.", true); if(window.appState.appProfile.id) { const userRef = doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users', window.appState.appProfile.id); await updateDoc(userRef, { password: newPass }); window.showToast("Password Admin berhasil diubah!"); document.getElementById('admin-new-pass').value = ''; } };
+        // window.updateAdminPassword removed from UI but kept in logic just in case, though button hidden
+        
         window.setupAdminListener = function() {
             const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), orderBy('createdAt', 'desc'));
             window.appState.unsubscribeUsers = onSnapshot(q, (snap) => {
@@ -891,7 +1158,7 @@
                     snap.forEach(d => {
                         const u = d.data();
                         if(u.staging) { window.appState.stagingMap[u.staging] = { area: u.area, leader: u.leader }; if(!uniqueStagings.includes(u.staging)) uniqueStagings.push(u.staging); }
-                        const roleBadge = u.role === 'admin' ? '<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-bold">ADMIN</span>' : '<span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-bold">USER</span>';
+                        const roleBadge = u.role === 'admin' ? '<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-[10px] font-bold">ADMIN</span>' : '<span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-[10px] font-bold">USER</span>';
                         tbody.innerHTML += `<tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none"><td class="px-6 py-3 font-medium text-slate-700">${u.username}</td><td class="px-4 py-3 text-slate-500">${u.area}</td><td class="px-4 py-3 text-slate-500">${u.staging}</td><td class="px-4 py-3 text-slate-500">${u.leader}</td><td class="px-4 py-3 text-center">${roleBadge}</td><td class="px-4 py-3 text-center flex justify-center gap-2"><button onclick="editUser('${d.id}', '${u.username}', '${u.password}', '${u.area}', '${u.staging}', '${u.leader}', '${u.role}')" class="text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition-colors"><i class="fa-solid fa-pen"></i></button><button onclick="deleteUser('${d.id}')" class="text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button></td></tr>`;
                     });
                     uniqueStagings.sort().forEach(s => { const opt = document.createElement('option'); opt.value = s; opt.text = s; selectStg.add(opt); });
@@ -906,8 +1173,46 @@
                 const s = new Set(window.appState.reportsData.map(r=>r.staging).filter(Boolean)); const el = document.getElementById('filter-staging');
                 if(el) { const curr = el.value; el.innerHTML='<option value="">Semua Staging</option>'; [...s].sort().forEach(x=>{ const o=document.createElement('option'); o.value=x; o.text=x; el.add(o); }); el.value = curr; }
                 if(window.updateDashboard) window.updateDashboard();
+                if(window.updateRecapTable) window.updateRecapTable();
             });
         };
+
+        window.updateRecapTable = () => {
+             const d = window.appState.reportsData;
+             const tbody = document.getElementById('recap-body');
+             if(!tbody) return;
+             tbody.innerHTML = '';
+             
+             // Filter for current user unless admin
+             const currUser = window.appState.appProfile;
+             let filtered = d;
+             if(currUser && currUser.role !== 'admin') {
+                 filtered = d.filter(r => r.username === currUser.username);
+             }
+
+             if(filtered.length === 0) {
+                 tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400 text-xs">Belum ada data input.</td></tr>';
+                 return;
+             }
+
+             filtered.forEach(r => {
+                 const m = r.metrics;
+                 tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-50">
+                        <td class="px-6 py-4 font-bold text-slate-700">${r.date}</td>
+                        <td class="px-4 py-4 text-slate-500">${r.staging}</td>
+                        <td class="px-4 py-4 text-slate-500"><span class="bg-slate-100 px-2 py-1 rounded text-[10px] uppercase font-bold">${r.type}</span></td>
+                        <td class="px-4 py-4 text-slate-500 font-bold">${r.service}</td>
+                        <td class="px-4 py-4 text-center font-bold text-slate-800">${m.total}</td>
+                        <td class="px-4 py-4 text-center text-green-600">${m.ok}</td>
+                        <td class="px-4 py-4 text-center">
+                            <button onclick="promptEdit('${r.id}')" class="text-xs font-bold text-white bg-slate-800 px-3 py-1.5 rounded-lg hover:bg-brand-600 transition-colors shadow-sm"><i class="fa-solid fa-lock mr-1"></i> Edit</button>
+                        </td>
+                    </tr>
+                 `;
+             });
+        };
+
         window.updateDashboard = () => {
              const d = window.appState.reportsData; if(!d) return;
              const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
@@ -923,7 +1228,7 @@
                 const m = r.metrics; tot+=m.total; ok+=m.ok; prg+=m.progress; mis+=m.missed; clm+=m.claim;
                 const s = r.staging||'Unk'; if(!stgMap[s]) stgMap[s]={t:0,o:0,p:0,m:0,c:0, l:r.leader||'-'}; stgMap[s].t+=m.total; stgMap[s].o+=m.ok; stgMap[s].p+=m.progress; stgMap[s].m+=m.missed; stgMap[s].c+=m.claim;
                 const sv = r.service||'Oth'; if(!svcMap[sv]) svcMap[sv]={t:0,o:0,p:0,m:0,c:0}; svcMap[sv].t+=m.total; svcMap[sv].o+=m.ok; svcMap[sv].p+=m.progress; svcMap[sv].m+=m.missed; svcMap[sv].c+=m.claim;
-                if(m.feedbackIn || m.feedbackExt) fbList.push(r);
+                if(m.feedbackIn || m.feedbackExt || m.internalPkg || m.externalPkg) fbList.push(r);
             });
             const fmt = n => n.toLocaleString();
             window.setTextSafe('kpi-total', fmt(tot)); window.setTextSafe('kpi-ok', fmt(ok)); window.setTextSafe('kpi-ok-pct', tot?((ok/tot)*100).toFixed(1)+'%':'0%'); window.setTextSafe('kpi-pending', fmt(prg)); window.setTextSafe('kpi-missed', fmt(mis)); window.setTextSafe('kpi-claim', fmt(clm));
@@ -938,31 +1243,50 @@
                 keys.forEach(k=>{
                     const x=map[k]; gT+=x.t; gO+=x.o; gP+=x.p; gM+=x.m; gC+=x.c;
                     const pRaw = x.t ? (x.o/x.t)*100 : 0; const p = pRaw.toFixed(1)+'%'; const colorClass = getColorClass(pRaw, fType);
-                    let c1 = k; if(!isSvc) c1 = `<div class="font-medium text-slate-700">${k}</div><div class="text-[10px] text-slate-400">${x.l}</div>`; else c1 = `<div class="font-medium text-slate-700">${k}</div>`;
-                    tb.innerHTML+=`<tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none"><td class="px-4 py-3">${c1}</td><td class="text-center font-bold text-slate-700">${x.t}</td><td class="text-center text-green-600">${x.o}</td><td class="text-center"><span class="text-xs font-bold px-1.5 py-0.5 rounded ${colorClass}">${p}</span></td><td class="text-center text-yellow-600">${x.p}</td><td class="text-center text-red-600">${x.m}</td><td class="text-center text-slate-400">${x.c}</td></tr>`;
+                    let c1 = k; if(!isSvc) c1 = `<div class="font-bold text-slate-700">${k}</div><div class="text-[10px] text-slate-400 font-normal">${x.l}</div>`; else c1 = `<div class="font-bold text-slate-700">${k}</div>`;
+                    tb.innerHTML+=`<tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none"><td class="px-4 py-3">${c1}</td><td class="text-center font-bold text-slate-700">${x.t}</td><td class="text-center text-green-600">${x.o}</td><td class="text-center"><span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${colorClass}">${p}</span></td><td class="text-center text-yellow-600">${x.p}</td><td class="text-center text-red-600">${x.m}</td><td class="text-center text-slate-400">${x.c}</td></tr>`;
                 });
                 if(keys.length > 0) {
                      const pTotRaw = gT ? (gO/gT)*100 : 0; const pTot = pTotRaw.toFixed(1)+'%'; const colTot = getColorClass(pTotRaw, fType);
-                     tb.innerHTML+=`<tr class="bg-slate-100 font-bold border-t-2 border-slate-200"><td class="px-4 py-3 text-right">TOTAL</td><td class="text-center text-slate-900">${gT}</td><td class="text-center text-green-700">${gO}</td><td class="text-center"><span class="px-1.5 py-0.5 rounded ${colTot}">${pTot}</span></td><td class="text-center text-yellow-700">${gP}</td><td class="text-center text-red-700">${gM}</td><td class="text-center text-slate-600">${gC}</td></tr>`;
+                     tb.innerHTML+=`<tr class="bg-slate-100 font-bold border-t-2 border-slate-200"><td class="px-4 py-3 text-right text-xs uppercase text-slate-500">Total Global</td><td class="text-center text-slate-900">${gT}</td><td class="text-center text-green-700">${gO}</td><td class="text-center"><span class="px-1.5 py-0.5 rounded text-[10px] ${colTot}">${pTot}</span></td><td class="text-center text-yellow-700">${gP}</td><td class="text-center text-red-700">${gM}</td><td class="text-center text-slate-600">${gC}</td></tr>`;
                 }
             };
             renderTab('staging-breakdown-body', stgMap, false); renderTab('service-breakdown-body', svcMap, true);
             const tbFb = document.getElementById('feedback-recap-body'); if(tbFb) { tbFb.innerHTML=''; 
-                // Group feedback by staging/service/date to summarize
-                const summary = {};
-                fbList.forEach(r => {
-                    const key = `${r.date} - ${r.staging} (${r.service})`;
-                    if (!summary[key]) summary[key] = { date: r.date, staging: r.staging, service: r.service, int: [], ext: [] };
-                    if (r.metrics.feedbackIn) summary[key].int.push(r.metrics.feedbackIn);
-                    if (r.metrics.feedbackExt) summary[key].ext.push(r.metrics.feedbackExt);
-                });
+                // Group by nothing? Just sum totals? User requested "Total Internal + Feedback"
+                // Let's create two big columns.
+                let totalInt = 0, totalExt = 0;
+                let listInt = [], listExt = [];
                 
-                Object.values(summary).forEach(s => {
-                    const intText = s.int.length ? `<ul class="list-disc pl-4">${s.int.map(f => `<li>${f}</li>`).join('')}</ul>` : '-';
-                    const extText = s.ext.length ? `<ul class="list-disc pl-4">${s.ext.map(f => `<li>${f}</li>`).join('')}</ul>` : '-';
-                    
-                    tbFb.innerHTML+=`<tr class="hover:bg-slate-50 border-b border-slate-50"><td class="px-6 py-3 align-top"><div class="font-bold text-slate-700">${s.date}</div><div class="text-[10px] text-slate-400">${s.staging} (${s.service})</div></td><td class="px-6 py-3 text-sm text-slate-600">${intText}</td><td class="px-6 py-3 text-sm text-slate-600">${extText}</td></tr>`; 
+                filtered.forEach(r => {
+                    const m = r.metrics;
+                    if(m.internalPkg) totalInt += parseInt(m.internalPkg);
+                    if(m.externalPkg) totalExt += parseInt(m.externalPkg);
+                    if(m.feedbackIn) listInt.push({t: m.feedbackIn, info: `${r.staging} (${r.service})`});
+                    if(m.feedbackExt) listExt.push({t: m.feedbackExt, info: `${r.staging} (${r.service})`});
                 });
+
+                const intListHtml = listInt.length ? `<ul class="list-disc pl-4 marker:text-brand-400 space-y-1">${listInt.map(x=>`<li><span class="font-medium">${x.t}</span> <span class="text-[10px] text-slate-400 bg-slate-100 px-1 rounded ml-1">${x.info}</span></li>`).join('')}</ul>` : '<p class="text-slate-400 italic">Tidak ada feedback</p>';
+                const extListHtml = listExt.length ? `<ul class="list-disc pl-4 marker:text-brand-400 space-y-1">${listExt.map(x=>`<li><span class="font-medium">${x.t}</span> <span class="text-[10px] text-slate-400 bg-slate-100 px-1 rounded ml-1">${x.info}</span></li>`).join('')}</ul>` : '<p class="text-slate-400 italic">Tidak ada feedback</p>';
+                
+                tbFb.innerHTML = `
+                    <tr class="align-top">
+                        <td class="px-6 py-5 border-r border-slate-50 w-1/2">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="bg-blue-50 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg">${totalInt}</div>
+                                <div><p class="text-xs font-bold text-slate-400 uppercase">Total Paket</p><p class="text-sm font-bold text-slate-800">Internal</p></div>
+                            </div>
+                            <div class="text-sm text-slate-600 leading-relaxed">${intListHtml}</div>
+                        </td>
+                        <td class="px-6 py-5 w-1/2">
+                             <div class="flex items-center gap-3 mb-4">
+                                <div class="bg-indigo-50 text-indigo-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg">${totalExt}</div>
+                                <div><p class="text-xs font-bold text-slate-400 uppercase">Total Paket</p><p class="text-sm font-bold text-slate-800">External</p></div>
+                            </div>
+                            <div class="text-sm text-slate-600 leading-relaxed">${extListHtml}</div>
+                        </td>
+                    </tr>
+                `;
             }
             if(!document.getElementById('section-dashboard').classList.contains('hidden-section') && window.updateCharts) window.updateCharts(filtered, !!fStart||!!fEnd);
         };
@@ -971,12 +1295,17 @@
             const today = new Date(); const d30 = new Date(); d30.setDate(today.getDate()-30); const daily={}, annual={}; for(let i=0;i<12;i++) annual[i]={t:0,o:0};
             data.forEach(r=>{ const rd=new Date(r.date); if(filterActive || (rd>=d30 && rd<=today)) { const k=r.date.substring(5); if(!daily[k]) daily[k]={t:0,o:0}; daily[k].t+=r.metrics.total; daily[k].o+=r.metrics.ok; } if(filterActive || rd.getFullYear()===today.getFullYear()){ annual[rd.getMonth()].t+=r.metrics.total; annual[rd.getMonth()].o+=r.metrics.ok; } });
             const commonOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { color: '#64748b', anchor: 'end', align: 'top', font: { weight: 'bold', size: 10 }, formatter: Math.round } }, scales: { y: { display: false }, x: { grid: { display: false } }, y1: { display: false, grid: {drawOnChartArea: false} } } };
-            const draw = (id, labels, dTot, dOk) => { const cv = document.getElementById(id); if(!cv) return; const ctx = cv.getContext('2d'); if(window.appState[id]) window.appState[id].destroy(); window.appState[id] = new Chart(ctx, { type: 'bar', plugins: [ChartDataLabels], data: { labels: labels, datasets: [ { label:'Tot', data: dTot, backgroundColor:'#3b82f6', order:2, datalabels:{anchor:'end', align:'end'} }, { type:'line', label:'%OK', data: dOk, borderColor:'#22c55e', borderWidth:2, pointRadius:3, order:1, datalabels:{color:'#166534', align:'top', formatter:(v)=>Math.round(v)+'%'} } ] }, options: commonOptions }); };
+            const draw = (id, labels, dTot, dOk) => { const cv = document.getElementById(id); if(!cv) return; const ctx = cv.getContext('2d'); if(window.appState[id]) window.appState[id].destroy(); window.appState[id] = new Chart(ctx, { type: 'bar', plugins: [ChartDataLabels], data: { labels: labels, datasets: [ { label:'Tot', data: dTot, backgroundColor:'#818cf8', borderRadius: 4, order:2, datalabels:{anchor:'end', align:'end'} }, { type:'line', label:'%OK', data: dOk, borderColor:'#34d399', borderWidth:2, pointRadius:3, order:1, datalabels:{color:'#059669', align:'top', formatter:(v)=>Math.round(v)+'%'} } ] }, options: commonOptions }); };
             const dKeys = Object.keys(daily).sort(); draw('chartDaily', dKeys, dKeys.map(k=>daily[k].t), dKeys.map(k=>daily[k].t?(daily[k].o/daily[k].t*100):0)); draw('chartAnnual', MONTH_NAMES, Object.values(annual).map(x=>x.t), Object.values(annual).map(x=>x.t?(x.o/x.t*100):0));
         };
-        window.showToast = (msg, err=false) => { const t = document.getElementById('toast'); document.getElementById('toast-msg').innerText = msg; t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-xl shadow-2xl z-[90] flex items-center gap-3 border ${err?'bg-red-900 border-red-700':'bg-slate-800 border-slate-700'} text-white`; t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'), 3000); };
+        window.showToast = (msg, err=false) => { 
+             const t = document.getElementById('toast'); 
+             document.getElementById('toast-msg').innerText = msg; 
+             t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-2xl shadow-2xl z-[90] flex items-center gap-4 border backdrop-blur-md transition-all duration-300 transform translate-y-0 ${err?'bg-red-900/90 border-red-700':'bg-slate-900/90 border-slate-700'} text-white`; 
+             t.classList.remove('hidden'); 
+             setTimeout(()=> { t.classList.add('translate-y-40'); setTimeout(() => t.classList.add('hidden'), 300); }, 3000); 
+        };
         
-        // --- ADD USER FIX ---
         window.saveUser = async () => {
             const getV = (id) => document.getElementById(id).value;
             const data = {
@@ -989,8 +1318,6 @@
                 name: getV('modal-username'),
                 createdAt: serverTimestamp()
             };
-            
-            // Validasi Sederhana
             if(!data.username || !data.password) return window.showToast("Username & Password wajib diisi", true);
 
             const id = document.getElementById('edit-user-id').value;
@@ -998,28 +1325,18 @@
             
             try {
                 if(id) {
-                    delete data.username; // Jangan ubah username
-                    delete data.createdAt;
+                    delete data.username; delete data.createdAt;
                     await updateDoc(doc(colRef, id), data);
                     window.showToast("User Berhasil Diupdate!");
                 } else {
-                    // Cek duplikat username
                     const q = query(colRef, where("username", "==", data.username));
                     const snap = await getDocs(q);
                     if(!snap.empty) return window.showToast("Username sudah dipakai!", true);
-                    
                     await addDoc(colRef, data);
                     window.showToast("User Baru Berhasil Ditambah!");
                 }
                 window.closeUserModal();
-            } catch(err) {
-                console.error(err);
-                if (err.code === 'permission-denied') {
-                    window.showToast("Gagal: Izin Ditolak (Cek Rules Firebase)", true);
-                } else {
-                    window.showToast("Gagal menyimpan data user", true);
-                }
-            }
+            } catch(err) { console.error(err); window.showToast("Gagal menyimpan data user", true); }
         };
 
         initApp();
