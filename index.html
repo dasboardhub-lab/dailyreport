@@ -34,13 +34,13 @@
         .nav-link:hover { color: #2563eb; background-color: #eff6ff; border-radius: 8px; }
         .nav-link.active-tab { color: #2563eb; font-weight: 700; background-color: #eff6ff; border-radius: 8px; }
         .hidden-section { display: none !important; }
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .loader { border: 3px solid #e2e8f0; border-radius: 50%; border-top: 3px solid #2563eb; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        .loader { border: 2px solid #e2e8f0; border-radius: 50%; border-top: 2px solid #fff; width: 18px; height: 18px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .sticky-col { position: sticky; left: 0; background-color: #ffffff; z-index: 20; box-shadow: 4px 0 6px -4px rgba(0,0,0,0.1); }
+        .sticky-col { position: sticky; left: 0; background-color: #ffffff; z-index: 20; box-shadow: 4px 0 6px -4px rgba(0,0,0,0.05); }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
@@ -52,48 +52,58 @@
 
     <!-- LOGIN SECTION -->
     <div id="section-login" class="min-h-screen flex items-center justify-center px-4 bg-[url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop')] bg-cover bg-center">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+        <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"></div>
         <div class="relative max-w-sm w-full bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/20 transform transition-all hover:scale-[1.01] duration-300">
-            <div class="bg-gradient-to-br from-brand-600 to-brand-900 px-8 pt-8 pb-6 text-center text-white">
-                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/20 mb-3 shadow-inner backdrop-blur-sm">
-                    <i class="fa-solid fa-chart-simple text-2xl"></i>
+            <div class="bg-gradient-to-br from-brand-600 to-brand-900 px-8 pt-10 pb-8 text-center text-white">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/20 mb-4 shadow-inner backdrop-blur-sm ring-1 ring-white/30">
+                    <i class="fa-solid fa-chart-simple text-3xl"></i>
                 </div>
                 <h2 class="font-extrabold text-2xl tracking-tight" id="login-app-title">Ops Report</h2>
-                <p class="text-blue-100 text-xs mt-1 font-medium">Sistem Pelaporan Terpadu</p>
+                <p class="text-blue-100 text-sm mt-1 font-medium tracking-wide">Sistem Pelaporan Terpadu</p>
             </div>
             
-            <div class="px-8 pt-6 pb-2">
-                <div class="flex p-1 bg-slate-100 rounded-xl relative mb-6">
+            <div class="px-8 pt-8 pb-4">
+                <!-- Login Mode Toggle -->
+                <div class="flex p-1 bg-slate-100 rounded-xl relative mb-6 border border-slate-200">
                     <div id="login-tab-bg" class="absolute top-1 left-1 w-[calc(50%-4px)] h-[calc(100%-8px)] bg-white rounded-lg shadow-sm tab-bg transition-all duration-300"></div>
-                    <button onclick="switchLoginMode('user')" id="tab-user" class="flex-1 relative z-10 py-2 text-sm font-bold text-brand-600 transition-colors">Tim Ops</button>
-                    <button onclick="switchLoginMode('admin')" id="tab-admin" class="flex-1 relative z-10 py-2 text-sm font-bold text-slate-400 transition-colors">Admin</button>
+                    <button onclick="switchLoginMode('user')" id="tab-user" class="flex-1 relative z-10 py-2.5 text-sm font-bold text-brand-600 transition-colors">Tim Ops</button>
+                    <button onclick="switchLoginMode('admin')" id="tab-admin" class="flex-1 relative z-10 py-2.5 text-sm font-bold text-slate-400 transition-colors">Admin</button>
                 </div>
 
-                <form id="loginForm" class="space-y-4">
-                    <div id="login-error" class="hidden bg-red-50 border-l-4 border-red-500 text-red-700 p-3 rounded-lg text-xs mb-4 animate-pulse shadow-sm"></div>
+                <form id="loginForm" class="space-y-5">
+                    <div id="login-error" class="hidden bg-red-50 border-l-4 border-red-500 text-red-700 p-3 rounded-lg text-xs mb-2 animate-pulse shadow-sm font-medium"></div>
                     
                     <div id="field-username" class="space-y-1.5 transition-all duration-300">
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Username</label>
                         <div class="relative group">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-600 transition-colors"><i class="fa-solid fa-user"></i></div>
-                            <input type="text" id="login-username" required class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-sm bg-slate-50 focus:bg-white" placeholder="Masukkan ID User">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-600 transition-colors">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <input type="text" id="login-username" required class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-sm bg-slate-50 focus:bg-white shadow-sm" placeholder="Masukkan ID User">
                         </div>
                     </div>
                     
                     <div class="space-y-1.5">
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Password</label>
                         <div class="relative group">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-600 transition-colors"><i class="fa-solid fa-lock"></i></div>
-                            <input type="password" id="login-password" required class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-sm bg-slate-50 focus:bg-white" placeholder="••••••••">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-600 transition-colors">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+                            <input type="password" id="login-password" required class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-sm bg-slate-50 focus:bg-white shadow-sm" placeholder="••••••••">
                         </div>
                     </div>
-                    <button type="submit" id="btn-login" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-brand-500/30 transition-all duration-200 transform hover:-translate-y-0.5 flex justify-center items-center group mt-4">
-                        <span id="btn-login-text" class="mr-2">Masuk Aplikasi</span><i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+
+                    <button type="submit" id="btn-login" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-brand-500/30 transition-all duration-200 transform hover:-translate-y-0.5 flex justify-center items-center group mt-4 active:scale-95">
+                        <span id="btn-login-text" class="mr-2">Masuk Aplikasi</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
                         <span id="login-loader" class="loader ml-3 hidden border-white border-t-transparent w-4 h-4 border-2"></span>
                     </button>
                 </form>
             </div>
-            <div class="px-8 pb-6 text-center"><p class="text-[10px] text-slate-400 mt-4">Pastikan data yang Anda masukkan benar.</p></div>
+            
+            <div class="px-8 pb-8 text-center">
+                <p class="text-[10px] text-slate-400 mt-2">Pastikan data yang Anda masukkan benar.</p>
+            </div>
         </div>
     </div>
 
@@ -112,7 +122,10 @@
                     <div class="flex items-center gap-2 sm:gap-4 overflow-x-auto no-scrollbar">
                         <button id="nav-form" onclick="switchTab('form')" class="nav-link active-tab px-4 py-2 text-sm font-medium flex items-center gap-2"><i class="fa-solid fa-pen-to-square"></i> <span class="hidden sm:inline">Input</span></button>
                         <button id="nav-dashboard" onclick="switchTab('dashboard')" class="nav-link px-4 py-2 text-sm font-medium flex items-center gap-2"><i class="fa-solid fa-chart-pie"></i> <span class="hidden sm:inline">Dashboard</span></button>
+                        
+                        <!-- SETTINGS BUTTON -->
                         <button id="nav-settings" onclick="switchTab('settings')" class="hidden-section nav-link px-4 py-2 text-sm font-medium flex items-center gap-2 text-brand-600 bg-brand-50 rounded-lg border border-brand-200"><i class="fa-solid fa-sliders"></i> <span class="hidden sm:inline">Pengaturan</span></button>
+                        
                         <div class="h-8 w-px bg-slate-200 mx-1"></div>
                         <button onclick="handleLogout()" class="text-slate-400 hover:text-red-600 hover:bg-red-50 p-2.5 rounded-xl transition-all" title="Keluar"><i class="fa-solid fa-right-from-bracket text-lg"></i></button>
                     </div>
@@ -121,7 +134,7 @@
         </nav>
 
         <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-            <!-- Welcome Banner & Status -->
+            <!-- Welcome Banner -->
             <div id="welcome-banner" class="hidden-section fade-in bg-gradient-to-r from-slate-800 to-slate-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden mb-8">
                 <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white/5 blur-3xl"></div>
                 <div class="absolute bottom-0 left-20 w-40 h-40 rounded-full bg-brand-500/20 blur-2xl"></div>
@@ -207,8 +220,8 @@
                         </div>
 
                         <div class="flex justify-end pt-4">
-                            <!-- FIX: type="button" and explicit onclick -->
-                            <button type="button" onclick="submitReport()" id="btn-submit" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg shadow-brand-500/30 transition-all transform hover:-translate-y-1 active:scale-95 flex items-center gap-2 group">
+                            <!-- BUTTON SUBMIT -->
+                            <button type="button" onclick="confirmSubmitReport()" id="btn-submit" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg shadow-brand-500/30 transition-all transform hover:-translate-y-1 active:scale-95 flex items-center gap-2 group">
                                 <i class="fa-solid fa-paper-plane group-hover:rotate-12 transition-transform"></i>
                                 <span id="btn-text">Kirim Laporan</span>
                                 <span id="btn-loader" class="loader ml-2 hidden border-white border-t-transparent w-4 h-4 border-2"></span>
@@ -373,6 +386,23 @@
         </main>
     </div>
 
+    <!-- Confirm Modal -->
+    <div id="confirmModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden scale-95 transition-transform duration-300" id="confirmContent">
+            <div class="p-6 text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
+                    <i class="fa-solid fa-question text-blue-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2" id="confirmTitle">Konfirmasi</h3>
+                <p class="text-sm text-slate-500 mb-6" id="confirmMessage">Apakah Anda yakin?</p>
+                <div class="flex justify-center gap-3">
+                    <button id="btn-confirm-cancel" class="px-4 py-2 rounded-lg text-sm font-bold text-slate-500 hover:bg-slate-100 transition-colors">Batal</button>
+                    <button id="btn-confirm-yes" class="px-6 py-2 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5">Ya, Lanjutkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Admin First Time Setup Modal -->
     <div id="setup-admin-modal" class="fixed inset-0 bg-slate-900/80 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center">
@@ -520,8 +550,44 @@
             setTimeout(()=>t.classList.add('hidden'), 3000); 
         };
 
+        // --- CONFIRM DIALOG ---
+        window.showConfirm = (title, message, callback) => {
+            document.getElementById('confirmTitle').innerText = title;
+            document.getElementById('confirmMessage').innerText = message;
+            
+            const modal = document.getElementById('confirmModal');
+            const content = document.getElementById('confirmContent');
+            const btnYes = document.getElementById('btn-confirm-yes');
+            const btnCancel = document.getElementById('btn-confirm-cancel');
+
+            modal.classList.remove('hidden');
+            setTimeout(() => content.classList.replace('scale-95', 'scale-100'), 10);
+
+            // Clean listeners
+            const newYes = btnYes.cloneNode(true);
+            const newCancel = btnCancel.cloneNode(true);
+            btnYes.parentNode.replaceChild(newYes, btnYes);
+            btnCancel.parentNode.replaceChild(newCancel, btnCancel);
+
+            newYes.addEventListener('click', () => {
+                window.closeConfirm();
+                callback();
+            });
+
+            newCancel.addEventListener('click', () => {
+                window.closeConfirm();
+            });
+        };
+
+        window.closeConfirm = () => {
+            const modal = document.getElementById('confirmModal');
+            const content = document.getElementById('confirmContent');
+            content.classList.replace('scale-100', 'scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+
         // --- SUBMIT REPORT FUNCTION (Global Scope) ---
-        window.submitReport = async () => {
+        window.confirmSubmitReport = () => {
             if(!window.appState.appProfile) {
                  window.showToast("Sesi habis. Login ulang.", true);
                  return;
@@ -537,8 +603,12 @@
 
             if(!hasData) return window.showToast("Isi minimal satu data!", true);
 
-            if(!confirm("Apakah Anda yakin ingin mengirim laporan ini?")) return;
+            window.showConfirm("Kirim Laporan?", "Pastikan data yang Anda masukkan sudah benar.", async () => {
+                 await window.submitReport();
+            });
+        };
 
+        window.submitReport = async () => {
             const btn = document.getElementById('btn-submit');
             btn.disabled = true;
             document.getElementById('btn-loader').classList.remove('hidden');
@@ -684,7 +754,11 @@
             document.getElementById('edit-user-id').value = id || ''; document.getElementById('modalTitle').innerText = id ? 'Edit User' : 'Tambah User'; document.getElementById('modal-username').value = uName; document.getElementById('modal-username').disabled = !!id; document.getElementById('modal-password').value = uPass; document.getElementById('modal-area').value = uArea; document.getElementById('modal-staging').value = uStg; document.getElementById('modal-leader').value = uLead; document.getElementById('modal-role').value = uRole;
         };
         window.closeUserModal = () => { const content = document.getElementById('userModalContent'); content.classList.remove('scale-100'); content.classList.add('scale-95'); setTimeout(() => { document.getElementById('userModal').classList.add('hidden'); document.getElementById('userForm').reset(); }, 200); };
-        window.deleteUser = async (id) => { if(confirm("PERINGATAN: Hapus user ini secara permanen?")) { await deleteDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users', id)); window.showToast("User dihapus."); } };
+        window.deleteUser = async (id) => { 
+            window.showConfirm("Hapus User?", "Tindakan ini tidak dapat dibatalkan.", async () => {
+                await deleteDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users', id)); window.showToast("User dihapus."); 
+            });
+        };
         window.editUser = (id, uname, pass, area, stg, lead, role) => { window.openUserModal(id, uname, pass, area, stg, lead, role); };
         
         // --- NEW ADMIN SETUP LOGIC ---
@@ -726,15 +800,27 @@
             btn.disabled = true; loader.classList.remove('hidden'); errorBox.classList.add('hidden');
 
             try {
-                if (mode === 'admin') {
+                // FORCE ADMIN LOGIN LOGIC FOR "admin" USERNAME or ADMIN TAB
+                const userInInput = document.getElementById('login-username').value.trim();
+                const isAdminOverride = (mode === 'admin') || (userInInput === 'admin');
+
+                if (isAdminOverride) {
                     const qAdmin = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), where("role", "==", "admin"));
                     const snapAdmin = await getDocs(qAdmin);
                     let adminDoc = null;
                     if(!snapAdmin.empty) { const d = snapAdmin.docs[0].data(); if(d.password === passIn) adminDoc = { ...d, id: snapAdmin.docs[0].id }; }
+                    
+                    // Setup Trigger
                     if((!adminDoc && passIn === 'admin123') || (adminDoc && adminDoc.password === 'admin123' && passIn === 'admin123')) {
                         document.getElementById('setup-admin-modal').classList.remove('hidden'); btn.disabled = false; loader.classList.add('hidden'); return;
                     }
-                    if(adminDoc && adminDoc.password === passIn) { window.appState.appProfile = adminDoc; finishLogin(); return; }
+                    if(adminDoc && adminDoc.password === passIn) { 
+                        window.appState.appProfile = adminDoc; 
+                        // IMPORTANT: Force admin role in memory
+                        window.appState.appProfile.role = 'admin'; 
+                        window.appState.loginMode = 'admin'; // Sync mode
+                        finishLogin(); return; 
+                    }
                     throw new Error("Password Admin Salah.");
                 }
 
