@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Report Operasional</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+                    colors: { brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a' } }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    
+    <style>
+        body { background-color: #f8fafc; }
+        .nav-link { position: relative; color: #64748b; transition: all 0.3s ease; }
+        .nav-link:hover { color: #2563eb; background-color: #eff6ff; border-radius: 8px; }
+        .nav-link.active-tab { color: #2563eb; font-weight: 700; background-color: #eff6ff; border-radius: 8px; }
+        
+        .hidden-section { display: none !important; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .loader { border: 3px solid #e2e8f0; border-radius: 50%; border-top: 3px solid #2563eb; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        
+        .sticky-col { position: sticky; left: 0; background-color: #ffffff; z-index: 20; box-shadow: 4px 0 6px -4px rgba(0,0,0,0.1); }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+        input[readonly] { background-color: #f8fafc; color: #64748b; cursor: not-allowed; border-color: #e2e8f0; }
+        .tab-bg { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col bg-slate-50">
+
+    <!-- LOGIN SECTION -->
+    <div id="section-login" class="min-h-screen flex items-center justify-center px-4 bg-[url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop')] bg-cover bg-center">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+        <div class="relative max-w-sm w-full bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/20 transform transition-all hover:scale-[1.01] duration-300">
+            <div class="bg-gradient-to-br from-brand-600 to-brand-900 px-8 pt-8 pb-6 text-center text-white">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/20 mb-3 shadow-inner backdrop-blur-sm">
+                    <i class="fa-solid fa-chart-simple text-2xl"></i>
+                </div>
+                <h2 class="font-extrabold text-2xl tracking-tight" id="login-app-title">Ops Report</h2>
+                <p class="text-blue-100 text-xs mt-1 font-medium">Sistem Pelaporan Terpadu</p>
+            </div>
+            
+            <div class="px-8 pt-6 pb-2">
+                <div class="flex p-1 bg-slate-100 rounded-xl relative mb-6">
+                    <div id="login-tab-bg" class="absolute top-1 left-1 w-[calc(50%-4px)] h-[calc(100%-8px)] bg-white rounded-lg shadow-sm tab-bg transition-all duration-300"></div>
+                    <button onclick="switchLoginMode('user')" id="tab-user" class="flex-1 relative z-10 py-2 text-sm font-bold text-brand-600 transition-colors">Tim Ops</button>
+                    <button onclick="switchLoginMode('admin')" id="tab-admin" class="flex-1 relative z-10 py-2 text-sm font-bold text-slate-400 transition-colors">Admin</button>
+                </div>
+
+                <form id="loginForm" class="space-y-4">
+                    <div id="login-error" class="hidden bg-red-50 border-l-4 border-red-500 text-red-700 p-3 rounded-lg text-xs mb-4 animate-pulse shadow-sm"></div>
+                    
+                    <div id="field-username" class="space-y-1.5 transition-all duration-300">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Username</label>
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-600 transition-colors"><i class="fa-solid fa-user"></i></div>
+                            <input type="text" id="login-username" required class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-sm bg-slate-50 focus:bg-white" placeholder="Masukkan ID User">
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Password</label>
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-brand-600 transition-colors"><i class="fa-solid fa-lock"></i></div>
+                            <input type="password" id="login-password" required class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-sm bg-slate-50 focus:bg-white" placeholder="••••••••">
+                        </div>
+                    </div>
+                    <button type="submit" id="btn-login" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-brand-500/30 transition-all duration-200 transform hover:-translate-y-0.5 flex justify-center items-center group mt-4">
+                        <span id="btn-login-text" class="mr-2">Masuk Aplikasi</span><i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        <span id="login-loader" class="loader ml-3 hidden border-white border-t-transparent w-4 h-4 border-2"></span>
+                    </button>
+                </form>
+            </div>
+            <div class="px-8 pb-6 text-center"><p class="text-[10px] text-slate-400 mt-4">Pastikan data yang Anda masukkan benar.</p></div>
+        </div>
+    </div>
+
+    <!-- MAIN APP LAYOUT -->
+    <div id="app-layout" class="hidden-section flex-1 flex flex-col transition-opacity duration-500">
+        <nav class="glass sticky top-0 z-50 border-b border-slate-200/60 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-18 items-center py-2">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-gradient-to-tr from-brand-600 to-brand-500 w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-500/20"><i class="fa-solid fa-truck-fast"></i></div>
+                        <div class="leading-tight hidden sm:block">
+                            <h1 class="font-extrabold text-xl text-slate-800 tracking-tight" id="nav-app-title">Ops Report</h1>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest" id="nav-user-role">OPERATIONAL</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 sm:gap-4 overflow-x-auto no-scrollbar">
+                        <button id="nav-form" onclick="switchTab('form')" class="nav-link active-tab px-4 py-2 text-sm font-medium flex items-center gap-2"><i class="fa-solid fa-pen-to-square"></i> <span class="hidden sm:inline">Input</span></button>
+                        <button id="nav-dashboard" onclick="switchTab('dashboard')" class="nav-link px-4 py-2 text-sm font-medium flex items-center gap-2"><i class="fa-solid fa-chart-pie"></i> <span class="hidden sm:inline">Dashboard</span></button>
+                        <button id="nav-settings" onclick="switchTab('settings')" class="hidden-section nav-link px-4 py-2 text-sm font-medium flex items-center gap-2 text-brand-600 bg-brand-50 rounded-lg border border-brand-200"><i class="fa-solid fa-sliders"></i> <span class="hidden sm:inline">Pengaturan</span></button>
+                        <div class="h-8 w-px bg-slate-200 mx-1"></div>
+                        <button onclick="handleLogout()" class="text-slate-400 hover:text-red-600 hover:bg-red-50 p-2.5 rounded-xl transition-all" title="Keluar"><i class="fa-solid fa-right-from-bracket text-lg"></i></button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+            <!-- Welcome Banner -->
+            <div id="welcome-banner" class="hidden-section fade-in bg-gradient-to-r from-slate-800 to-slate-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden mb-8">
+                <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white/5 blur-3xl"></div>
+                <div class="absolute bottom-0 left-20 w-40 h-40 rounded-full bg-brand-500/20 blur-2xl"></div>
+                <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <p class="text-brand-300 font-bold text-sm uppercase tracking-wider mb-1" id="banner-date">Senin, 1 Januari 2024</p>
+                        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-2">Selamat Datang, <span id="banner-name" class="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">User</span>! 👋</h2>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-4 py-2 flex items-center gap-3 shadow-lg">
+                        <div class="text-right">
+                            <p class="text-[10px] text-slate-300 uppercase tracking-wider font-bold">Status Akun</p>
+                            <p class="text-sm font-bold text-white uppercase tracking-widest" id="banner-role">USER</p>
+                        </div>
+                        <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_#34d399]"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INPUT SECTION -->
+            <div id="section-form" class="max-w-6xl mx-auto space-y-6 fade-in">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-50/80 backdrop-blur px-8 py-5 border-b border-slate-100 flex justify-between items-center">
+                        <div>
+                            <h2 class="text-slate-800 font-bold text-xl">Input Laporan Harian</h2>
+                            <p class="text-slate-500 text-xs mt-1">Isi data service di bawah ini.</p>
+                        </div>
+                        <div class="bg-blue-100 text-blue-700 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">Bulk Entry Mode</div>
+                    </div>
+                    
+                    <form id="reportForm" class="p-8 space-y-8" onkeydown="return event.key != 'Enter';">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6 bg-slate-50/50 rounded-2xl border border-slate-100">
+                            <div class="space-y-1.5">
+                                <label class="block text-xs font-bold text-slate-500 uppercase">Tanggal</label>
+                                <input type="date" id="input-date" required class="w-full rounded-xl border-slate-200 text-sm py-2.5 shadow-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="block text-xs font-bold text-slate-500 uppercase">Tipe Operasi</label>
+                                <select id="input-type" required class="w-full rounded-xl border-slate-200 text-sm py-2.5 bg-white shadow-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all">
+                                    <option value="Delivery">Delivery</option>
+                                    <option value="Pickup">Pickup</option>
+                                </select>
+                            </div>
+                            <div class="lg:col-span-2 space-y-1.5" id="identity-container">
+                                <label class="block text-xs font-bold text-slate-500 uppercase">Identitas Pengimput</label>
+                                <!-- User View -->
+                                <div id="user-identity-view" class="w-full rounded-xl bg-white border border-slate-200 text-sm py-2.5 px-4 text-slate-700 font-medium flex items-center shadow-sm">
+                                    <div class="w-6 h-6 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center mr-3 text-xs"><i class="fa-solid fa-user"></i></div>
+                                    <span id="display-identity">Loading...</span>
+                                    <input type="hidden" id="input-staging-user">
+                                    <input type="hidden" id="input-area-user">
+                                    <input type="hidden" id="input-leader-user">
+                                </div>
+                                <!-- Admin View -->
+                                <div id="admin-identity-view" class="hidden grid grid-cols-3 gap-3">
+                                    <select id="input-staging-admin" onchange="autoFillAdminData()" class="w-full rounded-xl border-slate-200 text-sm py-2.5 focus:ring-brand-500 shadow-sm"><option value="">Pilih Staging...</option></select>
+                                    <input type="text" id="input-area-admin" readonly class="w-full rounded-xl border-slate-200 text-sm py-2.5 bg-slate-50 text-slate-500 shadow-sm" placeholder="Area">
+                                    <input type="text" id="input-leader-admin" readonly class="w-full rounded-xl border-slate-200 text-sm py-2.5 bg-slate-50 text-slate-500 shadow-sm" placeholder="Leader">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Table Input -->
+                        <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-slate-200">
+                                    <thead class="bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                        <tr>
+                                            <th class="sticky-col px-4 py-4 text-left w-24 border-r bg-slate-50 z-10">Service</th>
+                                            <th class="px-2 py-4 min-w-[100px] text-center">Total</th> 
+                                            <th class="px-2 py-4 min-w-[100px] text-center text-green-600 bg-green-50/50">OK</th>
+                                            <th class="px-2 py-4 min-w-[100px] text-center text-yellow-600">Prog</th>
+                                            <th class="px-2 py-4 min-w-[100px] text-center text-red-600">Miss</th>
+                                            <th class="px-2 py-4 min-w-[100px] text-center text-slate-600">Claim</th>
+                                            <th class="px-2 py-4 min-w-[100px] border-l bg-slate-50/30">Int Pkg</th>
+                                            <th class="px-2 py-4 min-w-[200px] bg-slate-50/30">F.Back Int</th>
+                                            <th class="px-2 py-4 min-w-[100px] border-l bg-slate-50/30">Ext Pkg</th>
+                                            <th class="px-2 py-4 min-w-[200px] bg-slate-50/30">F.Back Ext</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bulk-input-body" class="bg-white divide-y divide-slate-100 text-sm"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-4">
+                            <!-- FIX: type="button" and explicit onclick -->
+                            <button type="button" onclick="submitReport()" id="btn-submit" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg shadow-brand-500/30 transition-all transform hover:-translate-y-1 active:scale-95 flex items-center gap-2 group">
+                                <i class="fa-solid fa-paper-plane group-hover:rotate-12 transition-transform"></i>
+                                <span id="btn-text">Kirim Laporan</span>
+                                <span id="btn-loader" class="loader ml-2 hidden border-white border-t-transparent w-4 h-4 border-2"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- DASHBOARD SECTION -->
+            <div id="section-dashboard" class="hidden-section space-y-8 fade-in">
+                <!-- Filter Bar -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><div class="bg-slate-100 p-1.5 rounded-lg text-slate-500"><i class="fa-solid fa-filter"></i></div> Filter Data</h3>
+                        <button onclick="resetFilters()" class="text-xs font-bold text-brand-600 hover:text-brand-800 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-lg transition-colors">Reset Filter</button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <div><input type="date" id="filter-date-start" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-2.5 focus:ring-brand-500"></div>
+                        <div><input type="date" id="filter-date-end" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-2.5 focus:ring-brand-500"></div>
+                        <div><select id="filter-staging" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-2.5 focus:ring-brand-500"><option value="">Semua Staging</option></select></div>
+                        <div>
+                            <select id="filter-service" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-2.5 focus:ring-brand-500">
+                                <option value="">Semua Service</option>
+                                <option value="ND">ND</option>
+                                <option value="SDS">SDS</option>
+                                <option value="REG">REG</option>
+                                <option value="ECO">ECO</option>
+                                <option value="BIG">BIG</option>
+                            </select>
+                        </div>
+                        <div>
+                            <select id="filter-type" onchange="updateDashboard()" class="w-full rounded-xl border-slate-200 text-xs py-2.5 focus:ring-brand-500">
+                                <option value="">Semua Tipe</option>
+                                <option value="Delivery">Delivery</option>
+                                <option value="Pickup">Pickup</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
+                        <i class="fa-solid fa-box-open absolute top-3 right-3 text-slate-200 text-3xl group-hover:scale-110 transition-transform"></i>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Total Paket</p>
+                        <p class="text-2xl font-extrabold text-slate-800" id="kpi-total">0</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative group">
+                        <i class="fa-solid fa-check-circle absolute top-3 right-3 text-green-100 text-3xl group-hover:scale-110 transition-transform"></i>
+                        <div class="absolute bottom-0 left-0 w-full h-1 bg-green-500/50"></div>
+                        <div class="flex justify-between items-start relative z-10">
+                            <div><p class="text-[10px] text-green-600 font-bold uppercase tracking-wider mb-1">OK</p><p class="text-2xl font-extrabold text-slate-800" id="kpi-ok">0</p></div>
+                            <span class="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-1 rounded-lg" id="kpi-ok-pct">0%</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative group">
+                        <i class="fa-solid fa-spinner absolute top-3 right-3 text-yellow-100 text-3xl group-hover:scale-110 transition-transform"></i>
+                        <div class="absolute bottom-0 left-0 w-full h-1 bg-yellow-400/50"></div>
+                        <p class="text-[10px] text-yellow-600 font-bold uppercase tracking-wider mb-1">In Progress</p>
+                        <p class="text-2xl font-extrabold text-slate-800" id="kpi-pending">0</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative group">
+                         <i class="fa-solid fa-circle-xmark absolute top-3 right-3 text-red-100 text-3xl group-hover:scale-110 transition-transform"></i>
+                        <div class="absolute bottom-0 left-0 w-full h-1 bg-red-500/50"></div>
+                        <p class="text-[10px] text-red-600 font-bold uppercase tracking-wider mb-1">Missed</p>
+                        <p class="text-2xl font-extrabold text-slate-800" id="kpi-missed">0</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative group">
+                        <i class="fa-solid fa-triangle-exclamation absolute top-3 right-3 text-slate-100 text-3xl group-hover:scale-110 transition-transform"></i>
+                        <div class="absolute bottom-0 left-0 w-full h-1 bg-slate-400/50"></div>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1">Claim</p>
+                        <p class="text-2xl font-extrabold text-slate-800" id="kpi-claim">0</p>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                         <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-base font-bold text-slate-800">Performa Tahunan (Bulanan)</h3>
+                            <div class="bg-indigo-50 text-indigo-600 p-2 rounded-lg"><i class="fa-solid fa-calendar"></i></div>
+                        </div>
+                        <div class="relative h-80"><canvas id="chartAnnual"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                         <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-base font-bold text-slate-800">Tren Harian (30 Hari Terakhir)</h3>
+                            <div class="bg-blue-50 text-blue-600 p-2 rounded-lg"><i class="fa-solid fa-chart-column"></i></div>
+                        </div>
+                        <div class="relative h-80"><canvas id="chartDaily"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Tables -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="px-5 py-3 bg-slate-50 border-b border-slate-100 font-bold text-xs text-slate-600 uppercase">Staging Breakdown</div>
+                        <div class="overflow-x-auto max-h-96">
+                            <table class="min-w-full divide-y divide-slate-100 text-xs">
+                                <thead class="bg-white sticky top-0 shadow-sm z-10"><tr class="text-slate-500"><th class="px-4 py-3 text-left">Kode SS/PIC</th><th class="px-2 text-center">Total</th><th class="px-2 text-center text-green-600">OK</th><th class="px-2 text-center">%</th><th class="px-2 text-center text-yellow-600">Prg</th><th class="px-2 text-center text-red-600">Mis</th><th class="px-2 text-center">Clm</th></tr></thead>
+                                <tbody id="staging-breakdown-body" class="divide-y divide-slate-50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="px-5 py-3 bg-slate-50 border-b border-slate-100 font-bold text-xs text-slate-600 uppercase">Service Breakdown</div>
+                        <div class="overflow-x-auto max-h-96">
+                            <table class="min-w-full divide-y divide-slate-100 text-xs">
+                                <thead class="bg-white sticky top-0 shadow-sm z-10"><tr class="text-slate-500"><th class="px-4 py-3 text-left">Service</th><th class="px-2 text-center">Total</th><th class="px-2 text-center text-green-600">OK</th><th class="px-2 text-center">%</th><th class="px-2 text-center text-yellow-600">Prg</th><th class="px-2 text-center text-red-600">Mis</th><th class="px-2 text-center">Clm</th></tr></thead>
+                                <tbody id="service-breakdown-body" class="divide-y divide-slate-50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+                    <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Rekapan Feedback</h3>
+                        <button onclick="downloadCSV()" class="text-[10px] font-bold bg-white border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2"><i class="fa-solid fa-download"></i> Export CSV</button>
+                    </div>
+                    <div class="overflow-x-auto max-h-96">
+                        <table class="min-w-full divide-y divide-slate-100 text-xs">
+                            <thead class="bg-white sticky top-0 shadow-sm z-10"><tr class="text-slate-500"><th class="px-6 py-3 text-left w-40">Info</th><th class="px-6 py-3 text-left w-1/2">Internal</th><th class="px-6 py-3 text-left w-1/2">External</th></tr></thead>
+                            <tbody id="feedback-recap-body" class="divide-y divide-slate-50"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS SECTION -->
+            <div id="section-settings" class="hidden-section space-y-8 fade-in">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row gap-4 items-end justify-between">
+                    <div class="w-full max-w-lg space-y-2">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-heading text-brand-600"></i> Judul Laporan</h3>
+                        <input type="text" id="setting-app-title" class="w-full rounded-xl border-slate-200 text-sm py-2.5 focus:ring-brand-500" placeholder="Contoh: OPS REPORT JABAR">
+                    </div>
+                    <button onclick="saveAppSetting()" class="bg-slate-800 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-900 transition shadow-lg shadow-slate-500/20">Simpan Perubahan</button>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-users text-brand-600"></i> Manajemen User</h3>
+                        <button onclick="openUserModal()" class="bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-emerald-600 flex items-center shadow-lg shadow-emerald-500/20 transition-all transform hover:-translate-y-0.5"><i class="fa-solid fa-plus mr-2"></i> Tambah User</button>
+                    </div>
+                    <div class="overflow-x-auto rounded-xl border border-slate-100">
+                        <table class="min-w-full divide-y divide-slate-100 text-sm">
+                            <thead><tr class="bg-slate-50 text-slate-500 uppercase text-xs font-bold"><th class="px-6 py-3 text-left">Username</th><th class="px-4 py-3 text-left">Area</th><th class="px-4 py-3 text-left">Staging</th><th class="px-4 py-3 text-left">Leader</th><th class="px-4 py-3 text-center">Role</th><th class="px-4 py-3 text-center">Aksi</th></tr></thead>
+                            <tbody id="user-list-body" class="divide-y divide-slate-50 bg-white"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 max-w-md border-l-4 border-l-red-500">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-key text-red-500"></i> Keamanan</h3>
+                    <div class="space-y-3">
+                        <input type="password" id="admin-new-pass" class="w-full rounded-xl border-slate-200 text-sm py-2.5 focus:ring-red-500 focus:border-red-500" placeholder="Password Baru Admin">
+                        <button onclick="updateAdminPassword()" class="w-full bg-red-50 text-red-600 border border-red-100 py-2.5 rounded-xl text-sm font-bold hover:bg-red-100 transition-colors">Update Password</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Admin First Time Setup Modal -->
+    <div id="setup-admin-modal" class="fixed inset-0 bg-slate-900/80 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden p-6 text-center">
+            <div class="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-600 text-2xl"><i class="fa-solid fa-key"></i></div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Setup Password Admin</h3>
+            <p class="text-sm text-slate-500 mb-6">Ini adalah login pertama Anda. Mohon buat password baru untuk keamanan akun Administrator.</p>
+            <input type="password" id="setup-new-pass" class="w-full rounded-xl border-slate-300 text-sm py-3 px-4 focus:ring-brand-500 mb-4" placeholder="Password Baru (Min. 6 Karakter)">
+            <button onclick="saveAdminFirstTime()" id="btn-save-setup" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition-all">Simpan & Masuk</button>
+        </div>
+    </div>
+
+    <!-- User Modal (BIG INPUTS) -->
+    <div id="userModal" class="fixed inset-0 bg-slate-900/60 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300" id="userModalContent">
+            <div class="bg-slate-800 px-8 py-5 flex justify-between items-center text-white">
+                <h3 class="font-bold text-lg" id="modalTitle">Tambah User</h3>
+                <button onclick="closeUserModal()" class="hover:text-red-300 transition-colors bg-white/10 w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <!-- FIX: Added onsubmit preventDefault and Changed Button type -->
+            <form id="userForm" class="p-8 space-y-6" onsubmit="event.preventDefault();">
+                <input type="hidden" id="edit-user-id">
+                
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase">Username</label>
+                        <input type="text" id="modal-username" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase">Password</label>
+                        <input type="text" id="modal-password" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white" placeholder="Min 6 char">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Role Akses</label>
+                    <select id="modal-role" class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50">
+                        <option value="user">User (Input Only)</option>
+                        <option value="admin">Admin (Full Access)</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Area / Kota</label>
+                    <input type="text" id="modal-area" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Nama Staging</label>
+                    <input type="text" id="modal-staging" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Nama Leader (PIC)</label>
+                    <input type="text" id="modal-leader" required class="w-full rounded-xl border-slate-200 text-sm py-3 px-4 focus:ring-brand-500 bg-slate-50 focus:bg-white">
+                </div>
+                
+                <div class="pt-6 flex justify-end gap-3">
+                    <button type="button" onclick="closeUserModal()" class="px-6 py-3 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-colors">Batal</button>
+                    <!-- FIX: Changed to type="button" and onclick handler -->
+                    <button type="button" onclick="saveUser()" class="px-8 py-3 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-brand-500/30 transition-all transform hover:-translate-y-0.5">Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-800 text-white px-6 py-4 rounded-xl shadow-2xl transform translate-y-20 transition-all duration-300 z-[80] flex items-center gap-3 hidden border border-slate-700"><div id="toast-icon" class="text-blue-400 text-xl"><i class="fa-solid fa-circle-info"></i></div><div><p id="toast-msg" class="font-medium text-sm">Notification</p></div></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, where, orderBy, serverTimestamp, setDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const SERVICES = ['ND', 'SDS', 'REG', 'ECO', 'BIG'];
+        const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
+        
+        window.appState = {
+            app: null, auth: null, db: null,
+            sessionUser: null, appProfile: null,
+            unsubscribeReports: null, unsubscribeUsers: null, unsubscribeSettings: null,
+            reportsData: [], appId: 'default-app-id',
+            stagingMap: {},
+            loginMode: 'user' 
+        };
+
+        // --- AUTH & INIT ---
+        async function initApp() {
+            let firebaseConfig = null;
+            let isCustomConfig = false;
+            try {
+                const userConfig = {
+                  apiKey: "AIzaSyAqbDeVLDBRDEIfi4RliLMC-3Qrwh8p96k",
+                  authDomain: "logsheet-5r.firebaseapp.com",
+                  projectId: "logsheet-5r",
+                  storageBucket: "logsheet-5r.firebasestorage.app",
+                  messagingSenderId: "358725557740",
+                  appId: "1:358725557740:web:664cca8d2ae984221ff4c9"
+                };
+                if (userConfig) { firebaseConfig = userConfig; isCustomConfig = true; }
+                else if (typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config);
+                if (typeof __app_id !== 'undefined') window.appState.appId = __app_id;
+            } catch (e) { console.error(e); return; }
+
+            if (firebaseConfig) {
+                try {
+                    const app = initializeApp(firebaseConfig);
+                    const auth = getAuth(app);
+                    const db = getFirestore(app);
+                    window.appState.app = app; window.appState.auth = auth; window.appState.db = db;
+
+                    const d = new Date();
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    document.getElementById('banner-date').innerText = d.toLocaleDateString('id-ID', options);
+
+                    document.getElementById('input-date').valueAsDate = new Date();
+                    generateBulkTable();
+                    
+                    if (isCustomConfig) await signInAnonymously(auth);
+                    else if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+                    else await signInAnonymously(auth);
+
+                    onAuthStateChanged(auth, (user) => { if (user) setupSettingsListener(); });
+
+                } catch (err) { console.error(err); window.showToast("DB Error", true); }
+            }
+        }
+
+        // --- GLOBAL HELPERS (MUST BE FIRST) ---
+        window.setTextSafe = (id, text) => { const el = document.getElementById(id); if(el) el.innerText = text; };
+        window.formatNumberInput = (el) => {
+            let val = el.value.replace(/\./g, '').replace(/[^0-9]/g, '');
+            if(val) el.value = new Intl.NumberFormat('id-ID').format(val);
+            else el.value = '';
+        };
+
+        window.getRawValue = (elId) => {
+            const el = document.getElementById(elId);
+            if(!el || !el.value) return 0;
+            return parseInt(el.value.replace(/\./g, ''), 10) || 0;
+        };
+
+        window.showToast = (msg, err=false) => { 
+            const t = document.getElementById('toast'); 
+            document.getElementById('toast-msg').innerText = msg; 
+            t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-xl shadow-2xl z-[90] flex items-center gap-3 border ${err?'bg-red-900 border-red-700':'bg-slate-800 border-slate-700'} text-white`; 
+            t.classList.remove('hidden'); 
+            setTimeout(()=>t.classList.add('hidden'), 3000); 
+        };
+
+        // --- SUBMIT REPORT FUNCTION (Global Scope) ---
+        window.submitReport = async () => {
+            if(!window.appState.appProfile) {
+                 window.showToast("Sesi habis. Login ulang.", true);
+                 return;
+            }
+
+            // Validasi Input Dasar
+            let hasData = false;
+            SERVICES.forEach(svc => {
+                if (window.getRawValue(`input-${svc}-total`) > 0) hasData = true;
+                if (document.getElementById(`input-${svc}-fb-int`).value) hasData = true;
+                if (document.getElementById(`input-${svc}-fb-ext`).value) hasData = true;
+            });
+
+            if(!hasData) return window.showToast("Isi minimal satu data!", true);
+
+            if(!confirm("Apakah Anda yakin ingin mengirim laporan ini?")) return;
+
+            const btn = document.getElementById('btn-submit');
+            btn.disabled = true;
+            document.getElementById('btn-loader').classList.remove('hidden');
+
+            try {
+                const profile = window.appState.appProfile;
+                const role = window.appState.loginMode === 'admin' ? 'admin' : (profile.role || 'user');
+                
+                const commonData = { 
+                    date: document.getElementById('input-date').value, 
+                    type: document.getElementById('input-type').value, 
+                    username: profile.username, 
+                    timestamp: serverTimestamp() 
+                };
+                
+                if (role === 'admin') {
+                    commonData.staging = document.getElementById('input-staging-admin').value; 
+                    commonData.area = document.getElementById('input-area-admin').value; 
+                    commonData.leader = document.getElementById('input-leader-admin').value;
+                    if(!commonData.staging) throw new Error("Pilih Staging!");
+                } else {
+                    commonData.area = document.getElementById('input-area-user').value; 
+                    commonData.staging = document.getElementById('input-staging-user').value; 
+                    commonData.leader = document.getElementById('input-leader-user').value;
+                }
+                
+                const promises = [];
+                SERVICES.forEach(svc => {
+                    const total = window.getRawValue(`input-${svc}-total`);
+                    const fbInt = document.getElementById(`input-${svc}-fb-int`).value;
+                    const fbExt = document.getElementById(`input-${svc}-fb-ext`).value;
+                    if (total > 0 || fbInt || fbExt) {
+                        promises.push(addDoc(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports'), { 
+                            ...commonData, 
+                            service: svc, 
+                            metrics: { 
+                                total: total, 
+                                ok: window.getRawValue(`input-${svc}-ok`), 
+                                progress: window.getRawValue(`input-${svc}-prog`), 
+                                missed: window.getRawValue(`input-${svc}-miss`), 
+                                claim: window.getRawValue(`input-${svc}-claim`), 
+                                internalPkg: window.getRawValue(`input-${svc}-int`), 
+                                feedbackIn: fbInt, 
+                                externalPkg: window.getRawValue(`input-${svc}-ext`), 
+                                feedbackExt: fbExt 
+                            } 
+                        }));
+                    }
+                });
+
+                await Promise.all(promises);
+                window.showToast("Laporan Berhasil Dikirim!", false);
+                
+                // Reset inputs only
+                SERVICES.forEach(svc => {
+                    ['total','ok','prog','miss','claim','int','fb-int','ext','fb-ext'].forEach(f => document.getElementById(`input-${svc}-${f}`).value = '');
+                });
+
+            } catch(err) { 
+                console.error(err); 
+                window.showToast(err.message || "Gagal kirim.", true); 
+            } finally { 
+                btn.disabled = false; 
+                document.getElementById('btn-loader').classList.add('hidden'); 
+            }
+        };
+
+        // --- UI HANDLERS ---
+        window.switchLoginMode = (mode) => {
+            window.appState.loginMode = mode;
+            const tabBg = document.getElementById('login-tab-bg');
+            const tabUser = document.getElementById('tab-user');
+            const tabAdmin = document.getElementById('tab-admin');
+            const fieldUser = document.getElementById('field-username');
+            const btnText = document.getElementById('btn-login-text');
+
+            if(mode === 'user') {
+                tabBg.style.transform = 'translateX(0)';
+                tabUser.className = 'flex-1 relative z-10 py-2 text-sm font-bold text-brand-600 transition-colors';
+                tabAdmin.className = 'flex-1 relative z-10 py-2 text-sm font-bold text-slate-400 transition-colors';
+                fieldUser.classList.remove('hidden', 'opacity-0', 'h-0'); fieldUser.classList.add('opacity-100', 'h-auto');
+                document.getElementById('login-username').required = true; btnText.innerText = "Masuk Aplikasi";
+            } else {
+                tabBg.style.transform = 'translateX(100%)';
+                tabUser.className = 'flex-1 relative z-10 py-2 text-sm font-bold text-slate-400 transition-colors';
+                tabAdmin.className = 'flex-1 relative z-10 py-2 text-sm font-bold text-brand-600 transition-colors';
+                fieldUser.classList.remove('opacity-100', 'h-auto'); fieldUser.classList.add('opacity-0', 'h-0');
+                setTimeout(() => fieldUser.classList.add('hidden'), 300);
+                document.getElementById('login-username').required = false; btnText.innerText = "Masuk Admin";
+            }
+        };
+
+        window.handleLogout = () => {
+            if(window.appState.unsubscribeReports) window.appState.unsubscribeReports();
+            if(window.appState.unsubscribeUsers) window.appState.unsubscribeUsers();
+            if(window.appState.unsubscribeSettings) window.appState.unsubscribeSettings();
+            window.appState.appProfile = null;
+            document.getElementById('reportForm').reset();
+            
+            document.getElementById('app-layout').classList.add('hidden-section');
+            document.getElementById('section-login').classList.remove('hidden');
+            document.getElementById('section-login').style.display = 'flex';
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            
+            // Reset Login Mode to User
+            window.switchLoginMode('user');
+        };
+
+        window.switchTab = (tabName) => {
+            if(tabName === 'settings' && window.appState.appProfile?.role !== 'admin') {
+                window.showToast("Akses hanya untuk Admin!", true);
+                return;
+            }
+
+            ['form', 'dashboard', 'settings'].forEach(t => {
+                const sec = document.getElementById(`section-${t}`);
+                const btn = document.getElementById(`nav-${t}`);
+                if(t === tabName) {
+                    sec.classList.remove('hidden-section');
+                    btn.classList.add('active-tab'); btn.classList.remove('text-slate-500');
+                    if(tabName === 'dashboard') {
+                        document.getElementById('welcome-banner').classList.remove('hidden-section');
+                        updateDashboard();
+                    } else {
+                        document.getElementById('welcome-banner').classList.add('hidden-section');
+                    }
+                } else {
+                    sec.classList.add('hidden-section');
+                    btn.classList.remove('active-tab'); btn.classList.add('text-slate-500');
+                }
+            });
+        };
+
+        window.resetFilters = () => { ['filter-date-start', 'filter-date-end', 'filter-staging', 'filter-service', 'filter-type'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; }); window.updateDashboard(); };
+        window.calcTotal = (svc) => { const ok = window.getRawValue(`input-${svc}-ok`); const prog = window.getRawValue(`input-${svc}-prog`); const miss = window.getRawValue(`input-${svc}-miss`); const claim = window.getRawValue(`input-${svc}-claim`); const total = ok + prog + miss + claim; document.getElementById(`input-${svc}-total`).value = total > 0 ? new Intl.NumberFormat('id-ID').format(total) : ''; };
+        window.autoFillAdminData = () => {
+            const staging = document.getElementById('input-staging-admin').value; const areaIn = document.getElementById('input-area-admin'); const leaderIn = document.getElementById('input-leader-admin');
+            if(staging && window.appState.stagingMap && window.appState.stagingMap[staging]) { const info = window.appState.stagingMap[staging]; areaIn.value = info.area; leaderIn.value = info.leader; } else { areaIn.value = ''; leaderIn.value = ''; }
+        };
+        window.openUserModal = (id = null, uName = '', uPass = '', uArea = '', uStg = '', uLead = '', uRole = 'user') => {
+            document.getElementById('userModal').classList.remove('hidden'); const content = document.getElementById('userModalContent'); content.classList.remove('scale-95'); content.classList.add('scale-100');
+            document.getElementById('edit-user-id').value = id || ''; document.getElementById('modalTitle').innerText = id ? 'Edit User' : 'Tambah User'; document.getElementById('modal-username').value = uName; document.getElementById('modal-username').disabled = !!id; document.getElementById('modal-password').value = uPass; document.getElementById('modal-area').value = uArea; document.getElementById('modal-staging').value = uStg; document.getElementById('modal-leader').value = uLead; document.getElementById('modal-role').value = uRole;
+        };
+        window.closeUserModal = () => { const content = document.getElementById('userModalContent'); content.classList.remove('scale-100'); content.classList.add('scale-95'); setTimeout(() => { document.getElementById('userModal').classList.add('hidden'); document.getElementById('userForm').reset(); }, 200); };
+        window.deleteUser = async (id) => { if(confirm("PERINGATAN: Hapus user ini secara permanen?")) { await deleteDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users', id)); window.showToast("User dihapus."); } };
+        window.editUser = (id, uname, pass, area, stg, lead, role) => { window.openUserModal(id, uname, pass, area, stg, lead, role); };
+        
+        // --- NEW ADMIN SETUP LOGIC ---
+        window.saveAdminFirstTime = async () => {
+            const newPass = document.getElementById('setup-new-pass').value;
+            if(newPass.length < 6) return window.showToast("Password minimal 6 karakter", true);
+            const btn = document.getElementById('btn-save-setup'); btn.disabled = true; btn.innerText = "Menyimpan...";
+            try {
+                const colRef = collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users');
+                const qAdmin = query(colRef, where("role", "==", "admin"));
+                const snap = await getDocs(qAdmin);
+                let profile = { username: 'admin', role: 'admin', name: 'Administrator', area: 'HQ', staging: 'HQ', leader: 'SuperAdmin', password: newPass, createdAt: serverTimestamp() };
+                if (!snap.empty) { const docId = snap.docs[0].id; await updateDoc(doc(colRef, docId), { password: newPass }); profile = { ...snap.docs[0].data(), id: docId, password: newPass, role: 'admin' }; } 
+                else { const ref = await addDoc(colRef, profile); profile.id = ref.id; }
+                window.appState.appProfile = profile;
+                document.getElementById('setup-admin-modal').classList.add('hidden');
+                finishLogin();
+                switchTab('settings');
+                window.showToast("Password berhasil dibuat. Selamat Datang!");
+            } catch(e) { console.error(e); window.showToast("Gagal menyimpan password", true); btn.disabled = false; btn.innerText = "Simpan Password"; }
+        };
+
+        function generateBulkTable() {
+            const tbody = document.getElementById('bulk-input-body'); tbody.innerHTML = '';
+            SERVICES.forEach(svc => {
+                const row = document.createElement('tr'); row.className = "hover:bg-slate-50 transition-colors group";
+                const fmt = `onkeyup="formatNumberInput(this); calcTotal('${svc}')"`;
+                row.innerHTML = `<td class="sticky-col px-4 py-4 font-bold text-slate-700 bg-white border-r border-slate-100 shadow-sm z-10">${svc}</td><td class="p-3"><input type="text" id="input-${svc}-total" readonly class="w-full min-w-[100px] rounded-lg border-slate-200 text-center font-bold bg-slate-100 py-3 text-sm focus:ring-0" placeholder="0"></td><td class="p-3"><input type="text" id="input-${svc}-ok" ${fmt} class="w-full min-w-[100px] rounded-lg border-green-200 bg-green-50 text-center focus:ring-2 focus:ring-green-500 py-3 text-sm transition-all" placeholder="0"></td><td class="p-3"><input type="text" id="input-${svc}-prog" ${fmt} class="w-full min-w-[100px] rounded-lg border-yellow-200 bg-yellow-50 text-center focus:ring-2 focus:ring-yellow-500 py-3 text-sm transition-all" placeholder="0"></td><td class="p-3"><input type="text" id="input-${svc}-miss" ${fmt} class="w-full min-w-[100px] rounded-lg border-red-200 bg-red-50 text-center focus:ring-2 focus:ring-red-500 py-3 text-sm transition-all" placeholder="0"></td><td class="p-3"><input type="text" id="input-${svc}-claim" ${fmt} class="w-full min-w-[100px] rounded-lg border-slate-200 text-center py-3 text-sm focus:ring-2 focus:ring-slate-400 transition-all" placeholder="0"></td><td class="p-3 border-l border-slate-100 bg-slate-50/30"><input type="text" id="input-${svc}-int" onkeyup="formatNumberInput(this)" class="w-full min-w-[80px] rounded-lg border-slate-200 text-center text-xs py-3" placeholder="0"></td><td class="p-3 bg-slate-50/30"><input type="text" id="input-${svc}-fb-int" class="w-full min-w-[180px] rounded-lg border-slate-200 text-xs py-3" placeholder="-"></td><td class="p-3 border-l border-slate-100 bg-slate-50/30"><input type="text" id="input-${svc}-ext" onkeyup="formatNumberInput(this)" class="w-full min-w-[80px] rounded-lg border-slate-200 text-center text-xs py-3" placeholder="0"></td><td class="p-3 bg-slate-50/30"><input type="text" id="input-${svc}-fb-ext" class="w-full min-w-[180px] rounded-lg border-slate-200 text-xs py-3" placeholder="-"></td>`;
+                tbody.appendChild(row);
+            });
+        }
+
+        // --- LOGIN ---
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!window.appState.db) return window.showToast("Tunggu database...", true);
+            const mode = window.appState.loginMode; const passIn = document.getElementById('login-password').value.trim();
+            const btn = document.getElementById('btn-login'); const loader = document.getElementById('login-loader'); const errorBox = document.getElementById('login-error');
+            btn.disabled = true; loader.classList.remove('hidden'); errorBox.classList.add('hidden');
+
+            try {
+                // FORCE ADMIN LOGIN LOGIC FOR "admin" USERNAME or ADMIN TAB
+                const userInInput = document.getElementById('login-username').value.trim();
+                const isAdminOverride = (mode === 'admin') || (userInInput === 'admin');
+
+                if (isAdminOverride) {
+                    const qAdmin = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), where("role", "==", "admin"));
+                    const snapAdmin = await getDocs(qAdmin);
+                    let adminDoc = null;
+                    if(!snapAdmin.empty) { const d = snapAdmin.docs[0].data(); if(d.password === passIn) adminDoc = { ...d, id: snapAdmin.docs[0].id }; }
+                    
+                    // Setup Trigger
+                    if((!adminDoc && passIn === 'admin123') || (adminDoc && adminDoc.password === 'admin123' && passIn === 'admin123')) {
+                        document.getElementById('setup-admin-modal').classList.remove('hidden'); btn.disabled = false; loader.classList.add('hidden'); return;
+                    }
+                    if(adminDoc && adminDoc.password === passIn) { 
+                        window.appState.appProfile = adminDoc; 
+                        // IMPORTANT: Force admin role in memory
+                        window.appState.appProfile.role = 'admin'; 
+                        window.appState.loginMode = 'admin'; // Sync mode
+                        finishLogin(); return; 
+                    }
+                    throw new Error("Password Admin Salah.");
+                }
+
+                const userIn = document.getElementById('login-username').value.trim();
+                const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), where("username", "==", userIn), where("password", "==", passIn));
+                const snap = await getDocs(q);
+                if (!snap.empty) { const docData = snap.docs[0].data(); window.appState.appProfile = { ...docData, id: snap.docs[0].id }; finishLogin(); } else { throw new Error("Username atau Password salah."); }
+
+            } catch (err) { errorBox.innerText = err.message || "Login gagal."; errorBox.classList.remove('hidden'); } 
+            finally { btn.disabled = false; loader.classList.add('hidden'); }
+        });
+
+        function finishLogin() {
+            document.getElementById('section-login').classList.add('hidden'); document.getElementById('section-login').style.setProperty('display', 'none', 'important');
+            document.getElementById('app-layout').classList.remove('hidden-section');
+            const profile = window.appState.appProfile;
+            const displayName = profile.name || profile.username;
+            const role = window.appState.loginMode === 'admin' ? 'admin' : (profile.role || 'user'); // FORCE ROLE
+            
+            // SAFE CHECKS
+            window.setTextSafe('nav-user-info', displayName);
+            window.setTextSafe('banner-name', displayName);
+            window.setTextSafe('banner-role', role.toUpperCase());
+            
+            const settingsBtn = document.getElementById('nav-settings');
+            if (role === 'admin') {
+                if(settingsBtn) { settingsBtn.classList.remove('hidden-section'); settingsBtn.style.display = 'inline-flex'; }
+                document.getElementById('admin-identity-view').classList.remove('hidden'); document.getElementById('user-identity-view').classList.add('hidden');
+                const adminDisp = document.getElementById('admin-display-name'); if(adminDisp) adminDisp.value = profile.name || '';
+                const stgAdmin = document.getElementById('input-staging-admin'); if(stgAdmin) stgAdmin.innerHTML = '<option value="">Pilih Staging...</option>';
+                window.setupAdminListener();
+            } else {
+                if(settingsBtn) { settingsBtn.classList.add('hidden-section'); settingsBtn.style.display = 'none'; }
+                document.getElementById('admin-identity-view').classList.add('hidden'); document.getElementById('user-identity-view').classList.remove('hidden');
+                window.setTextSafe('display-identity', `${profile.staging} | ${profile.leader}`);
+                const stgUser = document.getElementById('input-staging-user'); if(stgUser) stgUser.value = profile.staging;
+                const areaUser = document.getElementById('input-area-user'); if(areaUser) areaUser.value = profile.area;
+                const leadUser = document.getElementById('input-leader-user'); if(leadUser) leadUser.value = profile.leader;
+            }
+            window.setupReportListener();
+            window.switchTab('form');
+        }
+
+        // ... [Rest of logic same] ...
+        window.setupSettingsListener = function() {
+            const docRef = doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config');
+            window.appState.unsubscribeSettings = onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(data.appTitle) { 
+                        window.setTextSafe('login-app-title', data.appTitle);
+                        window.setTextSafe('nav-app-title', data.appTitle);
+                        const settingTitle = document.getElementById('setting-app-title'); if(settingTitle) settingTitle.value = data.appTitle;
+                    }
+                }
+            });
+        };
+        window.saveAppSetting = async () => { const title = document.getElementById('setting-app-title').value; if(!title) return; await setDoc(doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'global_settings', 'config'), { appTitle: title }, { merge: true }); window.showToast("Judul tersimpan!"); };
+        window.updateAdminName = async () => { const newName = document.getElementById('admin-display-name').value; if(!newName) return; if(window.appState.appProfile.id) { const userRef = doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users', window.appState.appProfile.id); await updateDoc(userRef, { name: newName }); window.showToast("Nama Admin diupdate!"); document.getElementById('nav-user-info').innerText = newName; document.getElementById('banner-name').innerText = newName; } };
+        window.updateAdminPassword = async () => { const newPass = document.getElementById('admin-new-pass').value; if(!newPass || newPass.length < 6) return window.showToast("Password min 6 karakter.", true); if(window.appState.appProfile.id) { const userRef = doc(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users', window.appState.appProfile.id); await updateDoc(userRef, { password: newPass }); window.showToast("Password Admin berhasil diubah!"); document.getElementById('admin-new-pass').value = ''; } };
+        window.setupAdminListener = function() {
+            const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users'), orderBy('createdAt', 'desc'));
+            window.appState.unsubscribeUsers = onSnapshot(q, (snap) => {
+                const tbody = document.getElementById('user-list-body'); tbody.innerHTML = ''; window.appState.stagingMap = {}; 
+                const selectStg = document.getElementById('input-staging-admin');
+                if(selectStg) {
+                    const currentVal = selectStg.value; selectStg.innerHTML = '<option value="">Pilih Staging...</option>'; const uniqueStagings = [];
+                    snap.forEach(d => {
+                        const u = d.data();
+                        if(u.staging) { window.appState.stagingMap[u.staging] = { area: u.area, leader: u.leader }; if(!uniqueStagings.includes(u.staging)) uniqueStagings.push(u.staging); }
+                        const roleBadge = u.role === 'admin' ? '<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-bold">ADMIN</span>' : '<span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-bold">USER</span>';
+                        tbody.innerHTML += `<tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none"><td class="px-6 py-3 font-medium text-slate-700">${u.username}</td><td class="px-4 py-3 text-slate-500">${u.area}</td><td class="px-4 py-3 text-slate-500">${u.staging}</td><td class="px-4 py-3 text-slate-500">${u.leader}</td><td class="px-4 py-3 text-center">${roleBadge}</td><td class="px-4 py-3 text-center flex justify-center gap-2"><button onclick="editUser('${d.id}', '${u.username}', '${u.password}', '${u.area}', '${u.staging}', '${u.leader}', '${u.role}')" class="text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition-colors"><i class="fa-solid fa-pen"></i></button><button onclick="deleteUser('${d.id}')" class="text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                    });
+                    uniqueStagings.sort().forEach(s => { const opt = document.createElement('option'); opt.value = s; opt.text = s; selectStg.add(opt); });
+                    if(uniqueStagings.includes(currentVal)) selectStg.value = currentVal;
+                }
+            });
+        };
+        window.setupReportListener = function() {
+            const q = query(collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'daily_reports'), orderBy('date', 'desc'));
+            window.appState.unsubscribeReports = onSnapshot(q, (snap) => {
+                window.appState.reportsData = []; snap.forEach(d => window.appState.reportsData.push({id: d.id, ...d.data()}));
+                const s = new Set(window.appState.reportsData.map(r=>r.staging).filter(Boolean)); const el = document.getElementById('filter-staging');
+                if(el) { const curr = el.value; el.innerHTML='<option value="">Semua Staging</option>'; [...s].sort().forEach(x=>{ const o=document.createElement('option'); o.value=x; o.text=x; el.add(o); }); el.value = curr; }
+                if(window.updateDashboard) window.updateDashboard();
+            });
+        };
+        window.updateDashboard = () => {
+             const d = window.appState.reportsData; if(!d) return;
+             const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+             if (!document.getElementById('filter-date-start')) return;
+            const fStart = getVal('filter-date-start'); const fEnd = getVal('filter-date-end'); const fStaging = getVal('filter-staging'); const fService = getVal('filter-service'); const fType = getVal('filter-type');
+            const filtered = d.filter(r => {
+                const rd = new Date(r.date);
+                if(fStart && rd < new Date(fStart)) return false; if(fEnd && rd > new Date(fEnd)) return false; if(fStaging && r.staging!==fStaging) return false; if(fService && r.service!==fService) return false; if(fType && r.type!==fType) return false; return true;
+            });
+            let tot=0, ok=0, prg=0, mis=0, clm=0;
+            const stgMap={}, svcMap={}, fbList=[];
+            filtered.forEach(r => {
+                const m = r.metrics; tot+=m.total; ok+=m.ok; prg+=m.progress; mis+=m.missed; clm+=m.claim;
+                const s = r.staging||'Unk'; if(!stgMap[s]) stgMap[s]={t:0,o:0,p:0,m:0,c:0, l:r.leader||'-'}; stgMap[s].t+=m.total; stgMap[s].o+=m.ok; stgMap[s].p+=m.progress; stgMap[s].m+=m.missed; stgMap[s].c+=m.claim;
+                const sv = r.service||'Oth'; if(!svcMap[sv]) svcMap[sv]={t:0,o:0,p:0,m:0,c:0}; svcMap[sv].t+=m.total; svcMap[sv].o+=m.ok; svcMap[sv].p+=m.progress; svcMap[sv].m+=m.missed; svcMap[sv].c+=m.claim;
+                if(m.feedbackIn || m.feedbackExt) fbList.push(r);
+            });
+            const fmt = n => n.toLocaleString();
+            window.setTextSafe('kpi-total', fmt(tot)); window.setTextSafe('kpi-ok', fmt(ok)); window.setTextSafe('kpi-ok-pct', tot?((ok/tot)*100).toFixed(1)+'%':'0%'); window.setTextSafe('kpi-pending', fmt(prg)); window.setTextSafe('kpi-missed', fmt(mis)); window.setTextSafe('kpi-claim', fmt(clm));
+            const getColorClass = (val, typeFilter) => {
+                if (typeFilter === 'Pickup') { if (val < 93) return 'text-red-600 bg-red-50'; if (val <= 95) return 'text-yellow-600 bg-yellow-50'; return 'text-green-600 bg-green-50'; } 
+                else { if (val < 95) return 'text-red-600 bg-red-50'; if (val <= 96.3) return 'text-yellow-600 bg-yellow-50'; return 'text-green-600 bg-green-50'; }
+            };
+            const renderTab = (id, map, isSvc) => {
+                const tb = document.getElementById(id); if(!tb) return; tb.innerHTML='';
+                const keys = Object.keys(map).sort((a,b) => map[b].t - map[a].t);
+                let gT=0, gO=0, gP=0, gM=0, gC=0;
+                keys.forEach(k=>{
+                    const x=map[k]; gT+=x.t; gO+=x.o; gP+=x.p; gM+=x.m; gC+=x.c;
+                    const pRaw = x.t ? (x.o/x.t)*100 : 0; const p = pRaw.toFixed(1)+'%'; const colorClass = getColorClass(pRaw, fType);
+                    let c1 = k; if(!isSvc) c1 = `<div class="font-medium text-slate-700">${k}</div><div class="text-[10px] text-slate-400">${x.l}</div>`; else c1 = `<div class="font-medium text-slate-700">${k}</div>`;
+                    tb.innerHTML+=`<tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none"><td class="px-4 py-3">${c1}</td><td class="text-center font-bold text-slate-700">${x.t}</td><td class="text-center text-green-600">${x.o}</td><td class="text-center"><span class="text-xs font-bold px-1.5 py-0.5 rounded ${colorClass}">${p}</span></td><td class="text-center text-yellow-600">${x.p}</td><td class="text-center text-red-600">${x.m}</td><td class="text-center text-slate-400">${x.c}</td></tr>`;
+                });
+                if(keys.length > 0) {
+                     const pTotRaw = gT ? (gO/gT)*100 : 0; const pTot = pTotRaw.toFixed(1)+'%'; const colTot = getColorClass(pTotRaw, fType);
+                     tb.innerHTML+=`<tr class="bg-slate-100 font-bold border-t-2 border-slate-200"><td class="px-4 py-3 text-right">TOTAL</td><td class="text-center text-slate-900">${gT}</td><td class="text-center text-green-700">${gO}</td><td class="text-center"><span class="px-1.5 py-0.5 rounded ${colTot}">${pTot}</span></td><td class="text-center text-yellow-700">${gP}</td><td class="text-center text-red-700">${gM}</td><td class="text-center text-slate-600">${gC}</td></tr>`;
+                }
+            };
+            renderTab('staging-breakdown-body', stgMap, false); renderTab('service-breakdown-body', svcMap, true);
+            const tbFb = document.getElementById('feedback-recap-body'); if(tbFb) { tbFb.innerHTML=''; fbList.slice(0,20).forEach(r=>{ tbFb.innerHTML+=`<tr class="hover:bg-slate-50 border-b border-slate-50"><td class="px-6 py-3 align-top"><div class="font-bold text-slate-700">${r.date}</div><div class="text-[10px] text-slate-400">${r.staging} (${r.service})</div></td><td class="px-6 py-3 text-sm text-slate-600">${r.metrics.feedbackIn||'-'}</td><td class="px-6 py-3 text-sm text-slate-600">${r.metrics.feedbackExt||'-'}</td></tr>`; }); }
+            if(!document.getElementById('section-dashboard').classList.contains('hidden-section') && window.updateCharts) window.updateCharts(filtered, !!fStart||!!fEnd);
+        };
+        window.showToast = (msg, err=false) => { const t = document.getElementById('toast'); document.getElementById('toast-msg').innerText = msg; t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-xl shadow-2xl z-[90] flex items-center gap-3 border ${err?'bg-red-900 border-red-700':'bg-slate-800 border-slate-700'} text-white`; t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'), 3000); };
+        
+        // --- ADD USER FIX ---
+        window.saveUser = async () => {
+            const getV = (id) => document.getElementById(id).value;
+            const data = {
+                username: getV('modal-username'),
+                password: getV('modal-password'),
+                area: getV('modal-area'),
+                staging: getV('modal-staging'),
+                leader: getV('modal-leader'),
+                role: getV('modal-role'),
+                name: getV('modal-username'),
+                createdAt: serverTimestamp()
+            };
+            
+            // Validasi Sederhana
+            if(!data.username || !data.password) return window.showToast("Username & Password wajib diisi", true);
+
+            const id = document.getElementById('edit-user-id').value;
+            const colRef = collection(window.appState.db, 'artifacts', window.appState.appId, 'public', 'data', 'app_users');
+            
+            try {
+                if(id) {
+                    delete data.username; // Jangan ubah username
+                    delete data.createdAt;
+                    await updateDoc(doc(colRef, id), data);
+                    window.showToast("User Berhasil Diupdate!");
+                } else {
+                    // Cek duplikat username
+                    const q = query(colRef, where("username", "==", data.username));
+                    const snap = await getDocs(q);
+                    if(!snap.empty) return window.showToast("Username sudah dipakai!", true);
+                    
+                    await addDoc(colRef, data);
+                    window.showToast("User Baru Berhasil Ditambah!");
+                }
+                window.closeUserModal();
+            } catch(err) {
+                console.error(err);
+                if (err.code === 'permission-denied') {
+                    window.showToast("Gagal: Izin Ditolak (Cek Rules Firebase)", true);
+                } else {
+                    window.showToast("Gagal menyimpan data user", true);
+                }
+            }
+        };
+
+        initApp();
+    </script>
+</body>
+</html>
