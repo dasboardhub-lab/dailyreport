@@ -79,10 +79,10 @@
         .input-cell input { 
             width: 100%; text-align: center; 
             background: transparent; border: none;
-            border-radius: 6px; padding: 6px; font-size: 0.9rem; font-weight: 500;
+            border-radius: 6px; padding: 6px; font-size: 0.95rem; font-weight: 600; 
         }
         .input-cell input:focus { background: rgba(0, 122, 255, 0.1); color: #007AFF; outline: none; }
-        .total-cell input { font-weight: 700; color: #007AFF; }
+        .total-cell input { font-weight: 800; color: #007AFF; }
 
         /* Scrollbar Hide */
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -109,6 +109,9 @@
         /* KPI Card Hover */
         .kpi-card { transition: transform 0.2s; }
         .kpi-card:hover { transform: translateY(-2px); }
+
+        /* Custom Widths for Dashboard Table - Equal Widths */
+        .col-metric { width: 11%; text-align: right; } 
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col">
@@ -286,13 +289,13 @@
                                 <thead class="text-slate-400 font-semibold border-b border-black/5 bg-slate-50/20">
                                     <tr>
                                         <th class="p-3 pl-4">SS</th>
-                                        <th class="p-3 text-right">Total</th>
-                                        <th class="p-3 text-right">OK</th>
-                                        <th class="p-3 text-center">%OK</th>
-                                        <th class="p-3 text-right text-slate-500">Inprog</th>
-                                        <th class="p-3 text-right text-orange-500">MBH</th>
-                                        <th class="p-3 text-right text-red-500">Miss</th>
-                                        <th class="p-3 text-right pr-4 text-purple-500 claim-col">Claim</th>
+                                        <th class="p-3 col-metric">Total</th>
+                                        <th class="p-3 col-metric">OK</th>
+                                        <th class="p-3 col-metric text-center">%OK</th>
+                                        <th class="p-3 col-metric text-slate-500">Inprog</th>
+                                        <th class="p-3 col-metric text-orange-500">MBH</th>
+                                        <th class="p-3 col-metric text-red-500">Miss</th>
+                                        <th class="p-3 col-metric pr-4 text-purple-500 claim-col">Claim</th>
                                     </tr>
                                 </thead>
                                 <tbody id="body-breakdown-staging" class="divide-y divide-black/5"></tbody>
@@ -309,13 +312,13 @@
                                 <thead class="text-slate-400 font-semibold border-b border-black/5 bg-slate-50/20">
                                     <tr>
                                         <th class="p-3 pl-4">Svc</th>
-                                        <th class="p-3 text-right">Total</th>
-                                        <th class="p-3 text-right">OK</th>
-                                        <th class="p-3 text-center">%OK</th>
-                                        <th class="p-3 text-right text-slate-500">Inprog</th>
-                                        <th class="p-3 text-right text-orange-500">MBH</th>
-                                        <th class="p-3 text-right text-red-500">Miss</th>
-                                        <th class="p-3 text-right pr-4 text-purple-500 claim-col">Claim</th>
+                                        <th class="p-3 col-metric">Total</th>
+                                        <th class="p-3 col-metric">OK</th>
+                                        <th class="p-3 col-metric text-center">%OK</th>
+                                        <th class="p-3 col-metric text-slate-500">Inprog</th>
+                                        <th class="p-3 col-metric text-orange-500">MBH</th>
+                                        <th class="p-3 col-metric text-red-500">Miss</th>
+                                        <th class="p-3 col-metric pr-4 text-purple-500 claim-col">Claim</th>
                                     </tr>
                                 </thead>
                                 <tbody id="body-breakdown-service" class="divide-y divide-black/5"></tbody>
@@ -701,17 +704,29 @@
             const fSvc = document.getElementById('dash-filter-service').value;
             const fType = document.getElementById('dash-filter-type').value;
 
-            const filtered = allReports.filter(r => {
+            // Separate filter for standard widgets (respects date)
+            const filteredByDate = allReports.filter(r => {
                 const rDate = r.date || new Date(r.timestamp.seconds*1000).toISOString().split('T')[0];
                 const inDate = (!start || rDate >= start) && (!end || rDate <= end);
                 const inSS = fSS === 'all' || r.kodeSS === fSS;
                 const inType = fType === 'all' || r.type === fType;
-                return inDate && inSS && inType;
+                const inSvc = fSvc === 'all' || r.details.some(d => d.label === fSvc && d.total > 0); // Rough check
+                return inDate && inSS && inType; // Svc check inside processBreakdowns usually
             });
-            updateKPIs(filtered, fType);
-            processCharts(filtered); 
-            processBreakdowns(filtered, fSvc, fType); 
-            processFeedback(filtered);
+            
+            // Separate filter for Annual Chart (Ignores Date)
+            const filteredForAnnual = allReports.filter(r => {
+                const inSS = fSS === 'all' || r.kodeSS === fSS;
+                const inType = fType === 'all' || r.type === fType;
+                 // Svc check is complex for totals, usually charts aggregate all unless specific breakdown requested.
+                 // For now, respect SS and Type for Annual.
+                return inSS && inType;
+            });
+
+            updateKPIs(filteredByDate, fType);
+            processCharts(filteredByDate, filteredForAnnual); 
+            processBreakdowns(filteredByDate, fSvc, fType); 
+            processFeedback(filteredByDate);
         }
 
         function updateKPIs(data, filterType) {
@@ -723,29 +738,38 @@
             });
             const pct = total > 0 ? (ok/total*100).toFixed(1) : 0;
             
-            document.getElementById('kpi-val-total').textContent = total.toLocaleString();
-            document.getElementById('kpi-val-ok').textContent = ok.toLocaleString();
-            document.getElementById('kpi-badge-ok').textContent = pct + '%';
-            document.getElementById('kpi-val-prog').textContent = prog.toLocaleString();
-            document.getElementById('kpi-val-mbh').textContent = mbh.toLocaleString();
-            document.getElementById('kpi-val-miss').textContent = miss.toLocaleString();
-            document.getElementById('kpi-val-claim').textContent = claim.toLocaleString();
+            document.getElementById('kpi-val-total').textContent = total.toLocaleString('id-ID');
+            document.getElementById('kpi-val-ok').textContent = ok.toLocaleString('id-ID');
+            document.getElementById('kpi-badge-ok').textContent = pct.toLocaleString('id-ID') + '%';
+            document.getElementById('kpi-val-prog').textContent = prog.toLocaleString('id-ID');
+            document.getElementById('kpi-val-mbh').textContent = mbh.toLocaleString('id-ID');
+            document.getElementById('kpi-val-miss').textContent = miss.toLocaleString('id-ID');
+            document.getElementById('kpi-val-claim').textContent = claim.toLocaleString('id-ID');
 
             const isPickup = filterType === 'pickup';
             document.getElementById('kpi-card-claim').style.display = isPickup ? 'none' : 'flex';
         }
 
-        function processCharts(data) {
+        function processCharts(dataByDate, dataAnnual) {
             const chartAnnualCanvas = document.getElementById('chartAnnual');
             const chartMonthlyCanvas = document.getElementById('chartMonthly');
             if(!chartAnnualCanvas || !chartMonthlyCanvas) return;
 
+            // --- Annual Chart (Uses dataAnnual - Ignores Date Filter) ---
             const months = {};
-            for(let i=0; i<12; i++) { const m = new Date(new Date().getFullYear(), i, 1).toLocaleString('id-ID',{month:'short'}); months[m] = {total:0, ok:0}; }
-            data.forEach(r => {
-                const m = new Date(r.date).toLocaleString('id-ID',{month:'short'});
-                let rTotal = 0, rOK = 0; r.details?.forEach(d => { rTotal+=d.total; rOK+=d.ok; });
-                if(months[m]) { months[m].total+=rTotal; months[m].ok+=rOK; }
+            // Init with 0 for Jan-Dec
+            for(let i=0; i<12; i++) { 
+                const m = new Date(new Date().getFullYear(), i, 1).toLocaleString('id-ID',{month:'short'}); 
+                months[m] = {total:0, ok:0}; 
+            }
+            dataAnnual.forEach(r => {
+                const dateVal = r.date ? new Date(r.date) : (r.timestamp ? new Date(r.timestamp.seconds*1000) : new Date());
+                // Only consider current year for "Annual Trend" usually, or just aggregate all if simple
+                if(dateVal.getFullYear() === new Date().getFullYear()) {
+                     const m = dateVal.toLocaleString('id-ID',{month:'short'});
+                     let rTotal = 0, rOK = 0; r.details?.forEach(d => { rTotal+=d.total; rOK+=d.ok; });
+                     if(months[m]) { months[m].total+=rTotal; months[m].ok+=rOK; }
+                }
             });
             const keysM = Object.keys(months);
             const datM_Vol = keysM.map(k=>months[k].total);
@@ -766,24 +790,43 @@
                             align: (context) => context.dataset.type === 'line' ? 'top' : 'top', 
                             offset: (context) => context.dataset.type === 'line' ? 4 : -5,
                             font: { weight: 'bold', size: 10 },
-                            formatter: (val) => val > 0 ? val : ''
+                            formatter: (val) => val > 0 ? val.toLocaleString('id-ID') : ''
                         }
                     }, 
                     scales:{ y:{display:false}, y1:{display:false, min:0, max:100}, x:{grid:{display:false}} } 
                 }
             });
 
+            // --- Monthly Chart (Uses dataByDate - Respects Filter) ---
             const days = {};
+            // Last 30 days logic (Standard) OR based on selected range?
+            // If user selects specific range, chart usually adapts. 
+            // Current code generates last 30 days keys.
+            // Let's stick to last 30 days logic for consistency with title "Performa 30 Hari"
             for(let i=29; i>=0; i--) {
                 const d = new Date(); d.setDate(d.getDate()-i);
                 const k = d.toISOString().split('T')[0];
-                days[k] = { label: d.getDate(), total:0, ok:0 };
+                // Label DD/MM
+                const label = d.getDate() + '/' + (d.getMonth()+1);
+                days[k] = { label: label, total:0, ok:0 };
             }
-            data.forEach(r => { if(days[r.date]) { r.details?.forEach(d => { days[r.date].total+=d.total; days[r.date].ok+=d.ok; }); } });
-            const keysD = Object.keys(days).sort();
-            const lblD = keysD.map(k=>days[k].label);
-            const datD_Vol = keysD.map(k=>days[k].total);
-            const datD_SLA = keysD.map(k=> days[k].total>0 ? ((days[k].ok/days[k].total)*100).toFixed(1) : 0);
+            
+            // Map dataByDate to these 30 days buckets
+            // Note: If filter is "Yesterday", "30 Days" chart might look empty except yesterday. 
+            // If we want "30 Days" to ALWAYS show last 30 days regardless of date filter, use dataAnnual. 
+            // But usually "30 Days" chart is a specific view. 
+            // Let's use dataAnnual for this too if it implies "Last 30 Days Trend" independent of the "Daily" table filter.
+            // Actually, usually dashboard charts show broader context. Let's use dataAnnual (filtered only by Type/SS) for the 30-day chart too, to make it a true "Trend" chart.
+            
+            dataAnnual.forEach(r => { 
+                const dateStr = r.date || (r.timestamp ? new Date(r.timestamp.seconds*1000).toISOString().split('T')[0] : '');
+                if(days[dateStr]) { r.details?.forEach(d => { days[dateStr].total+=d.total; days[dateStr].ok+=d.ok; }); } 
+            });
+            
+            const sortedKeys = Object.keys(days).sort();
+            const lblD = sortedKeys.map(k=>days[k].label);
+            const datD_Vol = sortedKeys.map(k=>days[k].total);
+            const datD_SLA = sortedKeys.map(k=> days[k].total>0 ? ((days[k].ok/days[k].total)*100).toFixed(1) : 0);
 
             if(chartMonthly) chartMonthly.destroy();
             chartMonthly = new Chart(chartMonthlyCanvas, {
@@ -800,7 +843,7 @@
                             align: (context) => context.dataset.type === 'line' ? 'top' : 'top', 
                             offset: (context) => context.dataset.type === 'line' ? 4 : -5,
                             font: { weight: 'bold', size: 9 },
-                            formatter: (val) => val > 0 ? val : ''
+                            formatter: (val) => val > 0 ? val.toLocaleString('id-ID') : ''
                         }
                     }, 
                     scales:{ y:{display:false}, y1:{display:false, min:0, max:100}, x:{grid:{display:false}} } 
@@ -832,30 +875,33 @@
                 const slaColor = getSLAColor(sla, d.type);
                 return `<tr class="hover:bg-black/5 border-b border-black/5">
                     <td class="p-3 pl-4 font-bold text-slate-700">${label}</td>
-                    <td class="p-3 text-right font-bold text-slate-800">${d.total.toLocaleString()}</td>
-                    <td class="p-3 text-right font-medium text-slate-600">${d.ok.toLocaleString()}</td>
-                    <td class="p-3 text-center"><div class="${slaColor} text-[10px] text-white font-bold px-2 py-0.5 rounded-full inline-block">${sla.toFixed(0)}%</div></td>
-                    <td class="p-3 text-right text-slate-500">${d.inp}</td>
-                    <td class="p-3 text-right text-orange-500">${d.mbh}</td>
-                    <td class="p-3 text-right text-red-500 font-bold">${d.miss}</td>
-                    <td class="p-3 text-right pr-4 text-purple-600 font-medium ${showClaim?'':'hidden'}">${d.claim}</td>
+                    <td class="p-3 col-metric font-bold text-slate-800">${d.total.toLocaleString('id-ID')}</td>
+                    <td class="p-3 col-metric font-medium text-slate-600">${d.ok.toLocaleString('id-ID')}</td>
+                    <td class="p-3 col-metric text-center"><div class="${slaColor} text-[10px] text-white font-bold px-2 py-0.5 rounded-full inline-block">${sla.toLocaleString('id-ID', {maximumFractionDigits:1})}%</div></td>
+                    <td class="p-3 col-metric text-slate-500">${d.inp.toLocaleString('id-ID')}</td>
+                    <td class="p-3 col-metric text-orange-500">${d.mbh.toLocaleString('id-ID')}</td>
+                    <td class="p-3 col-metric text-red-500 font-bold">${d.miss.toLocaleString('id-ID')}</td>
+                    <td class="p-3 col-metric pr-4 text-purple-600 font-medium ${showClaim?'':'hidden'}">${d.claim.toLocaleString('id-ID')}</td>
                 </tr>`;
             };
 
             const renderFooter = (list) => {
                 let t=0, o=0, i=0, mb=0, m=0, c=0;
                 list.forEach(x => { t+=x.total; o+=x.ok; i+=x.inp; mb+=x.mbh; m+=x.miss; c+=x.claim; });
+                
+                // Hitung Rata-rata %OK Total
                 const avgPct = t > 0 ? (o / t * 100) : 0;
                 const avgColor = getSLAColor(avgPct, filterType);
+
                 return `<tr class="bg-slate-200/50 font-bold text-slate-800 border-t-2 border-slate-300">
                     <td class="p-3 pl-4">TOTAL</td>
-                    <td class="p-3 text-right">${t.toLocaleString()}</td>
-                    <td class="p-3 text-right">${o.toLocaleString()}</td>
-                    <td class="p-3 text-center"><div class="${avgColor} text-[10px] text-white font-bold px-2 py-0.5 rounded-full inline-block">${avgPct.toFixed(1)}%</div></td>
-                    <td class="p-3 text-right">${i}</td>
-                    <td class="p-3 text-right">${mb}</td>
-                    <td class="p-3 text-right text-red-600">${m}</td>
-                    <td class="p-3 text-right pr-4 ${showClaim?'':'hidden'}">${c}</td>
+                    <td class="p-3 col-metric">${t.toLocaleString('id-ID')}</td>
+                    <td class="p-3 col-metric">${o.toLocaleString('id-ID')}</td>
+                    <td class="p-3 col-metric text-center"><div class="${avgColor} text-[10px] text-white font-bold px-2 py-0.5 rounded-full inline-block">${avgPct.toLocaleString('id-ID', {maximumFractionDigits:1})}%</div></td>
+                    <td class="p-3 col-metric">${i.toLocaleString('id-ID')}</td>
+                    <td class="p-3 col-metric">${mb.toLocaleString('id-ID')}</td>
+                    <td class="p-3 col-metric text-red-600">${m.toLocaleString('id-ID')}</td>
+                    <td class="p-3 col-metric pr-4 ${showClaim?'':'hidden'}">${c.toLocaleString('id-ID')}</td>
                 </tr>`;
             }
 
@@ -1280,10 +1326,6 @@
                 </tr>`;
             }).join('') || '<tr><td colspan="8" class="p-8 text-center text-slate-400 italic text-xs">Belum ada laporan masuk</td></tr>';
         }
-        
-        // ... (rest of functions remain largely same, verify auth logic) ...
-
-        // Ensure updateFilterUser, toggleUserStatus, renderUsersTable, editUser, prepareAddUser, closeAddUserModal, toggleFormFields, document.getElementById('add-user-form').addEventListener, window.openAuthModal, window.closeAuthModal, window.verifyAuthCode, openConfirmDelete, window.openDeleteModal, window.closeDeleteModal, window.executeDelete, window.showTab, switchLoginTab are all present and correct.
         
         function updateFilterUser() {
             const sel = document.getElementById('filter-user'); const cur = sel.value;
