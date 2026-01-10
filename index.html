@@ -608,6 +608,7 @@
             document.getElementById('user-display-role').textContent = currentUser.role;
             document.getElementById('avatar-initials').textContent = currentUser.name.charAt(0).toUpperCase();
 
+            // FIX: Ensure correct visibility state on login
             const navSettings = document.getElementById('nav-settings');
             if(currentUser.role === 'coordinator') {
                 navSettings.classList.remove('hidden');
@@ -632,6 +633,7 @@
                 document.getElementById('main-app').classList.add('hidden');
                 document.getElementById('login-page').classList.remove('hidden');
                 
+                // FIX: Reset Admin Menu Visibility to HIDDEN by default
                 const navSettings = document.getElementById('nav-settings');
                 navSettings.classList.add('hidden');
                 navSettings.classList.remove('flex');
@@ -941,32 +943,41 @@
             
             if(type === 'delivery') {
                 btnDel.classList.remove('text-slate-500');
-                btnDel.classList.add('bg-white', 'text-[#007AFF]', 'shadow-sm');
+                btnDel.classList.add('bg-blue-50', 'text-[#007AFF]', 'border-blue-200'); // Blue
                 btnPick.classList.add('text-slate-500');
-                btnPick.classList.remove('bg-white', 'text-[#007AFF]', 'shadow-sm');
+                btnPick.classList.remove('bg-orange-50', 'text-[#FF9500]', 'border-orange-200');
             } else {
                 btnPick.classList.remove('text-slate-500');
-                btnPick.classList.add('bg-white', 'text-[#007AFF]', 'shadow-sm');
+                btnPick.classList.add('bg-orange-50', 'text-[#FF9500]', 'border-orange-200'); // Orange
                 btnDel.classList.add('text-slate-500');
-                btnDel.classList.remove('bg-white', 'text-[#007AFF]', 'shadow-sm');
+                btnDel.classList.remove('bg-blue-50', 'text-[#007AFF]', 'border-blue-200');
             }
             renderInputTable();
+        }
+
+        // --- NEW: Number Formatting Helper ---
+        window.formatNumberInput = (input) => {
+            let val = input.value.replace(/\D/g, ''); // Remove non-digits
+            if (val) {
+                val = parseInt(val, 10).toLocaleString('id-ID'); // Format 1.000
+            }
+            input.value = val;
         }
 
         window.renderInputTable = () => {
             const isDel = document.getElementById('input-type').value === 'delivery';
             let head = `<tr>
-                <th class="p-2 border-b border-slate-200">Layanan</th>
-                <th class="p-2 border-b border-slate-200 bg-blue-50 text-blue-600">Total</th>
-                <th class="p-2 border-b border-slate-200">OK</th>
-                <th class="p-2 border-b border-slate-200 text-xs text-slate-400">P</th>
-                <th class="p-2 border-b border-slate-200 text-xs text-slate-400">M</th>
-                <th class="p-2 border-b border-slate-200 text-xs text-red-500">Mis</th>
-                ${isDel?'<th class="p-2 border-b border-slate-200 text-xs">Clm</th>':''}
-                <th class="p-2 border-b border-slate-200 border-l pl-2 text-xs">In</th>
-                <th class="p-2 border-b border-slate-200 text-xs w-20">Ket</th>
-                <th class="p-2 border-b border-slate-200 text-xs">Ex</th>
-                <th class="p-2 border-b border-slate-200 text-xs w-20">Ket</th>
+                <th class="p-3 border-b border-slate-200 w-24">Layanan</th>
+                <th class="p-3 border-b border-slate-200 bg-blue-50 text-blue-600 w-20">Total</th>
+                <th class="p-3 border-b border-slate-200 w-16">OK</th>
+                <th class="p-3 border-b border-slate-200 text-xs text-slate-400 w-16">P</th>
+                <th class="p-3 border-b border-slate-200 text-xs text-slate-400 w-16">M</th>
+                <th class="p-3 border-b border-slate-200 text-xs text-red-500 w-16">Mis</th>
+                ${isDel?'<th class="p-3 border-b border-slate-200 text-xs w-16">Clm</th>':''}
+                <th class="p-3 border-b border-slate-200 border-l pl-2 text-xs w-16">In</th>
+                <th class="p-3 border-b border-slate-200 text-xs w-auto">Ket</th>
+                <th class="p-3 border-b border-slate-200 text-xs w-16">Ex</th>
+                <th class="p-3 border-b border-slate-200 text-xs w-auto">Ket</th>
             </tr>`;
             document.getElementById('table-header').innerHTML = head;
             let body = '';
@@ -975,22 +986,27 @@
                 body += `<tr data-label="${lbl}" class="border-b border-slate-100 last:border-0">
                     <td class="p-2 font-bold text-slate-600 text-xs bg-slate-50/50">${lbl}</td>
                     <td class="p-2 total-cell input-cell"><input type="text" id="${rid}-total" readonly value="0"></td>
-                    <td class="p-2 input-cell"><input type="number" class="sla-input" data-row="${rid}" min="0" oninput="calcRow('${rid}')"></td>
-                    <td class="p-2 input-cell"><input type="number" class="sla-input" data-row="${rid}" min="0" oninput="calcRow('${rid}')"></td>
-                    <td class="p-2 input-cell"><input type="number" class="sla-input" data-row="${rid}" min="0" oninput="calcRow('${rid}')"></td>
-                    <td class="p-2 input-cell"><input type="number" class="sla-input" data-row="${rid}" min="0" oninput="calcRow('${rid}')"></td>
-                    ${isDel ? `<td class="p-2 input-cell"><input type="number" class="sla-input" data-row="${rid}" min="0" oninput="calcRow('${rid}')"></td>` : ''}
-                    <td class="p-2 input-cell border-l pl-2"><input type="number" min="0"></td>
+                    <td class="p-2 input-cell"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
+                    <td class="p-2 input-cell"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
+                    <td class="p-2 input-cell"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
+                    <td class="p-2 input-cell"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
+                    ${isDel ? `<td class="p-2 input-cell"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>` : ''}
+                    <td class="p-2 input-cell border-l pl-2"><input type="text" oninput="formatNumberInput(this)"></td>
                     <td class="p-2"><input type="text" class="w-full text-xs bg-transparent border-b border-slate-200 outline-none"></td>
-                    <td class="p-2 input-cell"><input type="number" min="0"></td>
+                    <td class="p-2 input-cell"><input type="text" oninput="formatNumberInput(this)"></td>
                     <td class="p-2"><input type="text" class="w-full text-xs bg-transparent border-b border-slate-200 outline-none"></td>
                 </tr>`;
             });
             document.getElementById('table-body').innerHTML = body;
         }
+
         window.calcRow = (rid) => {
             let tot = 0;
-            document.querySelectorAll(`input.sla-input[data-row="${rid}"]`).forEach(i => tot += (parseInt(i.value)||0));
+            // Handle formatted inputs (strip dots)
+            document.querySelectorAll(`input.sla-input[data-row="${rid}"]`).forEach(i => {
+                const val = parseInt(i.value.replace(/\./g, '')) || 0;
+                tot += val;
+            });
             document.getElementById(`${rid}-total`).value = tot.toLocaleString('id-ID');
         }
 
@@ -1010,21 +1026,50 @@
                 const dupSnap = await getDocs(qDup);
                 if(!dupSnap.empty) return showNotification(`Laporan ${type} tanggal ${date} sudah ada!`, "error");
             }
-            let gTotal = 0; const details = [];
+            
+            let gTotal = 0; 
+            const details = [];
+            
             document.querySelectorAll('#table-body tr').forEach(tr => {
-                const inps = tr.querySelectorAll('input'); const isDel = type === 'delivery';
-                const tot = parseInt(inps[0].value.replace(/\./g,'')) || 0; gTotal += tot;
+                const inps = tr.querySelectorAll('input'); 
+                const isDel = type === 'delivery';
+                
+                // Helper to get raw integer value from formatted input
+                const getVal = (idx) => {
+                    if (!inps[idx]) return 0;
+                    return parseInt(inps[idx].value.replace(/\./g, '')) || 0;
+                };
+                
+                // Helper to get string value
+                const getStr = (idx) => inps[idx] ? inps[idx].value : '';
+
+                const tot = getVal(0);
+                gTotal += tot;
+                
+                // Index mapping depends on delivery/pickup columns
+                // 0: Total, 1: OK, 2: Inp, 3: MBH, 4: Miss
+                // If Del: 5: Claim, 6: IntTot, 7: IntKet, 8: ExtTot, 9: ExtKet
+                // If Pick: 5: IntTot, 6: IntKet, 7: ExtTot, 8: ExtKet
+
                 details.push({
                     label: tr.getAttribute('data-label'),
-                    total: tot, ok: parseInt(inps[1].value)||0, inprogress: parseInt(inps[2].value)||0, mbh: parseInt(inps[3].value)||0, missed: parseInt(inps[4].value)||0,
-                    claimed: isDel ? (parseInt(inps[5].value)||0) : 0,
-                    total_int: parseInt(inps[isDel?6:5].value)||0, feed_int: inps[isDel?7:6].value,
-                    total_ext: parseInt(inps[isDel?8:7].value)||0, feed_ext: inps[isDel?9:8].value
+                    total: tot, 
+                    ok: getVal(1), 
+                    inprogress: getVal(2), 
+                    mbh: getVal(3), 
+                    missed: getVal(4),
+                    claimed: isDel ? getVal(5) : 0,
+                    
+                    total_int: isDel ? getVal(6) : getVal(5), 
+                    feed_int: isDel ? getStr(7) : getStr(6),
+                    
+                    total_ext: isDel ? getVal(8) : getVal(7), 
+                    feed_ext: isDel ? getStr(9) : getStr(8)
                 });
             });
             
             btn.disabled = true; 
-            const originalContent = btn.innerHTML; // Simpan konten asli (termasuk span btn-submit-text)
+            const originalContent = btn.innerHTML; 
             btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Loading...';
             
             try {
@@ -1032,16 +1077,13 @@
                 if(editId) { 
                     await updateDoc(doc(db,'artifacts', appId, 'public', 'data', 'reports', editId), payload); 
                     showNotification("Data diperbarui!"); 
-                    // Kembalikan konten tombol sebelum memanggil cancelEditMode
                     btn.innerHTML = originalContent;
                     window.cancelEditMode(); 
-                    // Return to list view
                     toggleReportForm(false);
                 }
                 else { 
                     await addDoc(collection(db,'artifacts', appId, 'public', 'data', 'reports'), payload); 
                     showNotification("Laporan tersimpan!"); 
-                    // Kembalikan konten tombol juga di sini
                     btn.innerHTML = originalContent;
                     document.getElementById('report-form').reset(); 
                     setupReportForm(); 
@@ -1051,7 +1093,6 @@
             } catch(e) { 
                 console.error(e); 
                 showNotification("Gagal menyimpan", "error"); 
-                // Kembalikan konten tombol jika error
                 btn.innerHTML = originalContent;
             }
             btn.disabled = false; 
@@ -1096,11 +1137,30 @@
             r.details?.forEach(d => {
                 rows.forEach(tr => {
                     if(tr.getAttribute('data-label') === d.label) {
-                        const inps = tr.querySelectorAll('input'); const isDel = r.type === 'delivery';
-                        inps[1].value = d.ok||''; inps[2].value = d.inprogress||''; inps[3].value = d.mbh||''; inps[4].value = d.missed||'';
-                        if(isDel) inps[5].value = d.claimed||'';
+                        const inps = tr.querySelectorAll('input'); 
+                        const isDel = r.type === 'delivery';
+                        
+                        // Populate with formatted strings
+                        const setVal = (idx, val) => {
+                             if(inps[idx]) inps[idx].value = val ? val.toLocaleString('id-ID') : '';
+                        };
+                        const setStr = (idx, val) => {
+                            if(inps[idx]) inps[idx].value = val || '';
+                        }
+
+                        setVal(1, d.ok); 
+                        setVal(2, d.inprogress); 
+                        setVal(3, d.mbh); 
+                        setVal(4, d.missed);
+                        
+                        if(isDel) setVal(5, d.claimed);
+                        
                         const off = isDel ? 6 : 5;
-                        inps[off].value = d.total_int||''; inps[off+1].value = d.feed_int||''; inps[off+2].value = d.total_ext||''; inps[off+3].value = d.feed_ext||'';
+                        setVal(off, d.total_int); 
+                        setStr(off+1, d.feed_int); 
+                        setVal(off+2, d.total_ext); 
+                        setStr(off+3, d.feed_ext);
+                        
                         calcRow(tr.querySelector('.sla-input').getAttribute('data-row'));
                     }
                 })
@@ -1165,11 +1225,11 @@
                         detailsHTML += `
                         <div class="grid grid-cols-12 gap-1 text-[10px] items-center border-b border-dashed border-slate-100 pb-0.5 last:border-0">
                             <div class="col-span-2 font-bold text-slate-700 truncate" title="${d.label}">${d.label}</div>
-                            <div class="col-span-2 text-right font-mono bg-blue-50 text-blue-600 rounded px-0.5">${d.total}</div>
-                            <div class="col-span-2 text-right font-mono text-green-600">${d.ok}</div>
-                            <div class="col-span-2 text-right font-mono text-slate-400">${d.inprogress}</div>
-                            <div class="col-span-2 text-right font-mono text-red-500 font-bold">${d.missed > 0 ? d.missed : '-'}</div>
-                            <div class="col-span-2 text-right font-mono text-purple-500 font-bold">${d.claimed > 0 ? d.claimed : '-'}</div>
+                            <div class="col-span-2 text-right font-mono bg-blue-50 text-blue-600 rounded px-0.5">${d.total.toLocaleString()}</div>
+                            <div class="col-span-2 text-right font-mono text-green-600">${d.ok.toLocaleString()}</div>
+                            <div class="col-span-2 text-right font-mono text-slate-400">${d.inprogress.toLocaleString()}</div>
+                            <div class="col-span-2 text-right font-mono text-red-500 font-bold">${d.missed > 0 ? d.missed.toLocaleString() : '-'}</div>
+                            <div class="col-span-2 text-right font-mono text-purple-500 font-bold">${d.claimed > 0 ? d.claimed.toLocaleString() : '-'}</div>
                         </div>`;
 
                         if(d.feed_int) feedbacks.push(`<span class="text-blue-600 font-bold text-[9px]">[In] ${d.label}:</span> ${d.feed_int}`);
@@ -1206,8 +1266,8 @@
                         <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border ${r.type==='delivery'?'bg-blue-50 text-blue-600 border-blue-100':'bg-orange-50 text-orange-600 border-orange-100'}">${r.type.substr(0,3)}</span>
                     </td>
                     <td class="p-3">${detailsHTML}</td>
-                    <td class="p-3 text-center text-xs font-bold text-blue-600">${totInt > 0 ? totInt : '-'}</td>
-                    <td class="p-3 text-center text-xs font-bold text-orange-600">${totExt > 0 ? totExt : '-'}</td>
+                    <td class="p-3 text-center text-xs font-bold text-blue-600">${totInt > 0 ? totInt.toLocaleString() : '-'}</td>
+                    <td class="p-3 text-center text-xs font-bold text-orange-600">${totExt > 0 ? totExt.toLocaleString() : '-'}</td>
                     <td class="p-3 text-[10px] text-slate-600 leading-tight">
                         ${feedbacks.length > 0 ? feedbacks.join('<br>') : '<span class="text-slate-300 italic">-</span>'}
                     </td>
