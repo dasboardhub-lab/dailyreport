@@ -225,7 +225,7 @@
                             <option value="all">All Type</option><option value="delivery">Del</option><option value="pickup">Pick</option>
                         </select>
                         <!-- Reset Button -->
-                        <button onclick="resetFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ml-2" title="Reset Filter">
+                        <button onclick="resetFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ml-2" title="Reset Filter (30 Hari Terakhir)">
                             <i class="fa-solid fa-rotate-right"></i>
                         </button>
                     </div>
@@ -663,6 +663,16 @@
             currentAdminCode = code; showNotification("Disimpan!");
         }
 
+        function getLast30Days() {
+            const end = new Date();
+            const start = new Date();
+            start.setDate(end.getDate() - 30);
+            return {
+                start: start.toISOString().split('T')[0],
+                end: end.toISOString().split('T')[0]
+            };
+        }
+
         function setupDashboardFilters() {
             const ssSet = new Set(allReports.map(r => r.kodeSS).filter(Boolean));
             const ssSel = document.getElementById('dash-filter-ss');
@@ -671,13 +681,13 @@
                 ssSel.innerHTML = '<option value="all">Semua SS</option>' + [...ssSet].map(ss => `<option value="${ss}">${ss}</option>`).join('');
                 if([...ssSet].includes(cur)) ssSel.value = cur;
             }
-            const now = new Date();
-            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+            
+            // Set Default 30 Days
+            const { start, end } = getLast30Days();
             const startIn = document.getElementById('dash-date-start');
             const endIn = document.getElementById('dash-date-end');
-            if(startIn && !startIn.value) startIn.value = firstDay;
-            if(endIn && !endIn.value) endIn.value = lastDay;
+            if(startIn && !startIn.value) startIn.value = start;
+            if(endIn && !endIn.value) endIn.value = end;
 
             ['dash-date-start', 'dash-date-end', 'dash-filter-ss', 'dash-filter-service', 'dash-filter-type'].forEach(id => {
                 const el = document.getElementById(id); if(el) el.addEventListener('change', renderDashboard);
@@ -685,11 +695,9 @@
         }
 
         window.resetFilters = () => {
-            const now = new Date();
-            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
-            document.getElementById('dash-date-start').value = firstDay;
-            document.getElementById('dash-date-end').value = lastDay;
+            const { start, end } = getLast30Days();
+            document.getElementById('dash-date-start').value = start;
+            document.getElementById('dash-date-end').value = end;
             document.getElementById('dash-filter-ss').value = 'all';
             document.getElementById('dash-filter-service').value = 'all';
             document.getElementById('dash-filter-type').value = 'all';
@@ -706,33 +714,39 @@
 
             // Separate filter for standard widgets (respects date)
             const filteredByDate = allReports.filter(r => {
-                const rDate = r.date || new Date(r.timestamp.seconds*1000).toISOString().split('T')[0];
+                let rDate;
+                if (r.date) rDate = r.date;
+                else if (r.timestamp && r.timestamp.seconds) rDate = new Date(r.timestamp.seconds*1000).toISOString().split('T')[0];
+                else rDate = new Date().toISOString().split('T')[0];
+
                 const inDate = (!start || rDate >= start) && (!end || rDate <= end);
                 const inSS = fSS === 'all' || r.kodeSS === fSS;
                 const inType = fType === 'all' || r.type === fType;
-                const inSvc = fSvc === 'all' || r.details.some(d => d.label === fSvc && d.total > 0); // Rough check
-                return inDate && inSS && inType; // Svc check inside processBreakdowns usually
+                // Check if the specific service exists in this report (Optimization)
+                const inSvc = fSvc === 'all' || r.details.some(d => d.label === fSvc && d.total > 0);
+                
+                return inDate && inSS && inType && inSvc;
             });
             
             // Separate filter for Annual Chart (Ignores Date)
             const filteredForAnnual = allReports.filter(r => {
                 const inSS = fSS === 'all' || r.kodeSS === fSS;
                 const inType = fType === 'all' || r.type === fType;
-                 // Svc check is complex for totals, usually charts aggregate all unless specific breakdown requested.
-                 // For now, respect SS and Type for Annual.
-                return inSS && inType;
+                const inSvc = fSvc === 'all' || r.details.some(d => d.label === fSvc && d.total > 0);
+                return inSS && inType && inSvc;
             });
 
-            updateKPIs(filteredByDate, fType);
-            processCharts(filteredByDate, filteredForAnnual); 
+            updateKPIs(filteredByDate, fType, fSvc);
+            processCharts(filteredByDate, filteredForAnnual, fSvc); 
             processBreakdowns(filteredByDate, fSvc, fType); 
-            processFeedback(filteredByDate);
+            processFeedback(filteredByDate, fSvc);
         }
 
-        function updateKPIs(data, filterType) {
+        function updateKPIs(data, filterType, filterSvc) {
             let total = 0, ok = 0, prog = 0, mbh = 0, miss = 0, claim = 0;
             data.forEach(r => {
                 r.details?.forEach(d => {
+                    if (filterSvc !== 'all' && d.label !== filterSvc) return;
                     total += d.total; ok += d.ok; prog += d.inprogress; mbh += d.mbh; miss += d.missed; claim += d.claimed;
                 });
             });
@@ -750,7 +764,7 @@
             document.getElementById('kpi-card-claim').style.display = isPickup ? 'none' : 'flex';
         }
 
-        function processCharts(dataByDate, dataAnnual) {
+        function processCharts(dataByDate, dataAnnual, filterSvc) {
             const chartAnnualCanvas = document.getElementById('chartAnnual');
             const chartMonthlyCanvas = document.getElementById('chartMonthly');
             if(!chartAnnualCanvas || !chartMonthlyCanvas) return;
@@ -764,10 +778,13 @@
             }
             dataAnnual.forEach(r => {
                 const dateVal = r.date ? new Date(r.date) : (r.timestamp ? new Date(r.timestamp.seconds*1000) : new Date());
-                // Only consider current year for "Annual Trend" usually, or just aggregate all if simple
                 if(dateVal.getFullYear() === new Date().getFullYear()) {
                      const m = dateVal.toLocaleString('id-ID',{month:'short'});
-                     let rTotal = 0, rOK = 0; r.details?.forEach(d => { rTotal+=d.total; rOK+=d.ok; });
+                     let rTotal = 0, rOK = 0; 
+                     r.details?.forEach(d => { 
+                         if (filterSvc !== 'all' && d.label !== filterSvc) return;
+                         rTotal+=d.total; rOK+=d.ok; 
+                     });
                      if(months[m]) { months[m].total+=rTotal; months[m].ok+=rOK; }
                 }
             });
@@ -799,28 +816,25 @@
 
             // --- Monthly Chart (Uses dataByDate - Respects Filter) ---
             const days = {};
-            // Last 30 days logic (Standard) OR based on selected range?
-            // If user selects specific range, chart usually adapts. 
-            // Current code generates last 30 days keys.
-            // Let's stick to last 30 days logic for consistency with title "Performa 30 Hari"
+            // Last 30 days logic for bucket keys (independent of data presence)
             for(let i=29; i>=0; i--) {
                 const d = new Date(); d.setDate(d.getDate()-i);
                 const k = d.toISOString().split('T')[0];
-                // Label DD/MM
                 const label = d.getDate() + '/' + (d.getMonth()+1);
                 days[k] = { label: label, total:0, ok:0 };
             }
             
-            // Map dataByDate to these 30 days buckets
-            // Note: If filter is "Yesterday", "30 Days" chart might look empty except yesterday. 
-            // If we want "30 Days" to ALWAYS show last 30 days regardless of date filter, use dataAnnual. 
-            // But usually "30 Days" chart is a specific view. 
-            // Let's use dataAnnual for this too if it implies "Last 30 Days Trend" independent of the "Daily" table filter.
-            // Actually, usually dashboard charts show broader context. Let's use dataAnnual (filtered only by Type/SS) for the 30-day chart too, to make it a true "Trend" chart.
-            
-            dataAnnual.forEach(r => { 
+            // We iterate dataByDate. Note: if the date filter is NARROWER than 30 days (e.g. today),
+            // this chart will only show bars for today, but the X-axis will still show 30 days empty slots.
+            // This is usually desired for "30 Day Performance" context.
+            dataByDate.forEach(r => { 
                 const dateStr = r.date || (r.timestamp ? new Date(r.timestamp.seconds*1000).toISOString().split('T')[0] : '');
-                if(days[dateStr]) { r.details?.forEach(d => { days[dateStr].total+=d.total; days[dateStr].ok+=d.ok; }); } 
+                if(days[dateStr]) { 
+                    r.details?.forEach(d => { 
+                        if (filterSvc !== 'all' && d.label !== filterSvc) return;
+                        days[dateStr].total+=d.total; days[dateStr].ok+=d.ok; 
+                    }); 
+                } 
             });
             
             const sortedKeys = Object.keys(days).sort();
@@ -857,9 +871,11 @@
                 const type = r.type; 
                 r.details?.forEach(d => {
                     if (filterSvc !== 'all' && d.label !== filterSvc) return;
+                    
                     if(!byService[d.label]) byService[d.label] = { total:0, ok:0, inp:0, mbh:0, miss:0, claim:0, type: type };
                     else if(byService[d.label].type !== type) byService[d.label].type = 'mixed';
                     const s = byService[d.label]; s.total+=d.total; s.ok+=d.ok; s.inp+=d.inprogress; s.mbh+=d.mbh; s.miss+=d.missed; s.claim+=d.claimed;
+                    
                     const key = `${r.kodeSS} - ${r.reporterName}`;
                     if(!byStaging[key]) byStaging[key] = { name:key, total:0, ok:0, inp:0, mbh:0, miss:0, claim:0, type: type };
                     else if(byStaging[key].type !== type) byStaging[key].type = 'mixed';
@@ -927,9 +943,10 @@
             return color;
         }
 
-        function processFeedback(data) {
+        function processFeedback(data, filterSvc) {
             const feedInt = {}, feedExt = {}; let totInt = 0, totExt = 0;
             data.forEach(r => { r.details?.forEach(d => {
+                    if (filterSvc !== 'all' && d.label !== filterSvc) return;
                     if(d.total_int > 0) totInt += d.total_int;
                     if(d.feed_int && d.feed_int.trim() !== '-' && d.feed_int.trim() !== '') { const t = d.feed_int.trim().toLowerCase(); feedInt[t] = (feedInt[t] || 0) + d.total_int; }
                     if(d.total_ext > 0) totExt += d.total_ext;
@@ -1015,14 +1032,14 @@
             let head = `<tr>
                 <th class="p-3 border-b border-slate-200 w-24">Layanan</th>
                 <th class="p-3 border-b border-slate-200 bg-blue-50 text-blue-600 w-20">Total</th>
-                <th class="p-3 border-b border-slate-200 w-16">OK</th>
-                <th class="p-3 border-b border-slate-200 text-xs text-slate-400 w-16">P</th>
-                <th class="p-3 border-b border-slate-200 text-xs text-slate-400 w-16">M</th>
-                <th class="p-3 border-b border-slate-200 text-xs text-red-500 w-16">Mis</th>
-                ${isDel?'<th class="p-3 border-b border-slate-200 text-xs w-16">Clm</th>':''}
-                <th class="p-3 border-b border-slate-200 border-l pl-2 text-xs w-16">In</th>
+                <th class="p-3 border-b border-slate-200 w-20">OK</th>
+                <th class="p-3 border-b border-slate-200 text-xs text-slate-400 w-20">P</th>
+                <th class="p-3 border-b border-slate-200 text-xs text-slate-400 w-20">M</th>
+                <th class="p-3 border-b border-slate-200 text-xs text-red-500 w-20">Mis</th>
+                ${isDel?'<th class="p-3 border-b border-slate-200 text-xs w-20">Clm</th>':''}
+                <th class="p-3 border-b border-slate-200 border-l pl-2 text-xs w-20">In</th>
                 <th class="p-3 border-b border-slate-200 text-xs w-auto">Ket</th>
-                <th class="p-3 border-b border-slate-200 text-xs w-16">Ex</th>
+                <th class="p-3 border-b border-slate-200 text-xs w-20">Ex</th>
                 <th class="p-3 border-b border-slate-200 text-xs w-auto">Ket</th>
             </tr>`;
             document.getElementById('table-header').innerHTML = head;
@@ -1031,16 +1048,16 @@
                 const rid = `row-${i}`;
                 body += `<tr data-label="${lbl}" class="border-b border-slate-100 last:border-0">
                     <td class="p-2 font-bold text-slate-600 text-xs bg-slate-50/50">${lbl}</td>
-                    <td class="p-2 total-cell input-cell"><input type="text" id="${rid}-total" readonly value="0"></td>
-                    <td class="p-2 input-cell"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
-                    <td class="p-2 input-cell"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
-                    <td class="p-2 input-cell"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
-                    <td class="p-2 input-cell"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
-                    ${isDel ? `<td class="p-2 input-cell"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>` : ''}
-                    <td class="p-2 input-cell border-l pl-2"><input type="text" oninput="formatNumberInput(this)"></td>
-                    <td class="p-2"><input type="text" class="w-full text-xs bg-transparent border-b border-slate-200 outline-none"></td>
-                    <td class="p-2 input-cell"><input type="text" oninput="formatNumberInput(this)"></td>
-                    <td class="p-2"><input type="text" class="w-full text-xs bg-transparent border-b border-slate-200 outline-none"></td>
+                    <td class="p-2 total-cell input-cell w-20"><input type="text" id="${rid}-total" readonly value="0"></td>
+                    <td class="p-2 input-cell w-20"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
+                    <td class="p-2 input-cell w-20"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
+                    <td class="p-2 input-cell w-20"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
+                    <td class="p-2 input-cell w-20"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
+                    ${isDel ? `<td class="p-2 input-cell w-20"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>` : ''}
+                    <td class="p-2 input-cell w-20 border-l pl-2"><input type="text" oninput="formatNumberInput(this)"></td>
+                    <td class="p-2 w-auto"><input type="text" class="w-full text-xs bg-transparent border-b border-slate-200 outline-none"></td>
+                    <td class="p-2 input-cell w-20"><input type="text" oninput="formatNumberInput(this)"></td>
+                    <td class="p-2 w-auto"><input type="text" class="w-full text-xs bg-transparent border-b border-slate-200 outline-none"></td>
                 </tr>`;
             });
             document.getElementById('table-body').innerHTML = body;
