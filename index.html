@@ -737,7 +737,8 @@
             });
 
             updateKPIs(filteredByDate, fType, fSvc);
-            processCharts(filteredByDate, filteredForAnnual, fSvc); 
+            // FIX: Pass start and end date to processCharts
+            processCharts(filteredByDate, filteredForAnnual, fSvc, start, end); 
             processBreakdowns(filteredByDate, fSvc, fType); 
             processFeedback(filteredByDate, fSvc);
         }
@@ -764,7 +765,8 @@
             document.getElementById('kpi-card-claim').style.display = isPickup ? 'none' : 'flex';
         }
 
-        function processCharts(dataByDate, dataAnnual, filterSvc) {
+        // FIX: Accept startDate and endDate arguments
+        function processCharts(dataByDate, dataAnnual, filterSvc, startDate, endDate) {
             const chartAnnualCanvas = document.getElementById('chartAnnual');
             const chartMonthlyCanvas = document.getElementById('chartMonthly');
             if(!chartAnnualCanvas || !chartMonthlyCanvas) return;
@@ -814,19 +816,19 @@
                 }
             });
 
-            // --- Monthly Chart (Uses dataByDate - Respects Filter) ---
+            // --- Daily Chart (Uses dataByDate - Respects Filter Range) ---
             const days = {};
-            // Last 30 days logic for bucket keys (independent of data presence)
-            for(let i=29; i>=0; i--) {
-                const d = new Date(); d.setDate(d.getDate()-i);
+            const sDate = new Date(startDate);
+            const eDate = new Date(endDate);
+            
+            // Loop from start date to end date to create buckets
+            for(let d = new Date(sDate); d <= eDate; d.setDate(d.getDate() + 1)) {
                 const k = d.toISOString().split('T')[0];
                 const label = d.getDate() + '/' + (d.getMonth()+1);
                 days[k] = { label: label, total:0, ok:0 };
             }
             
-            // We iterate dataByDate. Note: if the date filter is NARROWER than 30 days (e.g. today),
-            // this chart will only show bars for today, but the X-axis will still show 30 days empty slots.
-            // This is usually desired for "30 Day Performance" context.
+            // We iterate dataByDate.
             dataByDate.forEach(r => { 
                 const dateStr = r.date || (r.timestamp ? new Date(r.timestamp.seconds*1000).toISOString().split('T')[0] : '');
                 if(days[dateStr]) { 
