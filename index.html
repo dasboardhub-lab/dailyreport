@@ -55,18 +55,12 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
         
-        .glass-sidebar {
-            background: rgba(255, 255, 255, 0.65);
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
-            border-right: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .glass-dock {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
         }
 
         /* Input Styles iOS-like */
@@ -97,18 +91,25 @@
         .animate-scale-in { animation: scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
-        /* Sidebar Active */
-        .sidebar-active { background: #007AFF; color: white !important; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); }
-        .sidebar-active i { color: white !important; }
+        /* Sidebar/Nav Active */
+        .nav-active { 
+            background: #007AFF; 
+            color: white !important; 
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); 
+        }
+        .nav-active i { color: white !important; }
+        .nav-item:hover:not(.nav-active) {
+            background: rgba(0,0,0,0.05);
+        }
 
         /* Hide Helpers */
         .hidden { display: none !important; }
         input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
-<body class="antialiased h-screen overflow-hidden flex flex-col md:flex-row">
+<body class="antialiased min-h-screen flex flex-col">
 
-    <!-- --- LOGIN PAGE (iOS Lock Screen Vibe) --- -->
+    <!-- --- LOGIN PAGE --- -->
     <div id="login-page" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 w-full h-full bg-black/40 backdrop-blur-md">
         <div class="glass-panel w-full max-w-[340px] p-8 rounded-[32px] shadow-2xl animate-scale-in flex flex-col items-center">
             <div class="w-20 h-20 bg-gradient-to-tr from-blue-500 to-cyan-400 rounded-[22px] flex items-center justify-center mb-6 shadow-lg shadow-blue-500/30">
@@ -117,7 +118,6 @@
             <h1 class="text-2xl font-bold text-slate-800 mb-1">iReport</h1>
             <p class="text-slate-500 text-sm mb-8 font-medium">Daily Team Activity</p>
 
-            <!-- Toggle Segmented Control -->
             <div class="bg-slate-200/50 p-1 rounded-xl w-full flex mb-6 relative">
                 <div class="w-full grid grid-cols-2 relative z-10">
                     <button onclick="switchLoginTab('user')" id="tab-login-user" class="py-1.5 text-xs font-bold rounded-lg transition-all shadow-sm bg-white text-slate-800">Team</button>
@@ -128,334 +128,235 @@
             <form id="login-form" class="w-full space-y-4">
                 <input type="hidden" id="login-type" value="user">
                 <div id="login-intro-text" class="hidden"></div>
-
                 <div id="username-container">
                     <input type="text" id="username" class="ios-input w-full text-center font-medium placeholder:text-slate-400" placeholder="Username" required>
                 </div>
                 <div>
                     <input type="password" id="password" class="ios-input w-full text-center font-medium placeholder:text-slate-400" placeholder="Password" required>
                 </div>
-
                 <button type="submit" class="w-full bg-[#007AFF] hover:bg-[#0062cc] text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all mt-2">
                     Masuk
                 </button>
             </form>
-            
             <div id="login-error" class="mt-4 text-center text-red-500 text-xs font-bold hidden bg-red-50 px-3 py-2 rounded-lg">
                 <i class="fa-solid fa-circle-exclamation mr-1"></i> <span></span>
             </div>
         </div>
-        <p class="text-white/60 text-xs mt-8 font-medium tracking-wide">Designed for Logistics Team</p>
     </div>
 
 
-    <!-- --- MAIN APP (macOS Layout) --- -->
-    <div id="main-app" class="hidden w-full h-full flex flex-col md:flex-row relative">
+    <!-- --- MAIN APP (Unified Layout) --- -->
+    <div id="main-app" class="hidden flex-1 flex flex-col relative">
         
-        <!-- SIDEBAR (Desktop Only) -->
-        <aside class="hidden md:flex flex-col w-72 glass-sidebar h-full z-20 pt-8 pb-6 px-4">
-            <!-- App Header -->
-            <div class="flex items-center gap-3 px-2 mb-10">
-                <div class="w-9 h-9 bg-gradient-to-b from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-md">
+        <!-- TOP NAVIGATION BAR (Fixed) -->
+        <header class="fixed top-0 left-0 right-0 z-40 glass-nav h-20 px-4 md:px-8 flex items-center justify-between">
+            
+            <!-- Left: Logo -->
+            <div class="flex items-center gap-3 shrink-0">
+                <div class="w-10 h-10 bg-gradient-to-b from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-md">
                     <i class="fa-solid fa-chart-simple text-sm"></i>
                 </div>
-                <div class="flex flex-col">
+                <div class="hidden md:flex flex-col">
                     <span class="font-bold text-slate-800 text-lg leading-tight">iReport</span>
                     <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Dashboard Pro</span>
                 </div>
             </div>
 
-            <!-- Navigation -->
-            <nav class="flex-1 space-y-2">
-                <p class="px-3 text-[10px] font-bold text-slate-400 uppercase mb-1">Menu</p>
-                <button onclick="showTab('dashboard')" id="nav-dashboard-d" class="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 transition-all flex items-center gap-3 hover:bg-black/5 sidebar-active">
-                    <i class="fa-solid fa-table-columns w-5 text-center"></i> Dashboard
-                </button>
-                <button onclick="showTab('reports')" id="nav-reports-d" class="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 transition-all flex items-center gap-3 hover:bg-black/5">
-                    <i class="fa-solid fa-pen-to-square w-5 text-center"></i> Input Laporan
-                </button>
-                
-                <div id="admin-menu" class="hidden mt-6">
-                    <p class="px-3 text-[10px] font-bold text-slate-400 uppercase mb-2">Admin</p>
-                    <button onclick="showTab('settings')" id="nav-settings-d" class="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 transition-all flex items-center gap-3 hover:bg-black/5">
-                        <i class="fa-solid fa-users-gear w-5 text-center"></i> Manage Users
+            <!-- Center: Navigation Pills (Scrollable on Mobile) -->
+            <nav class="flex-1 flex justify-center mx-4 overflow-x-auto no-scrollbar">
+                <div class="flex items-center bg-slate-100/70 p-1 rounded-2xl border border-slate-200/50 backdrop-blur-md">
+                    <button onclick="showTab('dashboard')" id="nav-dashboard" class="nav-item nav-active px-4 py-2 rounded-xl text-xs md:text-sm font-bold text-slate-500 transition-all flex items-center gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-table-columns"></i> <span>Dashboard</span>
+                    </button>
+                    <button onclick="showTab('reports')" id="nav-reports" class="nav-item px-4 py-2 rounded-xl text-xs md:text-sm font-bold text-slate-500 transition-all flex items-center gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-pen-to-square"></i> <span>Input</span>
+                    </button>
+                    <button onclick="showTab('settings')" id="nav-settings" class="nav-item hidden px-4 py-2 rounded-xl text-xs md:text-sm font-bold text-slate-500 transition-all flex items-center gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-users-gear"></i> <span>Admin</span>
                     </button>
                 </div>
             </nav>
 
-            <!-- User Profile (Bottom) -->
-            <div class="mt-auto pt-4 border-t border-black/5">
-                <div class="bg-white/50 p-3 rounded-2xl flex items-center gap-3 border border-white/40 shadow-sm">
-                    <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs" id="avatar-initials">U</div>
-                    <div class="flex-1 overflow-hidden">
-                        <p id="user-display-name" class="text-xs font-bold text-slate-800 truncate">User</p>
-                        <p id="user-display-role" class="text-[9px] text-blue-500 font-bold uppercase">Role</p>
+            <!-- Right: User & Logout -->
+            <div class="flex items-center gap-3 shrink-0">
+                <div class="text-right hidden sm:block">
+                    <p id="user-display-name" class="text-xs font-bold text-slate-800">User</p>
+                    <p id="user-display-role" class="text-[9px] text-blue-500 font-bold uppercase">Role</p>
+                </div>
+                <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs border border-white shadow-sm" id="avatar-initials">U</div>
+                <button onclick="logout()" class="w-9 h-9 bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-full flex items-center justify-center transition-colors border border-slate-200" title="Keluar">
+                    <i class="fa-solid fa-power-off text-xs"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- CONTENT AREA (Padded Top) -->
+        <main class="flex-1 w-full max-w-6xl mx-auto pt-24 px-4 md:px-8 pb-10 animate-scale-in">
+            
+            <!-- 1. DASHBOARD TAB -->
+            <div id="tab-dashboard" class="space-y-6">
+                <!-- Greeting Card -->
+                <div class="glass-panel p-6 md:p-8 rounded-[32px] relative overflow-hidden">
+                    <div class="relative z-10">
+                        <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-1">Overview</h2>
+                        <p class="text-slate-500 text-sm">Selamat datang kembali, <span id="dashboard-greeting-name" class="text-blue-600 font-bold">User</span>.</p>
                     </div>
-                    <button onclick="logout()" class="text-slate-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl"></div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="glass-panel p-2 rounded-2xl flex flex-col md:flex-row gap-2 md:items-center overflow-x-auto">
+                    <div class="flex items-center bg-slate-100/50 rounded-xl px-3 py-1.5 gap-2 border border-slate-200/50">
+                        <i class="fa-regular fa-calendar text-slate-400 text-xs"></i>
+                        <input type="date" id="dash-date-start" class="bg-transparent text-xs font-bold text-slate-600 outline-none w-24">
+                        <span class="text-slate-300 text-xs">→</span>
+                        <input type="date" id="dash-date-end" class="bg-transparent text-xs font-bold text-slate-600 outline-none w-24">
+                    </div>
+                    <div class="h-6 w-px bg-slate-200 hidden md:block"></div>
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 md:pb-0">
+                        <select id="dash-filter-ss" class="ios-input py-1.5 px-3 text-xs font-bold bg-slate-100/50 rounded-xl min-w-[100px]"><option value="all">Semua SS</option></select>
+                        <select id="dash-filter-service" class="ios-input py-1.5 px-3 text-xs font-bold bg-slate-100/50 rounded-xl min-w-[100px]">
+                            <option value="all">All Svc</option><option value="REG">REG</option><option value="ECO">ECO</option><option value="ND">ND</option><option value="SD/SDS">SD/SDS</option><option value="BIG">BIG</option>
+                        </select>
+                        <select id="dash-filter-type" class="ios-input py-1.5 px-3 text-xs font-bold bg-slate-100/50 rounded-xl min-w-[100px]">
+                            <option value="all">All Type</option><option value="delivery">Del</option><option value="pickup">Pick</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-panel p-6 rounded-[28px] h-72 flex flex-col">
+                        <h3 class="text-sm font-bold text-slate-800 mb-4">Tren Tahunan</h3>
+                        <div class="flex-1 w-full"><canvas id="chartAnnual"></canvas></div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-[28px] h-72 flex flex-col">
+                        <h3 class="text-sm font-bold text-slate-800 mb-4">Performa 30 Hari</h3>
+                        <div class="flex-1 w-full"><canvas id="chartMonthly"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Tables -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-panel rounded-[28px] overflow-hidden flex flex-col">
+                        <div class="p-5 border-b border-black/5 bg-slate-50/30">
+                            <h3 class="text-sm font-bold text-slate-800">Staging Performance</h3>
+                        </div>
+                        <div class="overflow-x-auto p-2">
+                            <table class="w-full text-xs text-left border-collapse">
+                                <thead class="text-slate-400 font-semibold border-b border-black/5">
+                                    <tr><th class="p-2 pl-4">SS</th><th class="p-2 text-right">Vol</th><th class="p-2 text-center">SLA</th><th class="p-2 text-right">M</th><th class="p-2 text-right pr-4">C</th></tr>
+                                </thead>
+                                <tbody id="body-breakdown-staging" class="divide-y divide-black/5"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="glass-panel rounded-[28px] overflow-hidden flex flex-col">
+                        <div class="p-5 border-b border-black/5 bg-slate-50/30">
+                            <h3 class="text-sm font-bold text-slate-800">Service Breakdown</h3>
+                        </div>
+                        <div class="overflow-x-auto p-2">
+                            <table class="w-full text-xs text-left border-collapse">
+                                <thead class="text-slate-400 font-semibold border-b border-black/5">
+                                    <tr><th class="p-2 pl-4">Svc</th><th class="p-2 text-right">Vol</th><th class="p-2 text-center">SLA</th><th class="p-2 text-right">M</th><th class="p-2 text-right pr-4">C</th></tr>
+                                </thead>
+                                <tbody id="body-breakdown-service" class="divide-y divide-black/5"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                <div class="glass-panel p-6 rounded-[28px]">
+                    <h3 class="text-sm font-bold text-slate-800 mb-4">Feedback Issues</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-blue-50/50 rounded-2xl p-4 border border-blue-100/50">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-blue-600">INTERNAL</span>
+                                <span id="feedback-total-int" class="font-bold text-lg text-blue-700">0</span>
+                            </div>
+                            <ul id="feedback-list-int" class="text-xs space-y-1 max-h-32 overflow-y-auto no-scrollbar"></ul>
+                        </div>
+                        <div class="bg-orange-50/50 rounded-2xl p-4 border border-orange-100/50">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-orange-600">EXTERNAL</span>
+                                <span id="feedback-total-ext" class="font-bold text-lg text-orange-700">0</span>
+                            </div>
+                            <ul id="feedback-list-ext" class="text-xs space-y-1 max-h-32 overflow-y-auto no-scrollbar"></ul>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </aside>
 
-        <!-- CONTENT AREA -->
-        <main class="flex-1 h-full overflow-y-auto overflow-x-hidden relative scroll-smooth no-scrollbar">
-            <!-- Mobile Header (Glass Sticky) -->
-            <header class="md:hidden sticky top-0 z-30 glass-dock px-5 py-4 flex justify-between items-center mb-2">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white"><i class="fa-solid fa-chart-pie text-xs"></i></div>
-                    <h1 class="font-bold text-lg text-slate-800">iReport</h1>
-                </div>
-                <div class="flex items-center gap-3">
-                    <div class="text-right">
-                        <p class="text-[10px] font-bold text-slate-800" id="user-display-name-m">User</p>
-                        <p class="text-[8px] font-bold text-blue-500 uppercase" id="user-display-role-m">Role</p>
+            <!-- 2. REPORTS TAB -->
+            <div id="tab-reports" class="hidden space-y-6">
+                <div class="glass-panel rounded-[32px] p-6 md:p-8 relative">
+                     <div id="edit-mode-indicator" class="hidden absolute top-0 left-0 right-0 bg-yellow-400 text-white text-center py-1 text-xs font-bold rounded-t-[32px]">
+                        Mode Edit <button onclick="cancelEditMode()" class="ml-2 underline">Batal</button>
                     </div>
-                    <button onclick="logout()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-power-off text-xs"></i></button>
-                </div>
-            </header>
-
-            <div class="max-w-6xl mx-auto p-4 md:p-10 pb-28 md:pb-10 animate-scale-in">
-                
-                <!-- 1. DASHBOARD TAB -->
-                <div id="tab-dashboard" class="space-y-6">
-                    <!-- Greeting Card -->
-                    <div class="glass-panel p-6 md:p-8 rounded-[32px] relative overflow-hidden">
-                        <div class="relative z-10">
-                            <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-1">Overview</h2>
-                            <p class="text-slate-500 text-sm">Selamat datang kembali, <span id="dashboard-greeting-name" class="text-blue-600 font-bold">User</span>.</p>
-                        </div>
-                        <!-- Abstract Blob -->
-                        <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl"></div>
+                    <div class="flex justify-between items-center mb-6 mt-2">
+                        <h2 class="text-xl font-bold text-slate-800">Input Laporan</h2>
                     </div>
-
-                    <!-- Filter Bar (Floating Pill) -->
-                    <div class="glass-panel p-2 rounded-2xl flex flex-col md:flex-row gap-2 md:items-center overflow-x-auto">
-                        <div class="flex items-center bg-slate-100/50 rounded-xl px-3 py-1.5 gap-2 border border-slate-200/50">
-                            <i class="fa-regular fa-calendar text-slate-400 text-xs"></i>
-                            <input type="date" id="dash-date-start" class="bg-transparent text-xs font-bold text-slate-600 outline-none w-24">
-                            <span class="text-slate-300 text-xs">→</span>
-                            <input type="date" id="dash-date-end" class="bg-transparent text-xs font-bold text-slate-600 outline-none w-24">
-                        </div>
-                        <div class="h-6 w-px bg-slate-200 hidden md:block"></div>
-                        <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 md:pb-0">
-                            <select id="dash-filter-ss" class="ios-input py-1.5 px-3 text-xs font-bold bg-slate-100/50 rounded-xl min-w-[100px]"><option value="all">Semua SS</option></select>
-                            <select id="dash-filter-service" class="ios-input py-1.5 px-3 text-xs font-bold bg-slate-100/50 rounded-xl min-w-[100px]">
-                                <option value="all">All Svc</option><option value="REG">REG</option><option value="ECO">ECO</option><option value="ND">ND</option><option value="SD/SDS">SD/SDS</option><option value="BIG">BIG</option>
-                            </select>
-                            <select id="dash-filter-type" class="ios-input py-1.5 px-3 text-xs font-bold bg-slate-100/50 rounded-xl min-w-[100px]">
-                                <option value="all">All Type</option><option value="delivery">Del</option><option value="pickup">Pick</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Charts Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="glass-panel p-6 rounded-[28px] h-72 flex flex-col">
-                            <h3 class="text-sm font-bold text-slate-800 mb-4">Tren Tahunan</h3>
-                            <div class="flex-1 w-full"><canvas id="chartAnnual"></canvas></div>
-                        </div>
-                        <div class="glass-panel p-6 rounded-[28px] h-72 flex flex-col">
-                            <h3 class="text-sm font-bold text-slate-800 mb-4">Performa 30 Hari</h3>
-                            <div class="flex-1 w-full"><canvas id="chartMonthly"></canvas></div>
-                        </div>
-                    </div>
-
-                    <!-- Tables -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="glass-panel rounded-[28px] overflow-hidden flex flex-col">
-                            <div class="p-5 border-b border-black/5 bg-slate-50/30">
-                                <h3 class="text-sm font-bold text-slate-800">Staging Performance</h3>
-                            </div>
-                            <div class="overflow-x-auto p-2">
-                                <table class="w-full text-xs text-left border-collapse">
-                                    <thead class="text-slate-400 font-semibold border-b border-black/5">
-                                        <tr><th class="p-2 pl-4">SS</th><th class="p-2 text-right">Vol</th><th class="p-2 text-center">SLA</th><th class="p-2 text-right">M</th><th class="p-2 text-right pr-4">C</th></tr>
-                                    </thead>
-                                    <tbody id="body-breakdown-staging" class="divide-y divide-black/5"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="glass-panel rounded-[28px] overflow-hidden flex flex-col">
-                            <div class="p-5 border-b border-black/5 bg-slate-50/30">
-                                <h3 class="text-sm font-bold text-slate-800">Service Breakdown</h3>
-                            </div>
-                            <div class="overflow-x-auto p-2">
-                                <table class="w-full text-xs text-left border-collapse">
-                                    <thead class="text-slate-400 font-semibold border-b border-black/5">
-                                        <tr><th class="p-2 pl-4">Svc</th><th class="p-2 text-right">Vol</th><th class="p-2 text-center">SLA</th><th class="p-2 text-right">M</th><th class="p-2 text-right pr-4">C</th></tr>
-                                    </thead>
-                                    <tbody id="body-breakdown-service" class="divide-y divide-black/5"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Feedback -->
-                    <div class="glass-panel p-6 rounded-[28px]">
-                        <h3 class="text-sm font-bold text-slate-800 mb-4">Feedback Issues</h3>
+                    <form id="report-form" class="space-y-6">
+                        <input type="hidden" id="report-id-hidden">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="bg-blue-50/50 rounded-2xl p-4 border border-blue-100/50">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-xs font-bold text-blue-600">INTERNAL</span>
-                                    <span id="feedback-total-int" class="font-bold text-lg text-blue-700">0</span>
+                            <div class="bg-white/40 p-4 rounded-2xl border border-white/50">
+                                <label class="block text-xs font-bold text-slate-400 uppercase mb-2 ml-1">Tanggal & Tipe</label>
+                                <div class="flex gap-2">
+                                    <input type="date" id="input-date" class="ios-input w-full font-bold text-slate-700">
+                                    <select id="input-type" onchange="renderInputTable()" class="ios-input w-full font-bold text-slate-700"><option value="delivery">Delivery</option><option value="pickup">Pickup</option></select>
                                 </div>
-                                <ul id="feedback-list-int" class="text-xs space-y-1 max-h-32 overflow-y-auto no-scrollbar"></ul>
                             </div>
-                            <div class="bg-orange-50/50 rounded-2xl p-4 border border-orange-100/50">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-xs font-bold text-orange-600">EXTERNAL</span>
-                                    <span id="feedback-total-ext" class="font-bold text-lg text-orange-700">0</span>
+                            <div class="bg-white/40 p-4 rounded-2xl border border-white/50">
+                                <div id="admin-user-select-container" class="hidden mb-2">
+                                    <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1 ml-1">Pilih User (Admin)</label>
+                                    <select id="input-admin-select-user" onchange="updateReporterInfo()" class="ios-input w-full text-xs"><option value="">-- Pilih --</option></select>
                                 </div>
-                                <ul id="feedback-list-ext" class="text-xs space-y-1 max-h-32 overflow-y-auto no-scrollbar"></ul>
+                                <div id="leader-user-info" class="flex gap-2">
+                                    <div class="w-full"><label class="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">PIC</label><input type="text" id="input-pic-name" class="ios-input w-full text-slate-600 font-bold bg-slate-100/50" readonly><input type="hidden" id="input-pic-id"></div>
+                                    <div class="w-24 shrink-0"><label class="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">SS</label><input type="text" id="input-kode-ss" class="ios-input w-full text-slate-600 font-bold bg-slate-100/50 text-center" readonly></div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                        <div class="bg-white/50 rounded-2xl overflow-hidden border border-white/60 shadow-sm">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm border-collapse"><thead id="table-header" class="bg-slate-50/50 text-slate-500 font-bold text-xs uppercase text-center border-b border-slate-200"></thead><tbody id="table-body" class="divide-y divide-slate-100"></tbody></table>
+                            </div>
+                        </div>
+                        <button type="submit" id="btn-submit-report" class="w-full bg-[#007AFF] hover:bg-[#0062cc] text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all"><span id="btn-submit-text">Simpan Laporan</span></button>
+                    </form>
                 </div>
-
-                <!-- 2. REPORTS TAB -->
-                <div id="tab-reports" class="hidden space-y-6">
-                    <div class="glass-panel rounded-[32px] p-6 md:p-8 relative">
-                         <div id="edit-mode-indicator" class="hidden absolute top-0 left-0 right-0 bg-yellow-400 text-white text-center py-1 text-xs font-bold rounded-t-[32px]">
-                            Mode Edit <button onclick="cancelEditMode()" class="ml-2 underline">Batal</button>
-                        </div>
-                        
-                        <div class="flex justify-between items-center mb-6 mt-2">
-                            <h2 class="text-xl font-bold text-slate-800">Input Laporan</h2>
-                        </div>
-
-                        <form id="report-form" class="space-y-6">
-                            <input type="hidden" id="report-id-hidden">
-                            
-                            <!-- Form Cards -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="bg-white/40 p-4 rounded-2xl border border-white/50">
-                                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2 ml-1">Tanggal & Tipe</label>
-                                    <div class="flex gap-2">
-                                        <input type="date" id="input-date" class="ios-input w-full font-bold text-slate-700">
-                                        <select id="input-type" onchange="renderInputTable()" class="ios-input w-full font-bold text-slate-700">
-                                            <option value="delivery">Delivery</option><option value="pickup">Pickup</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div class="bg-white/40 p-4 rounded-2xl border border-white/50">
-                                    <!-- Admin Selector -->
-                                    <div id="admin-user-select-container" class="hidden mb-2">
-                                        <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1 ml-1">Pilih User (Admin)</label>
-                                        <select id="input-admin-select-user" onchange="updateReporterInfo()" class="ios-input w-full text-xs"><option value="">-- Pilih --</option></select>
-                                    </div>
-                                    
-                                    <div id="leader-user-info" class="flex gap-2">
-                                        <div class="w-full">
-                                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">PIC</label>
-                                            <input type="text" id="input-pic-name" class="ios-input w-full text-slate-600 font-bold bg-slate-100/50" readonly>
-                                            <input type="hidden" id="input-pic-id">
-                                        </div>
-                                        <div class="w-24 shrink-0">
-                                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">SS</label>
-                                            <input type="text" id="input-kode-ss" class="ios-input w-full text-slate-600 font-bold bg-slate-100/50 text-center" readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Table Container -->
-                            <div class="bg-white/50 rounded-2xl overflow-hidden border border-white/60 shadow-sm">
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-sm border-collapse">
-                                        <thead id="table-header" class="bg-slate-50/50 text-slate-500 font-bold text-xs uppercase text-center border-b border-slate-200"></thead>
-                                        <tbody id="table-body" class="divide-y divide-slate-100"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <button type="submit" id="btn-submit-report" class="w-full bg-[#007AFF] hover:bg-[#0062cc] text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all">
-                                <span id="btn-submit-text">Simpan Laporan</span>
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- History List -->
-                    <div class="glass-panel rounded-[32px] p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-sm font-bold text-slate-800">Riwayat Terkini</h3>
-                            <select id="filter-user" class="ios-input py-1 px-3 text-xs font-bold"><option value="all">Semua</option></select>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead class="text-slate-400 text-[10px] uppercase font-bold border-b border-black/5">
-                                    <tr><th class="p-3">Tgl</th><th class="p-3">User</th><th class="p-3">Tipe</th><th class="p-3">Vol</th><th class="p-3 text-center">Aksi</th></tr>
-                                </thead>
-                                <tbody id="reports-table-body" class="text-xs font-medium divide-y divide-black/5"></tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div class="glass-panel rounded-[32px] p-6">
+                    <div class="flex justify-between items-center mb-4"><h3 class="text-sm font-bold text-slate-800">Riwayat Terkini</h3><select id="filter-user" class="ios-input py-1 px-3 text-xs font-bold"><option value="all">Semua</option></select></div>
+                    <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead class="text-slate-400 text-[10px] uppercase font-bold border-b border-black/5"><tr><th class="p-3">Tgl</th><th class="p-3">User</th><th class="p-3">Tipe</th><th class="p-3">Vol</th><th class="p-3 text-center">Aksi</th></tr></thead><tbody id="reports-table-body" class="text-xs font-medium divide-y divide-black/5"></tbody></table></div>
                 </div>
-
-                <!-- 3. SETTINGS TAB -->
-                <div id="tab-settings" class="hidden space-y-6">
-                    <div class="glass-panel p-6 rounded-[32px] flex flex-col md:flex-row gap-4 items-end">
-                        <div class="w-full">
-                            <label class="text-xs font-bold text-slate-500 uppercase ml-1">Security Code</label>
-                            <input type="text" id="setting-admin-code" class="ios-input w-full mt-1 text-center font-mono tracking-[4px] text-lg font-bold text-slate-700" placeholder="••••••">
-                        </div>
-                        <button onclick="saveGlobalSettings()" class="bg-slate-800 text-white font-bold py-3 px-6 rounded-2xl text-sm w-full md:w-auto">Save</button>
-                    </div>
-
-                    <div class="glass-panel rounded-[32px] overflow-hidden flex flex-col">
-                        <div class="p-5 border-b border-black/5 bg-slate-50/30 flex justify-between items-center">
-                            <h3 class="text-sm font-bold text-slate-800">Team Users</h3>
-                            <button onclick="prepareAddUser()" class="bg-[#007AFF] text-white p-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-plus"></i></button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead class="text-slate-400 text-xs font-bold bg-slate-50/50">
-                                    <tr><th class="p-4">Nama</th><th class="p-4">Role</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Edit</th></tr>
-                                </thead>
-                                <tbody id="users-table-body" class="divide-y divide-black/5 text-xs"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
             </div>
-        </main>
 
-        <!-- FLOATING BOTTOM DOCK (Mobile Only) -->
-        <nav class="md:hidden fixed bottom-6 left-4 right-4 h-16 glass-dock rounded-full flex items-center justify-around z-40 px-2 animate-scale-in">
-            <button onclick="showTab('dashboard')" id="nav-dashboard-m" class="flex flex-col items-center justify-center w-14 h-full text-[#007AFF]">
-                <i class="fa-solid fa-table-columns text-xl mb-0.5"></i>
-            </button>
-            <button onclick="showTab('reports')" id="nav-reports-m" class="flex flex-col items-center justify-center w-14 h-full text-slate-400">
-                <i class="fa-solid fa-pen-to-square text-xl mb-0.5"></i>
-            </button>
-            <button onclick="showTab('settings')" id="nav-settings-m" class="flex flex-col items-center justify-center w-14 h-full text-slate-400 hidden" id="mobile-settings-btn">
-                <i class="fa-solid fa-users-gear text-xl mb-0.5"></i>
-            </button>
-        </nav>
+            <!-- 3. SETTINGS TAB -->
+            <div id="tab-settings" class="hidden space-y-6">
+                <div class="glass-panel p-6 rounded-[32px] flex flex-col md:flex-row gap-4 items-end">
+                    <div class="w-full"><label class="text-xs font-bold text-slate-500 uppercase ml-1">Security Code</label><input type="text" id="setting-admin-code" class="ios-input w-full mt-1 text-center font-mono tracking-[4px] text-lg font-bold text-slate-700" placeholder="••••••"></div>
+                    <button onclick="saveGlobalSettings()" class="bg-slate-800 text-white font-bold py-3 px-6 rounded-2xl text-sm w-full md:w-auto">Save</button>
+                </div>
+                <div class="glass-panel rounded-[32px] overflow-hidden flex flex-col">
+                    <div class="p-5 border-b border-black/5 bg-slate-50/30 flex justify-between items-center"><h3 class="text-sm font-bold text-slate-800">Team Users</h3><button onclick="prepareAddUser()" class="bg-[#007AFF] text-white p-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-plus"></i></button></div>
+                    <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-slate-400 text-xs font-bold bg-slate-50/50"><tr><th class="p-4">Nama</th><th class="p-4">Role</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Edit</th></tr></thead><tbody id="users-table-body" class="divide-y divide-black/5 text-xs"></tbody></table></div>
+                </div>
+            </div>
+
+        </main>
     </div>
 
     <!-- MODALS (iOS Dialog Style) -->
     <div id="modal-add-user" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
         <div class="bg-white/90 backdrop-blur-xl w-full max-w-sm rounded-[24px] p-6 shadow-2xl animate-scale-in">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="modal-title" class="font-bold text-lg">User Baru</h3>
-                <button onclick="closeAddUserModal()" class="w-8 h-8 bg-slate-200 rounded-full text-slate-500"><i class="fa-solid fa-xmark"></i></button>
-            </div>
+            <div class="flex justify-between items-center mb-4"><h3 id="modal-title" class="font-bold text-lg">User Baru</h3><button onclick="closeAddUserModal()" class="w-8 h-8 bg-slate-200 rounded-full text-slate-500"><i class="fa-solid fa-xmark"></i></button></div>
             <form id="add-user-form" class="space-y-3">
                 <input type="hidden" id="edit-user-id">
-                <div class="grid grid-cols-2 gap-3">
-                    <select id="new-role" onchange="toggleFormFields()" class="ios-input w-full text-xs font-bold"><option value="leader">Leader</option><option value="coordinator">Coordinator</option></select>
-                    <select id="new-account-status" class="ios-input w-full text-xs font-bold"><option value="active">Active</option><option value="inactive">Inactive</option></select>
-                </div>
+                <div class="grid grid-cols-2 gap-3"><select id="new-role" onchange="toggleFormFields()" class="ios-input w-full text-xs font-bold"><option value="leader">Leader</option><option value="coordinator">Coordinator</option></select><select id="new-account-status" class="ios-input w-full text-xs font-bold"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
                 <input type="text" id="new-name" class="ios-input w-full font-bold" placeholder="Nama Lengkap" required>
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="new-username" class="ios-input w-full" placeholder="Username" required>
-                    <input type="text" id="new-password" class="ios-input w-full" placeholder="Password" required>
-                </div>
-                <div id="leader-fields" class="grid grid-cols-2 gap-3">
-                    <input type="text" id="new-kode-ss" class="ios-input w-full" placeholder="Kode SS">
-                    <input type="text" id="new-kota" class="ios-input w-full" placeholder="Kota">
-                </div>
+                <div class="grid grid-cols-2 gap-3"><input type="text" id="new-username" class="ios-input w-full" placeholder="Username" required><input type="text" id="new-password" class="ios-input w-full" placeholder="Password" required></div>
+                <div id="leader-fields" class="grid grid-cols-2 gap-3"><input type="text" id="new-kode-ss" class="ios-input w-full" placeholder="Kode SS"><input type="text" id="new-kota" class="ios-input w-full" placeholder="Kota"></div>
                 <button type="submit" class="w-full bg-[#007AFF] text-white font-bold py-3 rounded-xl mt-2">Simpan</button>
             </form>
         </div>
@@ -464,31 +365,22 @@
     <!-- Auth & Confirm -->
     <div id="modal-auth-code" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
         <div class="bg-white/90 backdrop-blur-xl w-full max-w-xs rounded-[24px] p-6 shadow-2xl text-center animate-scale-in">
-            <h3 class="font-bold text-lg mb-1">Security Check</h3>
-            <p class="text-xs text-slate-500 mb-4">Masukkan kode admin.</p>
-            <input type="password" id="auth-code-input" class="ios-input w-full text-center tracking-[4px] text-lg font-bold mb-4" placeholder="••••••">
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="closeAuthModal()" class="py-2.5 bg-slate-200 rounded-xl font-bold text-xs text-slate-600">Batal</button>
-                <button onclick="verifyAuthCode()" class="py-2.5 bg-[#007AFF] text-white rounded-xl font-bold text-xs">Verifikasi</button>
-            </div>
+            <h3 class="font-bold text-lg mb-1">Security Check</h3><p class="text-xs text-slate-500 mb-4">Masukkan kode admin.</p><input type="password" id="auth-code-input" class="ios-input w-full text-center tracking-[4px] text-lg font-bold mb-4" placeholder="••••••">
+            <div class="grid grid-cols-2 gap-3"><button onclick="closeAuthModal()" class="py-2.5 bg-slate-200 rounded-xl font-bold text-xs text-slate-600">Batal</button><button onclick="verifyAuthCode()" class="py-2.5 bg-[#007AFF] text-white rounded-xl font-bold text-xs">Verifikasi</button></div>
         </div>
     </div>
     
     <div id="modal-confirm-delete" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
         <div class="bg-white/90 backdrop-blur-xl w-full max-w-xs rounded-[24px] p-6 shadow-2xl text-center animate-scale-in">
             <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 text-red-500 text-xl"><i class="fa-solid fa-trash-can"></i></div>
-            <h3 class="font-bold text-lg mb-1">Hapus Data?</h3>
-            <p id="delete-confirmation-text" class="text-xs text-slate-500 mb-4">Tindakan ini permanen.</p>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="closeDeleteModal()" class="py-2.5 bg-slate-200 rounded-xl font-bold text-xs text-slate-600">Batal</button>
-                <button onclick="executeDelete()" class="py-2.5 bg-red-500 text-white rounded-xl font-bold text-xs">Hapus</button>
-            </div>
+            <h3 class="font-bold text-lg mb-1">Hapus Data?</h3><p id="delete-confirmation-text" class="text-xs text-slate-500 mb-4">Tindakan ini permanen.</p>
+            <div class="grid grid-cols-2 gap-3"><button onclick="closeDeleteModal()" class="py-2.5 bg-slate-200 rounded-xl font-bold text-xs text-slate-600">Batal</button><button onclick="executeDelete()" class="py-2.5 bg-red-500 text-white rounded-xl font-bold text-xs">Hapus</button></div>
         </div>
     </div>
 
-    <div id="toast-container" class="fixed top-6 right-1/2 translate-x-1/2 md:translate-x-0 md:right-6 z-[100] flex flex-col gap-2 w-max max-w-[90%]"></div>
+    <div id="toast-container" class="fixed top-24 right-1/2 translate-x-1/2 md:translate-x-0 md:right-6 z-[100] flex flex-col gap-2 w-max max-w-[90%]"></div>
 
-    <!-- JAVASCRIPT LOGIC (100% IDENTICAL) -->
+    <!-- JAVASCRIPT LOGIC (Updated for Top Nav) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -568,15 +460,13 @@
             document.getElementById('login-page').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             document.getElementById('user-display-name').textContent = currentUser.name;
-            document.getElementById('user-display-name-m').textContent = currentUser.name;
             document.getElementById('dashboard-greeting-name').textContent = currentUser.name;
             document.getElementById('user-display-role').textContent = currentUser.role;
-            document.getElementById('user-display-role-m').textContent = currentUser.role;
             document.getElementById('avatar-initials').textContent = currentUser.name.charAt(0).toUpperCase();
 
             if(currentUser.role === 'coordinator') {
-                document.getElementById('admin-menu').classList.remove('hidden');
-                document.getElementById('mobile-settings-btn').classList.remove('hidden');
+                document.getElementById('nav-settings').classList.remove('hidden');
+                document.getElementById('nav-settings').classList.add('flex');
             }
             
             fetchGlobalSettings(); listenToReports();
@@ -979,38 +869,10 @@
             const tabs = ['dashboard', 'reports', 'settings'];
             tabs.forEach(x => {
                 document.getElementById('tab-' + x).classList.add('hidden');
-                
-                // Desktop Sidebar Reset
-                const dNav = document.getElementById('nav-' + x + '-d');
-                if (dNav) {
-                    dNav.classList.remove('sidebar-active');
-                    dNav.classList.add('text-slate-600', 'hover:bg-black/5');
-                }
-
-                // Mobile Dock Reset
-                const mNav = document.getElementById('nav-' + x + '-m');
-                if (mNav) {
-                    mNav.classList.remove('text-[#007AFF]');
-                    mNav.classList.add('text-slate-400');
-                }
+                document.getElementById('nav-' + x).classList.remove('nav-active');
             });
-
-            // Activate Target
             document.getElementById('tab-' + t).classList.remove('hidden');
-            
-            // Desktop Sidebar Active
-            const activeD = document.getElementById('nav-' + t + '-d');
-            if (activeD) {
-                activeD.classList.remove('text-slate-600', 'hover:bg-black/5');
-                activeD.classList.add('sidebar-active');
-            }
-
-            // Mobile Dock Active
-            const activeM = document.getElementById('nav-' + t + '-m');
-            if (activeM) {
-                activeM.classList.remove('text-slate-400');
-                activeM.classList.add('text-[#007AFF]');
-            }
+            document.getElementById('nav-' + t).classList.add('nav-active');
         }
 
         switchLoginTab('user');
