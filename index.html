@@ -39,79 +39,33 @@
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background: #F2F2F7; /* Apple System Gray 6 */
+            background: #F2F2F7;
             background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
             background-attachment: fixed;
             background-size: cover;
             color: #1C1C1E;
             -webkit-tap-highlight-color: transparent;
         }
-
-        /* Glassmorphism Utilities */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-        
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
-        }
-
-        /* Input Styles iOS-like */
-        .ios-input {
-            background: rgba(118, 118, 128, 0.12);
-            border: none;
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-size: 15px;
-            transition: background 0.2s;
-        }
+        .glass-panel { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        .glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-bottom: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03); }
+        .ios-input { background: rgba(118, 118, 128, 0.12); border: none; border-radius: 10px; padding: 10px 14px; font-size: 15px; transition: background 0.2s; }
         .ios-input:focus { background: rgba(118, 118, 128, 0.2); outline: none; }
         .ios-input:disabled, .ios-input[readonly] { background: rgba(118, 118, 128, 0.05); color: #9ca3af; cursor: not-allowed; }
-        
-        /* Table Input */
-        .input-cell input { 
-            width: 100%; text-align: center; 
-            background: transparent; border: none;
-            border-radius: 6px; padding: 6px; font-size: 0.95rem; font-weight: 600; 
-        }
+        .input-cell input { width: 100%; text-align: center; background: transparent; border: none; border-radius: 6px; padding: 6px; font-size: 0.95rem; font-weight: 600; }
         .input-cell input:focus { background: rgba(0, 122, 255, 0.1); color: #007AFF; outline: none; }
         .total-cell input { font-weight: 800; color: #007AFF; }
-
-        /* Scrollbar Hide */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* Animation */
         .animate-scale-in { animation: scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-        /* Sidebar/Nav Active */
-        .nav-active { 
-            background: #007AFF; 
-            color: white !important; 
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); 
-        }
+        .nav-active { background: #007AFF; color: white !important; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); }
         .nav-active i { color: white !important; }
-        .nav-item:hover:not(.nav-active) {
-            background: rgba(0,0,0,0.05);
-        }
-
+        .nav-item:hover:not(.nav-active) { background: rgba(0,0,0,0.05); }
         .hidden { display: none !important; }
         input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        
-        /* KPI Card Hover */
         .kpi-card { transition: transform 0.2s; }
         .kpi-card:hover { transform: translateY(-2px); }
-
-        /* Custom Widths for Dashboard Table - Equal Widths */
-        .col-metric { width: 11%; text-align: right; } 
+        .col-metric { width: 11%; text-align: right; }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col">
@@ -193,7 +147,7 @@
             </div>
         </header>
 
-        <!-- CONTENT AREA (SUPER WIDE) -->
+        <!-- CONTENT AREA -->
         <main class="flex-1 w-full max-w-[1920px] mx-auto pt-24 px-4 md:px-8 lg:px-12 pb-10 animate-scale-in">
             
             <!-- 1. DASHBOARD TAB -->
@@ -224,49 +178,40 @@
                         <select id="dash-filter-type" class="ios-input py-1.5 px-3 text-xs font-bold bg-slate-100/50 rounded-xl min-w-[100px]">
                             <option value="all">All Type</option><option value="delivery">Del</option><option value="pickup">Pick</option>
                         </select>
-                        <!-- Reset Button -->
-                        <button onclick="resetFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ml-2" title="Reset Filter (30 Hari Terakhir)">
-                            <i class="fa-solid fa-rotate-right"></i>
-                        </button>
+                        <button onclick="resetFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ml-2" title="Reset Filter (30 Hari Terakhir)"><i class="fa-solid fa-rotate-right"></i></button>
                     </div>
                 </div>
 
                 <!-- KPI CARDS GRID -->
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    <!-- Total -->
                     <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
                         <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-layer-group"></i></div>
                         <div><p class="text-xs font-bold text-slate-400 uppercase">Total</p><h3 id="kpi-val-total" class="text-2xl font-bold text-slate-800">0</h3></div>
                     </div>
-                    <!-- OK -->
                     <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
                         <div class="absolute top-4 right-4 bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-full" id="kpi-badge-ok">0%</div>
                         <div class="w-10 h-10 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-check-circle"></i></div>
                         <div><p class="text-xs font-bold text-slate-400 uppercase">OK</p><h3 id="kpi-val-ok" class="text-2xl font-bold text-slate-800">0</h3></div>
                     </div>
-                    <!-- Inprogress -->
                     <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
                         <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-spinner"></i></div>
                         <div><p class="text-xs font-bold text-slate-400 uppercase">Inprog</p><h3 id="kpi-val-prog" class="text-2xl font-bold text-slate-800">0</h3></div>
                     </div>
-                    <!-- MBH -->
                     <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
                         <div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-hourglass-half"></i></div>
                         <div><p class="text-xs font-bold text-slate-400 uppercase">MBH</p><h3 id="kpi-val-mbh" class="text-2xl font-bold text-slate-800">0</h3></div>
                     </div>
-                    <!-- Missed -->
                     <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
                         <div class="w-10 h-10 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-circle-xmark"></i></div>
                         <div><p class="text-xs font-bold text-slate-400 uppercase">Missed</p><h3 id="kpi-val-miss" class="text-2xl font-bold text-red-600">0</h3></div>
                     </div>
-                    <!-- Claimed -->
                     <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative" id="kpi-card-claim">
                         <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-file-invoice-dollar"></i></div>
                         <div><p class="text-xs font-bold text-slate-400 uppercase">Claim</p><h3 id="kpi-val-claim" class="text-2xl font-bold text-slate-800">0</h3></div>
                     </div>
                 </div>
 
-                <!-- Charts (Full Width) -->
+                <!-- Charts -->
                 <div class="space-y-6">
                     <div class="glass-panel p-6 md:p-8 rounded-[32px] h-[400px] flex flex-col">
                         <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2"><i class="fa-regular fa-calendar text-blue-500"></i> Tren Tahunan</h3>
@@ -278,7 +223,7 @@
                     </div>
                 </div>
 
-                <!-- Tables (Full Columns + Total Footer) -->
+                <!-- Tables -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="glass-panel rounded-[28px] overflow-hidden flex flex-col">
                         <div class="p-5 border-b border-black/5 bg-slate-50/30">
@@ -333,38 +278,38 @@
                     <h3 class="text-sm font-bold text-slate-800 mb-4">Feedback Issues</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="bg-blue-50/50 rounded-2xl p-4 border border-blue-100/50">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs font-bold text-blue-600">INTERNAL</span>
-                                <span id="feedback-total-int" class="font-bold text-lg text-blue-700">0</span>
-                            </div>
+                            <div class="flex justify-between items-center mb-2"><span class="text-xs font-bold text-blue-600">INTERNAL</span><span id="feedback-total-int" class="font-bold text-lg text-blue-700">0</span></div>
                             <ul id="feedback-list-int" class="text-xs space-y-1 max-h-32 overflow-y-auto no-scrollbar"></ul>
                         </div>
                         <div class="bg-orange-50/50 rounded-2xl p-4 border border-orange-100/50">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs font-bold text-orange-600">EXTERNAL</span>
-                                <span id="feedback-total-ext" class="font-bold text-lg text-orange-700">0</span>
-                            </div>
+                            <div class="flex justify-between items-center mb-2"><span class="text-xs font-bold text-orange-600">EXTERNAL</span><span id="feedback-total-ext" class="font-bold text-lg text-orange-700">0</span></div>
                             <ul id="feedback-list-ext" class="text-xs space-y-1 max-h-32 overflow-y-auto no-scrollbar"></ul>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. REPORTS TAB (FULL HISTORY + FORM TOGGLE) -->
+            <!-- 2. REPORTS TAB -->
             <div id="tab-reports" class="hidden space-y-6">
-                <!-- HISTORY VIEW -->
+                <!-- HISTORY LIST -->
                 <div id="view-reports-list" class="glass-panel rounded-[32px] p-6 animate-scale-in">
-                    <div class="flex justify-between items-center mb-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                         <div>
                             <h3 class="text-lg font-bold text-slate-800">Riwayat Laporan</h3>
                             <p class="text-xs text-slate-500">Daftar laporan harian tim.</p>
                         </div>
-                        <div class="flex items-center gap-3">
+                        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                            <div class="flex items-center bg-slate-100/50 rounded-xl px-2 py-1.5 gap-2 border border-slate-200/50">
+                                <input type="date" id="hist-date-start" class="bg-transparent text-xs font-bold text-slate-600 outline-none w-24">
+                                <span class="text-slate-300 text-xs">→</span>
+                                <input type="date" id="hist-date-end" class="bg-transparent text-xs font-bold text-slate-600 outline-none w-24">
+                            </div>
                             <div class="relative">
-                                <select id="filter-user" class="ios-input py-2 px-4 text-xs font-bold pr-8 appearance-none"><option value="all">Semua PIC</option></select>
+                                <select id="filter-user" class="ios-input py-2 px-4 text-xs font-bold pr-8 appearance-none"><option value="all">Semua SS</option></select>
                                 <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none text-slate-400"><i class="fa-solid fa-chevron-down text-[10px]"></i></div>
                             </div>
-                            <button onclick="toggleReportForm(true)" class="bg-[#007AFF] hover:bg-[#0062cc] text-white w-9 h-9 rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center transition-all transform hover:scale-105">
+                            <!-- Tombol Plus (Hanya muncul jika bukan visitor) -->
+                            <button onclick="toggleReportForm(true)" id="btn-add-report" class="bg-[#007AFF] hover:bg-[#0062cc] text-white w-9 h-9 rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center transition-all transform hover:scale-105">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
@@ -388,7 +333,7 @@
                     </div>
                 </div>
 
-                <!-- INPUT FORM VIEW (Hidden by default) -->
+                <!-- INPUT FORM -->
                 <div id="view-reports-form" class="hidden glass-panel rounded-[32px] p-6 md:p-8 relative animate-scale-in">
                      <div id="edit-mode-indicator" class="hidden absolute top-0 left-0 right-0 bg-yellow-400 text-white text-center py-1 text-xs font-bold rounded-t-[32px] z-20">
                         Mode Edit Laporan
@@ -403,14 +348,13 @@
                         </div>
                     </div>
 
-                    <form id="report-form" class="space-y-6">
+                    <form id="report-form" class="space-y-6" onkeydown="return event.key != 'Enter';">
                         <input type="hidden" id="report-id-hidden">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="bg-white/40 p-4 rounded-2xl border border-white/50">
                                 <label class="block text-xs font-bold text-slate-400 uppercase mb-3 ml-1">Tanggal & Tipe</label>
                                 <div class="flex flex-col gap-3">
                                     <input type="date" id="input-date" class="ios-input w-full font-bold text-slate-700">
-                                    <!-- Custom Segmented Control for Type -->
                                     <div class="bg-slate-200/50 p-1 rounded-xl flex">
                                         <button type="button" onclick="selectReportType('delivery')" id="btn-type-delivery" class="flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm bg-white text-[#007AFF]">
                                             <i class="fa-solid fa-truck"></i> Delivery
@@ -472,6 +416,7 @@
                     <select id="new-role" onchange="toggleFormFields()" class="ios-input w-full text-xs font-bold">
                         <option value="leader">Leader</option>
                         <option value="coordinator">Coordinator</option>
+                        <option value="visitor">Visitor</option>
                     </select>
                     <select id="new-account-status" class="ios-input w-full text-xs font-bold"><option value="active">Active</option><option value="inactive">Inactive</option></select>
                 </div>
@@ -611,14 +556,23 @@
             document.getElementById('user-display-role').textContent = currentUser.role;
             document.getElementById('avatar-initials').textContent = currentUser.name.charAt(0).toUpperCase();
 
-            // FIX: Ensure correct visibility state on login
+            // Handle Role Visibility
             const navSettings = document.getElementById('nav-settings');
+            const btnAddReport = document.getElementById('btn-add-report');
+
             if(currentUser.role === 'coordinator') {
                 navSettings.classList.remove('hidden');
                 navSettings.classList.add('flex');
             } else {
                 navSettings.classList.add('hidden');
                 navSettings.classList.remove('flex');
+            }
+
+            // Hide add button for visitors
+            if(currentUser.role === 'visitor') {
+                btnAddReport.classList.add('hidden');
+            } else {
+                btnAddReport.classList.remove('hidden');
             }
             
             fetchGlobalSettings(); 
@@ -636,7 +590,6 @@
                 document.getElementById('main-app').classList.add('hidden');
                 document.getElementById('login-page').classList.remove('hidden');
                 
-                // FIX: Reset Admin Menu Visibility to HIDDEN by default
                 const navSettings = document.getElementById('nav-settings');
                 navSettings.classList.add('hidden');
                 navSettings.classList.remove('flex');
@@ -682,12 +635,30 @@
                 if([...ssSet].includes(cur)) ssSel.value = cur;
             }
             
-            // Set Default 30 Days
             const { start, end } = getLast30Days();
             const startIn = document.getElementById('dash-date-start');
             const endIn = document.getElementById('dash-date-end');
             if(startIn && !startIn.value) startIn.value = start;
             if(endIn && !endIn.value) endIn.value = end;
+
+            // Hist Filters
+            const histSS = document.getElementById('filter-user');
+             if(histSS) {
+                 // Populate history SS filter
+                 const cur = histSS.value;
+                 histSS.innerHTML = '<option value="all">Semua SS</option>' + [...ssSet].map(ss => `<option value="${ss}">${ss}</option>`).join('');
+                 if([...ssSet].includes(cur)) histSS.value = cur;
+                 histSS.addEventListener('change', renderReportsTable);
+             }
+            
+            const histStart = document.getElementById('hist-date-start');
+            const histEnd = document.getElementById('hist-date-end');
+            if(histStart && !histStart.value) histStart.value = start;
+            if(histEnd && !histEnd.value) histEnd.value = end;
+            
+            if(histStart) histStart.addEventListener('change', renderReportsTable);
+            if(histEnd) histEnd.addEventListener('change', renderReportsTable);
+
 
             ['dash-date-start', 'dash-date-end', 'dash-filter-ss', 'dash-filter-service', 'dash-filter-type'].forEach(id => {
                 const el = document.getElementById(id); if(el) el.addEventListener('change', renderDashboard);
@@ -712,7 +683,6 @@
             const fSvc = document.getElementById('dash-filter-service').value;
             const fType = document.getElementById('dash-filter-type').value;
 
-            // Separate filter for standard widgets (respects date)
             const filteredByDate = allReports.filter(r => {
                 let rDate;
                 if (r.date) rDate = r.date;
@@ -722,13 +692,11 @@
                 const inDate = (!start || rDate >= start) && (!end || rDate <= end);
                 const inSS = fSS === 'all' || r.kodeSS === fSS;
                 const inType = fType === 'all' || r.type === fType;
-                // Check if the specific service exists in this report (Optimization)
                 const inSvc = fSvc === 'all' || r.details.some(d => d.label === fSvc && d.total > 0);
                 
                 return inDate && inSS && inType && inSvc;
             });
             
-            // Separate filter for Annual Chart (Ignores Date)
             const filteredForAnnual = allReports.filter(r => {
                 const inSS = fSS === 'all' || r.kodeSS === fSS;
                 const inType = fType === 'all' || r.type === fType;
@@ -737,7 +705,6 @@
             });
 
             updateKPIs(filteredByDate, fType, fSvc);
-            // FIX: Pass start and end date to processCharts
             processCharts(filteredByDate, filteredForAnnual, fSvc, start, end); 
             processBreakdowns(filteredByDate, fSvc, fType); 
             processFeedback(filteredByDate, fSvc);
@@ -765,15 +732,12 @@
             document.getElementById('kpi-card-claim').style.display = isPickup ? 'none' : 'flex';
         }
 
-        // FIX: Accept startDate and endDate arguments
         function processCharts(dataByDate, dataAnnual, filterSvc, startDate, endDate) {
             const chartAnnualCanvas = document.getElementById('chartAnnual');
             const chartMonthlyCanvas = document.getElementById('chartMonthly');
             if(!chartAnnualCanvas || !chartMonthlyCanvas) return;
 
-            // --- Annual Chart (Uses dataAnnual - Ignores Date Filter) ---
             const months = {};
-            // Init with 0 for Jan-Dec
             for(let i=0; i<12; i++) { 
                 const m = new Date(new Date().getFullYear(), i, 1).toLocaleString('id-ID',{month:'short'}); 
                 months[m] = {total:0, ok:0}; 
@@ -816,19 +780,16 @@
                 }
             });
 
-            // --- Daily Chart (Uses dataByDate - Respects Filter Range) ---
             const days = {};
             const sDate = new Date(startDate);
             const eDate = new Date(endDate);
             
-            // Loop from start date to end date to create buckets
             for(let d = new Date(sDate); d <= eDate; d.setDate(d.getDate() + 1)) {
                 const k = d.toISOString().split('T')[0];
                 const label = d.getDate() + '/' + (d.getMonth()+1);
                 days[k] = { label: label, total:0, ok:0 };
             }
             
-            // We iterate dataByDate.
             dataByDate.forEach(r => { 
                 const dateStr = r.date || (r.timestamp ? new Date(r.timestamp.seconds*1000).toISOString().split('T')[0] : '');
                 if(days[dateStr]) { 
@@ -879,7 +840,7 @@
                     const s = byService[d.label]; s.total+=d.total; s.ok+=d.ok; s.inp+=d.inprogress; s.mbh+=d.mbh; s.miss+=d.missed; s.claim+=d.claimed;
                     
                     const key = `${r.kodeSS} - ${r.reporterName}`;
-                    if(!byStaging[key]) byStaging[key] = { name:key, total:0, ok:0, inp:0, mbh:0, miss:0, claim:0, type: type };
+                    if(!byStaging[key]) byStaging[key] = { name:key, total:0, ok:0, inp:0, mbh:0, miss:0, claim:0, type: type, ss: r.kodeSS, pic: r.reporterName };
                     else if(byStaging[key].type !== type) byStaging[key].type = 'mixed';
                     const ss = byStaging[key]; ss.total+=d.total; ss.ok+=d.ok; ss.inp+=d.inprogress; ss.mbh+=d.mbh; ss.miss+=d.missed; ss.claim+=d.claimed;
                 });
@@ -888,11 +849,22 @@
             const showClaim = filterType !== 'pickup';
             document.querySelectorAll('.claim-col').forEach(el => el.style.display = showClaim ? 'table-cell' : 'none');
 
-            const renderRow = (label, d) => {
+            const renderRow = (label, d, isStaging = false) => {
                 const sla = d.total > 0 ? (d.ok / d.total * 100) : 0;
                 const slaColor = getSLAColor(sla, d.type);
+                
+                // Staging: Add warning if Red
+                let labelHTML = label;
+                if(isStaging) {
+                    const isRed = (sla < 96.3 && d.type !== 'pickup') || (sla < 95 && d.type === 'pickup'); // Logic Red
+                    if(isRed) labelHTML += ' <i class="fa-solid fa-triangle-exclamation text-red-500 ml-1"></i>';
+                    
+                    // SS top, Name bottom
+                    labelHTML = `<div class="flex flex-col"><span class="font-bold text-slate-800">${d.ss}</span><span class="text-[9px] text-slate-500 uppercase">${d.pic}</span>${isRed ? '<span class="text-[9px] text-red-500 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Warning</span>' : ''}</div>`;
+                }
+
                 return `<tr class="hover:bg-black/5 border-b border-black/5">
-                    <td class="p-3 pl-4 font-bold text-slate-700">${label}</td>
+                    <td class="p-3 pl-4 font-bold text-slate-700">${labelHTML}</td>
                     <td class="p-3 col-metric font-bold text-slate-800">${d.total.toLocaleString('id-ID')}</td>
                     <td class="p-3 col-metric font-medium text-slate-600">${d.ok.toLocaleString('id-ID')}</td>
                     <td class="p-3 col-metric text-center"><div class="${slaColor} text-[10px] text-white font-bold px-2 py-0.5 rounded-full inline-block">${sla.toLocaleString('id-ID', {maximumFractionDigits:1})}%</div></td>
@@ -907,7 +879,6 @@
                 let t=0, o=0, i=0, mb=0, m=0, c=0;
                 list.forEach(x => { t+=x.total; o+=x.ok; i+=x.inp; mb+=x.mbh; m+=x.miss; c+=x.claim; });
                 
-                // Hitung Rata-rata %OK Total
                 const avgPct = t > 0 ? (o / t * 100) : 0;
                 const avgColor = getSLAColor(avgPct, filterType);
 
@@ -926,14 +897,14 @@
             const listSvc = Object.entries(byService).map(([k,v]) => ({label:k, ...v})).sort((a,b)=>b.total - a.total);
             const elSvc = document.getElementById('body-breakdown-service');
             if (elSvc) {
-                elSvc.innerHTML = listSvc.map(item => renderRow(item.label, item)).join('');
+                elSvc.innerHTML = listSvc.map(item => renderRow(item.label, item, false)).join('');
                 document.getElementById('foot-breakdown-service').innerHTML = renderFooter(listSvc);
             }
 
             const listStg = Object.values(byStaging).sort((a,b)=>b.total - a.total);
             const elStg = document.getElementById('body-breakdown-staging');
             if (elStg) {
-                elStg.innerHTML = listStg.map(item => renderRow(item.name, item)).join('');
+                elStg.innerHTML = listStg.map(item => renderRow(item.name, item, true)).join('');
                 document.getElementById('foot-breakdown-staging').innerHTML = renderFooter(listStg);
             }
         }
@@ -1041,7 +1012,7 @@
                 ${isDel?'<th class="p-3 border-b border-slate-200 text-xs w-20">Clm</th>':''}
                 <th class="p-3 border-b border-slate-200 border-l pl-2 text-xs w-20">In</th>
                 <th class="p-3 border-b border-slate-200 text-xs w-auto">Ket</th>
-                <th class="p-3 border-b border-slate-200 text-xs w-20">Ex</th>
+                <th class="p-3 border-b border-slate-200 text-xs w-16">Ex</th>
                 <th class="p-3 border-b border-slate-200 text-xs w-auto">Ket</th>
             </tr>`;
             document.getElementById('table-header').innerHTML = head;
@@ -1253,10 +1224,11 @@
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'reports'));
             reportsUnsubscribe = onSnapshot(q, (s) => { 
                 let rawDocs = s.docs.map(d=>({id:d.id, ...d.data()}));
+                // Sort Descending by Date (New to Old)
                 rawDocs.sort((a,b) => {
-                    const tA = a.timestamp ? a.timestamp.seconds : 0;
-                    const tB = b.timestamp ? b.timestamp.seconds : 0;
-                    return tB - tA;
+                    const dateA = new Date(a.date);
+                    const dateB = new Date(b.date);
+                    return dateB - dateA;
                 });
                 allReports = rawDocs;
                 renderDashboard(); setupDashboardFilters(); renderReportsTable(); updateFilterUser(); 
@@ -1270,8 +1242,18 @@
         }
 
         function renderReportsTable() {
-            const f = document.getElementById('filter-user').value; let d = allReports;
-            if(f !== 'all') d = d.filter(x => x.reporterName === f);
+            const fUser = document.getElementById('filter-user') ? document.getElementById('filter-user').value : 'all';
+            const fStart = document.getElementById('hist-date-start') ? document.getElementById('hist-date-start').value : '';
+            const fEnd = document.getElementById('hist-date-end') ? document.getElementById('hist-date-end').value : '';
+            
+            let d = allReports.filter(r => {
+                let matchUser = fUser === 'all' || r.kodeSS === fUser || r.reporterName === fUser;
+                let matchDate = true;
+                if(fStart && fEnd) {
+                    matchDate = r.date >= fStart && r.date <= fEnd;
+                }
+                return matchUser && matchDate;
+            });
             
             document.getElementById('reports-table-body').innerHTML = d.map(r => {
                 const date = r.date ? new Date(r.date).toLocaleDateString('id-ID') : '-';
@@ -1286,19 +1268,26 @@
                 r.details?.forEach(d => {
                     if(d.total > 0) {
                         hasDetails = true;
-                        // Format: Svc | Tot | OK | Pr | Ms | Cl
+                        
+                        // Calc SLA
+                        const sla = d.total > 0 ? (d.ok / d.total * 100).toFixed(1) : 0;
+                        const slaColor = getSLAColor(sla, r.type);
+
+                        // Format: Svc | Tot | OK | %SLA | Pr | Ms | Cl
                         detailsHTML += `
                         <div class="grid grid-cols-12 gap-1 text-[10px] items-center border-b border-dashed border-slate-100 pb-0.5 last:border-0">
                             <div class="col-span-2 font-bold text-slate-700 truncate" title="${d.label}">${d.label}</div>
-                            <div class="col-span-2 text-right font-mono bg-blue-50 text-blue-600 rounded px-0.5">${d.total.toLocaleString()}</div>
-                            <div class="col-span-2 text-right font-mono text-green-600">${d.ok.toLocaleString()}</div>
-                            <div class="col-span-2 text-right font-mono text-slate-400">${d.inprogress.toLocaleString()}</div>
-                            <div class="col-span-2 text-right font-mono text-red-500 font-bold">${d.missed > 0 ? d.missed.toLocaleString() : '-'}</div>
-                            <div class="col-span-2 text-right font-mono text-purple-500 font-bold">${d.claimed > 0 ? d.claimed.toLocaleString() : '-'}</div>
+                            <div class="col-span-2 text-right font-mono bg-blue-50 text-blue-600 rounded px-0.5">${d.total.toLocaleString('id-ID')}</div>
+                            <div class="col-span-1 text-right font-mono text-green-600">${d.ok.toLocaleString('id-ID')}</div>
+                            <div class="col-span-2 text-center font-bold ${slaColor.replace('bg-', 'text-').replace('500','600')}">${sla}%</div>
+                            <div class="col-span-1 text-right font-mono text-slate-400">${d.inprogress.toLocaleString('id-ID')}</div>
+                            <div class="col-span-1 text-right font-mono text-orange-500">${d.mbh.toLocaleString('id-ID')}</div>
+                            <div class="col-span-1 text-right font-mono text-red-500 font-bold">${d.missed > 0 ? d.missed.toLocaleString('id-ID') : '-'}</div>
+                            <div class="col-span-2 text-right font-mono text-purple-500 font-bold">${d.claimed > 0 ? d.claimed.toLocaleString('id-ID') : '-'}</div>
                         </div>`;
 
-                        if(d.feed_int) feedbacks.push(`<span class="text-blue-600 font-bold text-[9px]">[In] ${d.label}:</span> ${d.feed_int}`);
-                        if(d.feed_ext) feedbacks.push(`<span class="text-orange-600 font-bold text-[9px]">[Ex] ${d.label}:</span> ${d.feed_ext}`);
+                        if(d.feed_int) feedbacks.push(`<span class="text-blue-600 font-bold text-[9px]">[In] :</span> ${d.feed_int}`);
+                        if(d.feed_ext) feedbacks.push(`<span class="text-orange-600 font-bold text-[9px]">[Ex] :</span> ${d.feed_ext}`);
                     }
                 });
                 detailsHTML += '</div>';
@@ -1308,9 +1297,11 @@
                 <div class="grid grid-cols-12 gap-1 text-[9px] font-bold text-slate-400 border-b border-slate-200 pb-1 mb-1">
                     <div class="col-span-2">Svc</div>
                     <div class="col-span-2 text-right">Tot</div>
-                    <div class="col-span-2 text-right">OK</div>
-                    <div class="col-span-2 text-right">Prg</div>
-                    <div class="col-span-2 text-right">Mss</div>
+                    <div class="col-span-1 text-right">OK</div>
+                    <div class="col-span-2 text-center">%SLA</div>
+                    <div class="col-span-1 text-right">Prg</div>
+                    <div class="col-span-1 text-right">MBH</div>
+                    <div class="col-span-1 text-right">Mss</div>
                     <div class="col-span-2 text-right">Clm</div>
                 </div>`;
 
@@ -1321,23 +1312,28 @@
                 let totInt = 0, totExt = 0;
                 r.details?.forEach(x => { totInt += (x.total_int || 0); totExt += (x.total_ext || 0); });
 
+                // Check access for buttons
+                let showButtons = false;
+                if(currentUser.role === 'coordinator') showButtons = true;
+                else if(currentUser.role === 'leader' && r.reporterId === currentUser.id) showButtons = true;
+
                 return `<tr class="border-b border-black/5 last:border-0 align-top hover:bg-slate-50/50 transition-colors">
                     <td class="p-3 text-[10px] font-mono text-slate-500 font-medium">${date}</td>
                     <td class="p-3">
+                         <div class="text-[9px] text-slate-500 font-mono font-bold uppercase tracking-wide bg-slate-100 inline-block px-1 rounded mb-1">${r.kodeSS||'-'}</div>
                         <div class="font-bold text-slate-800 text-xs">${r.reporterName}</div>
-                        <div class="text-[9px] text-slate-500 font-mono font-bold mt-0.5 uppercase tracking-wide bg-slate-100 inline-block px-1 rounded">${r.kodeSS||'-'}</div>
                     </td>
                     <td class="p-3">
                         <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border ${r.type==='delivery'?'bg-blue-50 text-blue-600 border-blue-100':'bg-orange-50 text-orange-600 border-orange-100'}">${r.type.substr(0,3)}</span>
                     </td>
                     <td class="p-3">${detailsHTML}</td>
-                    <td class="p-3 text-center text-xs font-bold text-blue-600">${totInt > 0 ? totInt.toLocaleString() : '-'}</td>
-                    <td class="p-3 text-center text-xs font-bold text-orange-600">${totExt > 0 ? totExt.toLocaleString() : '-'}</td>
+                    <td class="p-3 text-center text-xs font-bold text-blue-600">${totInt > 0 ? totInt.toLocaleString('id-ID') : '-'}</td>
+                    <td class="p-3 text-center text-xs font-bold text-orange-600">${totExt > 0 ? totExt.toLocaleString('id-ID') : '-'}</td>
                     <td class="p-3 text-[10px] text-slate-600 leading-tight">
                         ${feedbacks.length > 0 ? feedbacks.join('<br>') : '<span class="text-slate-300 italic">-</span>'}
                     </td>
                     <td class="p-3 text-center">
-                        <div class="flex flex-col gap-2 items-center justify-center">
+                        <div class="flex flex-col gap-2 items-center justify-center ${showButtons ? '' : 'hidden'}">
                             <button onclick="requestEditReport('${r.id}')" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-pen-to-square"></i></button>
                             <button onclick="requestDeleteReport('${r.id}')" class="text-red-400 hover:bg-red-50 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
@@ -1347,8 +1343,12 @@
         }
         
         function updateFilterUser() {
-            const sel = document.getElementById('filter-user'); const cur = sel.value;
-            sel.innerHTML = '<option value="all">Semua PIC</option>' + [...new Set(allReports.map(r=>r.reporterName))].map(n=>`<option>${n}</option>`).join('');
+            const sel = document.getElementById('filter-user'); 
+            if(!sel) return;
+            const cur = sel.value;
+            // Populate SS Code instead of Name in History
+            const ssList = [...new Set(allReports.map(r=>r.kodeSS).filter(Boolean))].sort();
+            sel.innerHTML = '<option value="all">Semua SS</option>' + ssList.map(ss => `<option value="${ss}">${ss}</option>`).join('');
             sel.value = cur;
         }
 
