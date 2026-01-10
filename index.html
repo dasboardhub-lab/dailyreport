@@ -73,6 +73,7 @@
             transition: background 0.2s;
         }
         .ios-input:focus { background: rgba(118, 118, 128, 0.2); outline: none; }
+        .ios-input:disabled, .ios-input[readonly] { background: rgba(118, 118, 128, 0.05); color: #9ca3af; cursor: not-allowed; }
         
         /* Table Input */
         .input-cell input { 
@@ -132,7 +133,7 @@
                 <input type="hidden" id="login-type" value="user">
                 <div id="login-intro-text" class="hidden"></div>
                 <div id="username-container">
-                    <input type="text" id="username" class="ios-input w-full text-center font-medium placeholder:text-slate-400" placeholder="Username" required>
+                    <input type="text" id="username" class="ios-input w-full text-center font-medium placeholder:text-slate-400" placeholder="ID (Angka)" required>
                 </div>
                 <div>
                     <input type="password" id="password" class="ios-input w-full text-center font-medium placeholder:text-slate-400" placeholder="Password" required>
@@ -411,9 +412,15 @@
             <div class="flex justify-between items-center mb-4"><h3 id="modal-title" class="font-bold text-lg">User Baru</h3><button onclick="closeAddUserModal()" class="w-8 h-8 bg-slate-200 rounded-full text-slate-500"><i class="fa-solid fa-xmark"></i></button></div>
             <form id="add-user-form" class="space-y-3">
                 <input type="hidden" id="edit-user-id">
-                <div class="grid grid-cols-2 gap-3"><select id="new-role" onchange="toggleFormFields()" class="ios-input w-full text-xs font-bold"><option value="leader">Leader</option><option value="coordinator">Coordinator</option></select><select id="new-account-status" class="ios-input w-full text-xs font-bold"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="new-role" onchange="toggleFormFields()" class="ios-input w-full text-xs font-bold">
+                        <option value="leader">Leader</option>
+                        <option value="coordinator">Coordinator</option>
+                    </select>
+                    <select id="new-account-status" class="ios-input w-full text-xs font-bold"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+                </div>
                 <input type="text" id="new-name" class="ios-input w-full font-bold" placeholder="Nama Lengkap" required>
-                <div class="grid grid-cols-2 gap-3"><input type="text" id="new-username" class="ios-input w-full" placeholder="Username" required><input type="text" id="new-password" class="ios-input w-full" placeholder="Password" required></div>
+                <div class="grid grid-cols-2 gap-3"><input type="text" id="new-username" class="ios-input w-full" placeholder="ID (Angka)" required><input type="text" id="new-password" class="ios-input w-full" placeholder="Password (Min 6)" required></div>
                 <div id="leader-fields" class="grid grid-cols-2 gap-3"><input type="text" id="new-kode-ss" class="ios-input w-full" placeholder="Kode SS"><input type="text" id="new-kota" class="ios-input w-full" placeholder="Kota"></div>
                 <button type="submit" class="w-full bg-[#007AFF] text-white font-bold py-3 rounded-xl mt-2">Simpan</button>
             </form>
@@ -440,7 +447,7 @@
     <!-- JAVASCRIPT LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot, deleteDoc, updateDoc, doc, getDoc, setDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Register Plugin Chart JS Datalabels
@@ -450,11 +457,27 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         let currentUser = null, allReports = [], allUsers = [], chartAnnual = null, chartMonthly = null;
         let pendingAction = null, targetId = null, currentAdminCode = "123456";
         const ROW_LABELS = ['REG', 'ECO', 'ND', 'SD/SDS', 'BIG'];
         let reportsUnsubscribe = null, usersUnsubscribe = null;
+
+        // AUTH INIT
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth failed", error);
+            }
+        };
+        onAuthStateChanged(auth, (user) => { if(!user) initAuth(); });
+        initAuth();
 
         function showNotification(msg, type='success') {
             const div = document.createElement('div');
@@ -490,8 +513,8 @@
             const errEl = document.getElementById('login-error');
             
             try {
-                await signInAnonymously(auth);
-                const q = query(collection(db, 'users'), where("username", "==", u));
+                if (!auth.currentUser) await initAuth();
+                const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'users'), where("username", "==", u));
                 const snap = await getDocs(q);
                 
                 if(!snap.empty) {
@@ -504,10 +527,18 @@
                     finishLogin();
                 } else {
                     if(type==='admin' && u==='admin' && p==='TAB123') {
-                        const newAdm = {name:"Super Admin", username:"admin", password:"TAB123", role:"coordinator", status:"active", createdAt:serverTimestamp()};
-                        const ref = await addDoc(collection(db,'users'), newAdm);
-                        currentUser = {id:ref.id, ...newAdm};
-                        finishLogin();
+                        // Cek apakah sudah ada admin lain (role coordinator)
+                        const qCoord = query(collection(db, 'artifacts', appId, 'public', 'data', 'users'), where("role", "==", "coordinator"));
+                        const snapCoord = await getDocs(qCoord);
+                        
+                        if (snapCoord.empty) {
+                            const newAdm = {name:"Super Admin", username:"admin", password:"TAB123", role:"coordinator", status:"active", createdAt:serverTimestamp()};
+                            const ref = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), newAdm);
+                            currentUser = {id:ref.id, ...newAdm};
+                            finishLogin();
+                        } else {
+                            throw new Error("Username tidak ditemukan.");
+                        }
                     } else throw new Error("Username tidak ditemukan.");
                 }
             } catch(err) {
@@ -524,39 +555,60 @@
             document.getElementById('user-display-role').textContent = currentUser.role;
             document.getElementById('avatar-initials').textContent = currentUser.name.charAt(0).toUpperCase();
 
+            // FIX: Ensure correct visibility state on login
+            const navSettings = document.getElementById('nav-settings');
             if(currentUser.role === 'coordinator') {
-                document.getElementById('nav-settings').classList.remove('hidden');
-                document.getElementById('nav-settings').classList.add('flex');
+                navSettings.classList.remove('hidden');
+                navSettings.classList.add('flex');
+            } else {
+                navSettings.classList.add('hidden');
+                navSettings.classList.remove('flex');
             }
             
-            fetchGlobalSettings(); listenToReports();
+            fetchGlobalSettings(); 
+            listenToReports();
             if(currentUser.role === 'coordinator') listenToUsers();
             setupReportForm(); setupDashboardFilters(); renderInputTable(); window.showTab('dashboard');
         }
 
         async function logout() {
             try {
-                if(reportsUnsubscribe) reportsUnsubscribe(); if(usersUnsubscribe) usersUnsubscribe();
-                await signOut(auth); currentUser = null; allReports = []; allUsers = [];
+                if(reportsUnsubscribe) reportsUnsubscribe(); 
+                if(usersUnsubscribe) usersUnsubscribe();
+                
+                // Do not actually signOut from Firebase (keeps anonymous session for 'Login' page queries)
+                // Just clear local app state
+                currentUser = null; 
+                allReports = []; 
+                allUsers = [];
+                
                 document.getElementById('main-app').classList.add('hidden');
                 document.getElementById('login-page').classList.remove('hidden');
-                document.getElementById('login-form').reset(); document.getElementById('login-error').classList.add('hidden');
+                
+                // FIX: Reset Admin Menu Visibility to HIDDEN by default
+                const navSettings = document.getElementById('nav-settings');
+                navSettings.classList.add('hidden');
+                navSettings.classList.remove('flex');
+
+                document.getElementById('login-form').reset(); 
+                document.getElementById('login-error').classList.add('hidden');
                 switchLoginTab('user');
             } catch (error) { window.location.reload(); }
         }
         window.logout = logout;
 
         async function fetchGlobalSettings() {
-            const snap = await getDoc(doc(db, 'settings', 'globalConfig'));
+            if(!auth.currentUser) return;
+            const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'globalConfig'));
             if(snap.exists()) {
                 currentAdminCode = snap.data().adminCode || "123456";
                 const inp = document.getElementById('setting-admin-code'); if(inp) inp.value = currentAdminCode;
-            } else { setDoc(doc(db, 'settings', 'globalConfig'), {adminCode: "123456"}); }
+            } else { setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'globalConfig'), {adminCode: "123456"}); }
         }
         window.saveGlobalSettings = async () => {
             const code = document.getElementById('setting-admin-code').value.trim();
             if(!code) return showNotification("Kode kosong", "error");
-            await setDoc(doc(db,'settings','globalConfig'), {adminCode: code}, {merge:true});
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'globalConfig'), {adminCode: code}, {merge:true});
             currentAdminCode = code; showNotification("Disimpan!");
         }
 
@@ -878,7 +930,7 @@
 
             if(!picId || !date) return showNotification("Identitas/Tanggal kosong", "error");
             if(!editId) {
-                const qDup = query(collection(db,'reports'), where('reporterId','==',picId), where('date','==',date), where('type','==',type));
+                const qDup = query(collection(db,'artifacts', appId, 'public', 'data', 'reports'), where('reporterId','==',picId), where('date','==',date), where('type','==',type));
                 const dupSnap = await getDocs(qDup);
                 if(!dupSnap.empty) return showNotification(`Laporan ${type} tanggal ${date} sudah ada!`, "error");
             }
@@ -902,14 +954,14 @@
             try {
                 const payload = { date, type, reporterName: picName, reporterId: picId, kodeSS, grandTotalVolume: gTotal, details, timestamp: serverTimestamp() };
                 if(editId) { 
-                    await updateDoc(doc(db,'reports',editId), payload); 
+                    await updateDoc(doc(db,'artifacts', appId, 'public', 'data', 'reports', editId), payload); 
                     showNotification("Data diperbarui!"); 
                     // Kembalikan konten tombol sebelum memanggil cancelEditMode
                     btn.innerHTML = originalContent;
                     window.cancelEditMode(); 
                 }
                 else { 
-                    await addDoc(collection(db,'reports'), payload); 
+                    await addDoc(collection(db,'artifacts', appId, 'public', 'data', 'reports'), payload); 
                     showNotification("Laporan tersimpan!"); 
                     // Kembalikan konten tombol juga di sini
                     btn.innerHTML = originalContent;
@@ -968,11 +1020,24 @@
         }
 
         function listenToReports() {
-            const q = query(collection(db, 'reports'), orderBy('timestamp', 'desc'));
-            reportsUnsubscribe = onSnapshot(q, (s) => { allReports = s.docs.map(d=>({id:d.id, ...d.data()})); renderDashboard(); setupDashboardFilters(); renderReportsTable(); updateFilterUser(); });
+            if(!auth.currentUser) return;
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'reports'));
+            reportsUnsubscribe = onSnapshot(q, (s) => { 
+                let rawDocs = s.docs.map(d=>({id:d.id, ...d.data()}));
+                rawDocs.sort((a,b) => {
+                    const tA = a.timestamp ? a.timestamp.seconds : 0;
+                    const tB = b.timestamp ? b.timestamp.seconds : 0;
+                    return tB - tA;
+                });
+                allReports = rawDocs;
+                renderDashboard(); setupDashboardFilters(); renderReportsTable(); updateFilterUser(); 
+            }, (error) => console.error("Reports listener error", error));
         }
         function listenToUsers() {
-            onSnapshot(collection(db, 'users'), (s) => { allUsers = s.docs.map(d=>({id:d.id, ...d.data()})); renderUsersTable(); if(currentUser.role === 'coordinator') populateAdminUserSelect(); });
+            if(!auth.currentUser) return;
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'users'), (s) => { 
+                allUsers = s.docs.map(d=>({id:d.id, ...d.data()})); renderUsersTable(); if(currentUser.role === 'coordinator') populateAdminUserSelect(); 
+            }, (error) => console.error("Users listener error", error));
         }
 
         function renderReportsTable() {
@@ -982,7 +1047,6 @@
             document.getElementById('reports-table-body').innerHTML = d.map(r => {
                 const date = r.date ? new Date(r.date).toLocaleDateString('id-ID') : '-';
                 
-                // Build Detail Breakdown Grid
                 let detailsHTML = '<div class="space-y-1.5">';
                 let hasDetails = false;
                 
@@ -1031,7 +1095,7 @@
 
         window.toggleUserStatus = async (id, currentStatus) => {
             const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-            try { await updateDoc(doc(db,'users',id), {status: newStatus}); showNotification("Status diubah"); } catch(e) { showNotification("Gagal", "error"); }
+            try { await updateDoc(doc(db,'artifacts', appId, 'public', 'data', 'users', id), {status: newStatus}); showNotification("Status diubah"); } catch(e) { showNotification("Gagal", "error"); }
         }
         function renderUsersTable() {
             const tbody = document.getElementById('users-table-body');
@@ -1042,7 +1106,7 @@
                     ? `<button onclick="toggleUserStatus('${u.id}', '${isActive?'active':'inactive'}')" class="relative inline-flex items-center h-5 rounded-full w-9 transition-colors focus:outline-none ${isActive ? 'bg-[#34C759]' : 'bg-slate-300'}"><span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform shadow-sm ${isActive ? 'translate-x-4' : 'translate-x-0.5'}"></span></button>`
                     : `<span class="text-[9px] text-slate-300 font-bold bg-slate-100 px-1 rounded">LOCKED</span>`;
                 return `<tr class="border-b border-black/5 ${!isActive?'opacity-50 grayscale':''}">
-                    <td class="p-4 font-bold text-slate-700">${u.name}<br><span class="text-[10px] text-slate-400 font-normal">@${u.username}</span></td>
+                    <td class="p-4 font-bold text-slate-700">${u.name}<br><span class="text-[10px] text-slate-400 font-normal">ID: ${u.username}</span></td>
                     <td class="p-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 text-slate-500">${u.role}</span></td>
                     <td class="p-4 text-center">${toggleBtn}</td>
                     <td class="p-4 text-center"><div class="flex justify-center gap-3"><button onclick="editUser('${u.id}')" class="text-blue-500"><i class="fa-solid fa-pen"></i></button>${u.id!==currentUser.id && u.username!=='admin' ? `<button onclick="openDeleteModal('${u.id}', '${u.username}')" class="text-red-400"><i class="fa-solid fa-trash"></i></button>` : ''}</div></td>
@@ -1056,14 +1120,22 @@
             document.getElementById('new-account-status').value = u.status || 'active'; document.getElementById('new-name').value = u.name;
             document.getElementById('new-username').value = u.username; document.getElementById('new-password').value = u.password;
             document.getElementById('new-kode-ss').value = u.kodeSS||''; document.getElementById('new-kota').value = u.kotaArea||'';
+            
             const isAdm = u.username === 'admin';
-            document.getElementById('new-username').readOnly = isAdm; document.getElementById('new-role').disabled = isAdm; document.getElementById('new-account-status').disabled = isAdm;
+            document.getElementById('new-username').readOnly = isAdm; 
+            document.getElementById('new-role').disabled = isAdm; 
+            document.getElementById('new-account-status').disabled = isAdm;
+            
             toggleFormFields(); document.getElementById('modal-title').textContent = "Edit User"; document.getElementById('modal-add-user').classList.remove('hidden');
         }
         window.prepareAddUser = () => { 
             document.getElementById('add-user-form').reset(); document.getElementById('edit-user-id').value=''; 
-            document.getElementById('new-role').disabled = false; document.getElementById('new-username').readOnly = false;
-            document.getElementById('new-account-status').disabled = false; document.getElementById('modal-title').textContent = "User Baru";
+            
+            document.getElementById('new-role').disabled = false; 
+            document.getElementById('new-username').readOnly = false;
+            document.getElementById('new-account-status').disabled = false; 
+            
+            document.getElementById('modal-title').textContent = "User Baru";
             document.getElementById('modal-add-user').classList.remove('hidden'); 
         }
         window.closeAddUserModal = () => document.getElementById('modal-add-user').classList.add('hidden');
@@ -1074,9 +1146,51 @@
             const uid = document.getElementById('edit-user-id').value;
             const roleEl = document.getElementById('new-role'); const statusEl = document.getElementById('new-account-status');
             const roleVal = roleEl.disabled ? 'coordinator' : roleEl.value; const statusVal = statusEl.disabled ? 'active' : statusEl.value;
-            const data = { role: roleVal, name: document.getElementById('new-name').value, username: document.getElementById('new-username').value, password: document.getElementById('new-password').value, kodeSS: document.getElementById('new-kode-ss').value, kotaArea: document.getElementById('new-kota').value, status: statusVal };
+            
+            const rawUsername = document.getElementById('new-username').value;
+            const cleanUsername = rawUsername.trim().toLowerCase();
+            const cleanPassword = document.getElementById('new-password').value.trim();
+
+            if (!/^\d+$/.test(cleanUsername) && cleanUsername !== 'admin') {
+                showNotification("ID harus berupa angka!", "error");
+                return;
+            }
+
+            if (cleanPassword.length < 6) {
+                showNotification("Password minimal 6 karakter!", "error");
+                return;
+            }
+
+            const data = { 
+                role: roleVal, 
+                name: document.getElementById('new-name').value, 
+                username: cleanUsername, 
+                password: cleanPassword, 
+                kodeSS: document.getElementById('new-kode-ss').value, 
+                kotaArea: document.getElementById('new-kota').value, 
+                status: statusVal 
+            };
+
             if(!uid) data.createdAt = serverTimestamp();
-            try { if(uid) await updateDoc(doc(db,'users',uid), data); else await addDoc(collection(db,'users'), data); showNotification("Tersimpan!"); closeAddUserModal(); } catch(e) { showNotification("Gagal", "error"); }
+            try { 
+                if(!uid) {
+                    const qCheck = query(collection(db, 'artifacts', appId, 'public', 'data', 'users'), where("username", "==", cleanUsername));
+                    const snapCheck = await getDocs(qCheck);
+                    if(!snapCheck.empty) {
+                        showNotification("ID sudah dipakai!", "error");
+                        return;
+                    }
+                }
+
+                if(uid) await updateDoc(doc(db,'artifacts', appId, 'public', 'data', 'users', uid), data); 
+                else await addDoc(collection(db,'artifacts', appId, 'public', 'data', 'users'), data); 
+                
+                showNotification("User tersimpan!"); 
+                closeAddUserModal(); 
+            } catch(e) { 
+                console.error(e);
+                showNotification("Gagal menyimpan", "error"); 
+            }
         });
 
         window.openAuthModal = (action, id) => { targetId = id; pendingAction = action; document.getElementById('auth-code-input').value=''; document.getElementById('modal-auth-code').classList.remove('hidden'); setTimeout(() => document.getElementById('auth-code-input').focus(), 100); }
@@ -1084,9 +1198,15 @@
         window.verifyAuthCode = () => { if(document.getElementById('auth-code-input').value === currentAdminCode) { closeAuthModal(); if(pendingAction === 'deleteReport') openConfirmDelete(targetId); if(pendingAction === 'editReport') loadReportToForm(targetId); } else showNotification("Kode Salah", "error"); }
         function openConfirmDelete(id, username) { targetId = id; pendingAction = username ? 'deleteUser' : 'deleteReport'; document.getElementById('delete-confirmation-text').textContent = username ? `Hapus user ${username}?` : "Hapus laporan ini?"; document.getElementById('modal-confirm-delete').classList.remove('hidden'); }
         window.openDeleteModal = openConfirmDelete; window.closeDeleteModal = () => document.getElementById('modal-confirm-delete').classList.add('hidden');
-        window.executeDelete = async () => { try { if(pendingAction === 'deleteReport') await deleteDoc(doc(db,'reports',targetId)); if(pendingAction === 'deleteUser') await deleteDoc(doc(db,'users',targetId)); showNotification("Dihapus."); closeDeleteModal(); } catch(e) { showNotification("Gagal", "error"); } }
+        window.executeDelete = async () => { try { if(pendingAction === 'deleteReport') await deleteDoc(doc(db,'artifacts', appId, 'public', 'data', 'reports', targetId)); if(pendingAction === 'deleteUser') await deleteDoc(doc(db,'artifacts', appId, 'public', 'data', 'users', targetId)); showNotification("Dihapus."); closeDeleteModal(); } catch(e) { showNotification("Gagal", "error"); } }
 
         window.showTab = (t) => {
+            // Security Guard
+            if (t === 'settings' && currentUser && currentUser.role !== 'coordinator') {
+                showNotification("Akses ditolak!", "error");
+                return;
+            }
+
             const tabs = ['dashboard', 'reports', 'settings'];
             tabs.forEach(x => {
                 document.getElementById('tab-' + x).classList.add('hidden');
