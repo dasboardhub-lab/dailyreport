@@ -11,11 +11,12 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Chart.js -->
+    <!-- Chart.js & Datalabels Plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
     <!-- Font: San Francisco Alternative (Inter) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Config Tailwind -->
     <script>
@@ -39,7 +40,6 @@
         body { 
             font-family: 'Inter', sans-serif; 
             background: #F2F2F7; /* Apple System Gray 6 */
-            /* Abstract Wallpaper Background */
             background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
             background-attachment: fixed;
             background-size: cover;
@@ -102,9 +102,12 @@
             background: rgba(0,0,0,0.05);
         }
 
-        /* Hide Helpers */
         .hidden { display: none !important; }
         input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        /* KPI Card Hover */
+        .kpi-card { transition: transform 0.2s; }
+        .kpi-card:hover { transform: translateY(-2px); }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col">
@@ -145,13 +148,11 @@
     </div>
 
 
-    <!-- --- MAIN APP (Unified Layout) --- -->
+    <!-- --- MAIN APP --- -->
     <div id="main-app" class="hidden flex-1 flex flex-col relative">
         
-        <!-- TOP NAVIGATION BAR (Fixed) -->
+        <!-- TOP NAVIGATION -->
         <header class="fixed top-0 left-0 right-0 z-40 glass-nav h-20 px-4 md:px-8 flex items-center justify-between">
-            
-            <!-- Left: Logo -->
             <div class="flex items-center gap-3 shrink-0">
                 <div class="w-10 h-10 bg-gradient-to-b from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-md">
                     <i class="fa-solid fa-chart-simple text-sm"></i>
@@ -162,7 +163,6 @@
                 </div>
             </div>
 
-            <!-- Center: Navigation Pills (Scrollable on Mobile) -->
             <nav class="flex-1 flex justify-center mx-4 overflow-x-auto no-scrollbar">
                 <div class="flex items-center bg-slate-100/70 p-1 rounded-2xl border border-slate-200/50 backdrop-blur-md">
                     <button onclick="showTab('dashboard')" id="nav-dashboard" class="nav-item nav-active px-4 py-2 rounded-xl text-xs md:text-sm font-bold text-slate-500 transition-all flex items-center gap-2 whitespace-nowrap">
@@ -177,7 +177,6 @@
                 </div>
             </nav>
 
-            <!-- Right: User & Logout -->
             <div class="flex items-center gap-3 shrink-0">
                 <div class="text-right hidden sm:block">
                     <p id="user-display-name" class="text-xs font-bold text-slate-800">User</p>
@@ -190,8 +189,8 @@
             </div>
         </header>
 
-        <!-- CONTENT AREA (Padded Top) -->
-        <main class="flex-1 w-full max-w-6xl mx-auto pt-24 px-4 md:px-8 pb-10 animate-scale-in">
+        <!-- CONTENT AREA (SUPER WIDE) -->
+        <main class="flex-1 w-full max-w-[1920px] mx-auto pt-24 px-4 md:px-8 lg:px-12 pb-10 animate-scale-in">
             
             <!-- 1. DASHBOARD TAB -->
             <div id="tab-dashboard" class="space-y-6">
@@ -213,7 +212,7 @@
                         <input type="date" id="dash-date-end" class="bg-transparent text-xs font-bold text-slate-600 outline-none w-24">
                     </div>
                     <div class="h-6 w-px bg-slate-200 hidden md:block"></div>
-                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 md:pb-0">
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 md:pb-0 items-center">
                         <select id="dash-filter-ss" class="ios-input py-1.5 px-3 text-xs font-bold bg-slate-100/50 rounded-xl min-w-[100px]"><option value="all">Semua SS</option></select>
                         <select id="dash-filter-service" class="ios-input py-1.5 px-3 text-xs font-bold bg-slate-100/50 rounded-xl min-w-[100px]">
                             <option value="all">All Svc</option><option value="REG">REG</option><option value="ECO">ECO</option><option value="ND">ND</option><option value="SD/SDS">SD/SDS</option><option value="BIG">BIG</option>
@@ -221,22 +220,61 @@
                         <select id="dash-filter-type" class="ios-input py-1.5 px-3 text-xs font-bold bg-slate-100/50 rounded-xl min-w-[100px]">
                             <option value="all">All Type</option><option value="delivery">Del</option><option value="pickup">Pick</option>
                         </select>
+                        <!-- Reset Button -->
+                        <button onclick="resetFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ml-2" title="Reset Filter">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
                     </div>
                 </div>
 
-                <!-- Charts Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-panel p-6 rounded-[28px] h-72 flex flex-col">
-                        <h3 class="text-sm font-bold text-slate-800 mb-4">Tren Tahunan</h3>
-                        <div class="flex-1 w-full"><canvas id="chartAnnual"></canvas></div>
+                <!-- KPI CARDS GRID -->
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <!-- Total -->
+                    <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
+                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-layer-group"></i></div>
+                        <div><p class="text-xs font-bold text-slate-400 uppercase">Total</p><h3 id="kpi-val-total" class="text-2xl font-bold text-slate-800">0</h3></div>
                     </div>
-                    <div class="glass-panel p-6 rounded-[28px] h-72 flex flex-col">
-                        <h3 class="text-sm font-bold text-slate-800 mb-4">Performa 30 Hari</h3>
-                        <div class="flex-1 w-full"><canvas id="chartMonthly"></canvas></div>
+                    <!-- OK -->
+                    <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
+                        <div class="absolute top-4 right-4 bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-full" id="kpi-badge-ok">0%</div>
+                        <div class="w-10 h-10 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-check-circle"></i></div>
+                        <div><p class="text-xs font-bold text-slate-400 uppercase">OK</p><h3 id="kpi-val-ok" class="text-2xl font-bold text-slate-800">0</h3></div>
+                    </div>
+                    <!-- Inprogress -->
+                    <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
+                        <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-spinner"></i></div>
+                        <div><p class="text-xs font-bold text-slate-400 uppercase">Inprog</p><h3 id="kpi-val-prog" class="text-2xl font-bold text-slate-800">0</h3></div>
+                    </div>
+                    <!-- MBH -->
+                    <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
+                        <div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-hourglass-half"></i></div>
+                        <div><p class="text-xs font-bold text-slate-400 uppercase">MBH</p><h3 id="kpi-val-mbh" class="text-2xl font-bold text-slate-800">0</h3></div>
+                    </div>
+                    <!-- Missed -->
+                    <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
+                        <div class="w-10 h-10 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-circle-xmark"></i></div>
+                        <div><p class="text-xs font-bold text-slate-400 uppercase">Missed</p><h3 id="kpi-val-miss" class="text-2xl font-bold text-red-600">0</h3></div>
+                    </div>
+                    <!-- Claimed -->
+                    <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative" id="kpi-card-claim">
+                        <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                        <div><p class="text-xs font-bold text-slate-400 uppercase">Claim</p><h3 id="kpi-val-claim" class="text-2xl font-bold text-slate-800">0</h3></div>
                     </div>
                 </div>
 
-                <!-- Tables -->
+                <!-- Charts (Full Width) -->
+                <div class="space-y-6">
+                    <div class="glass-panel p-6 md:p-8 rounded-[32px] h-[400px] flex flex-col">
+                        <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2"><i class="fa-regular fa-calendar text-blue-500"></i> Tren Tahunan</h3>
+                        <div class="flex-1 w-full relative"><canvas id="chartAnnual"></canvas></div>
+                    </div>
+                    <div class="glass-panel p-6 md:p-8 rounded-[32px] h-[400px] flex flex-col">
+                        <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2"><i class="fa-solid fa-chart-line text-green-500"></i> Performa 30 Hari</h3>
+                        <div class="flex-1 w-full relative"><canvas id="chartMonthly"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Tables (Full Columns + Total Footer) -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="glass-panel rounded-[28px] overflow-hidden flex flex-col">
                         <div class="p-5 border-b border-black/5 bg-slate-50/30">
@@ -244,10 +282,20 @@
                         </div>
                         <div class="overflow-x-auto p-2">
                             <table class="w-full text-xs text-left border-collapse">
-                                <thead class="text-slate-400 font-semibold border-b border-black/5">
-                                    <tr><th class="p-2 pl-4">SS</th><th class="p-2 text-right">Vol</th><th class="p-2 text-center">SLA</th><th class="p-2 text-right">M</th><th class="p-2 text-right pr-4">C</th></tr>
+                                <thead class="text-slate-400 font-semibold border-b border-black/5 bg-slate-50/20">
+                                    <tr>
+                                        <th class="p-3 pl-4">SS</th>
+                                        <th class="p-3 text-right">Total</th>
+                                        <th class="p-3 text-right">OK</th>
+                                        <th class="p-3 text-center">%OK</th>
+                                        <th class="p-3 text-right text-slate-500">Inprog</th>
+                                        <th class="p-3 text-right text-orange-500">MBH</th>
+                                        <th class="p-3 text-right text-red-500">Miss</th>
+                                        <th class="p-3 text-right pr-4 text-purple-500 claim-col">Claim</th>
+                                    </tr>
                                 </thead>
                                 <tbody id="body-breakdown-staging" class="divide-y divide-black/5"></tbody>
+                                <tfoot id="foot-breakdown-staging" class="bg-slate-100/50 font-bold text-slate-800 border-t border-black/10"></tfoot>
                             </table>
                         </div>
                     </div>
@@ -257,10 +305,20 @@
                         </div>
                         <div class="overflow-x-auto p-2">
                             <table class="w-full text-xs text-left border-collapse">
-                                <thead class="text-slate-400 font-semibold border-b border-black/5">
-                                    <tr><th class="p-2 pl-4">Svc</th><th class="p-2 text-right">Vol</th><th class="p-2 text-center">SLA</th><th class="p-2 text-right">M</th><th class="p-2 text-right pr-4">C</th></tr>
+                                <thead class="text-slate-400 font-semibold border-b border-black/5 bg-slate-50/20">
+                                    <tr>
+                                        <th class="p-3 pl-4">Svc</th>
+                                        <th class="p-3 text-right">Total</th>
+                                        <th class="p-3 text-right">OK</th>
+                                        <th class="p-3 text-center">%OK</th>
+                                        <th class="p-3 text-right text-slate-500">Inprog</th>
+                                        <th class="p-3 text-right text-orange-500">MBH</th>
+                                        <th class="p-3 text-right text-red-500">Miss</th>
+                                        <th class="p-3 text-right pr-4 text-purple-500 claim-col">Claim</th>
+                                    </tr>
                                 </thead>
                                 <tbody id="body-breakdown-service" class="divide-y divide-black/5"></tbody>
+                                <tfoot id="foot-breakdown-service" class="bg-slate-100/50 font-bold text-slate-800 border-t border-black/10"></tfoot>
                             </table>
                         </div>
                     </div>
@@ -347,7 +405,7 @@
         </main>
     </div>
 
-    <!-- MODALS (iOS Dialog Style) -->
+    <!-- MODALS -->
     <div id="modal-add-user" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
         <div class="bg-white/90 backdrop-blur-xl w-full max-w-sm rounded-[24px] p-6 shadow-2xl animate-scale-in">
             <div class="flex justify-between items-center mb-4"><h3 id="modal-title" class="font-bold text-lg">User Baru</h3><button onclick="closeAddUserModal()" class="w-8 h-8 bg-slate-200 rounded-full text-slate-500"><i class="fa-solid fa-xmark"></i></button></div>
@@ -362,7 +420,6 @@
         </div>
     </div>
 
-    <!-- Auth & Confirm -->
     <div id="modal-auth-code" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
         <div class="bg-white/90 backdrop-blur-xl w-full max-w-xs rounded-[24px] p-6 shadow-2xl text-center animate-scale-in">
             <h3 class="font-bold text-lg mb-1">Security Check</h3><p class="text-xs text-slate-500 mb-4">Masukkan kode admin.</p><input type="password" id="auth-code-input" class="ios-input w-full text-center tracking-[4px] text-lg font-bold mb-4" placeholder="••••••">
@@ -380,11 +437,14 @@
 
     <div id="toast-container" class="fixed top-24 right-1/2 translate-x-1/2 md:translate-x-0 md:right-6 z-[100] flex flex-col gap-2 w-max max-w-[90%]"></div>
 
-    <!-- JAVASCRIPT LOGIC (Updated for Top Nav) -->
+    <!-- JAVASCRIPT LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot, deleteDoc, updateDoc, doc, getDoc, setDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Register Plugin Chart JS Datalabels
+        Chart.register(ChartDataLabels);
 
         const firebaseConfig = { apiKey: "AIzaSyAqbDeVLDBRDEIfi4RliLMC-3Qrwh8p96k", authDomain: "logsheet-5r.firebaseapp.com", projectId: "logsheet-5r", storageBucket: "logsheet-5r.firebasestorage.app", messagingSenderId: "358725557740", appId: "1:358725557740:web:664cca8d2ae984221ff4c9" };
         const app = initializeApp(firebaseConfig);
@@ -521,6 +581,18 @@
             });
         }
 
+        window.resetFilters = () => {
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+            document.getElementById('dash-date-start').value = firstDay;
+            document.getElementById('dash-date-end').value = lastDay;
+            document.getElementById('dash-filter-ss').value = 'all';
+            document.getElementById('dash-filter-service').value = 'all';
+            document.getElementById('dash-filter-type').value = 'all';
+            renderDashboard();
+        }
+
         function renderDashboard() {
             if(!document.getElementById('dash-date-start')) return;
             const start = document.getElementById('dash-date-start').value;
@@ -536,7 +608,31 @@
                 const inType = fType === 'all' || r.type === fType;
                 return inDate && inSS && inType;
             });
-            processCharts(filtered); processBreakdowns(filtered, fSvc, fType); processFeedback(filtered);
+            updateKPIs(filtered, fType);
+            processCharts(filtered); 
+            processBreakdowns(filtered, fSvc, fType); 
+            processFeedback(filtered);
+        }
+
+        function updateKPIs(data, filterType) {
+            let total = 0, ok = 0, prog = 0, mbh = 0, miss = 0, claim = 0;
+            data.forEach(r => {
+                r.details?.forEach(d => {
+                    total += d.total; ok += d.ok; prog += d.inprogress; mbh += d.mbh; miss += d.missed; claim += d.claimed;
+                });
+            });
+            const pct = total > 0 ? (ok/total*100).toFixed(1) : 0;
+            
+            document.getElementById('kpi-val-total').textContent = total.toLocaleString();
+            document.getElementById('kpi-val-ok').textContent = ok.toLocaleString();
+            document.getElementById('kpi-badge-ok').textContent = pct + '%';
+            document.getElementById('kpi-val-prog').textContent = prog.toLocaleString();
+            document.getElementById('kpi-val-mbh').textContent = mbh.toLocaleString();
+            document.getElementById('kpi-val-miss').textContent = miss.toLocaleString();
+            document.getElementById('kpi-val-claim').textContent = claim.toLocaleString();
+
+            const isPickup = filterType === 'pickup';
+            document.getElementById('kpi-card-claim').style.display = isPickup ? 'none' : 'flex';
         }
 
         function processCharts(data) {
@@ -558,8 +654,21 @@
             if(chartAnnual) chartAnnual.destroy();
             chartAnnual = new Chart(chartAnnualCanvas, {
                 type: 'bar',
-                data: { labels: keysM, datasets: [{ type:'bar', label:'Vol', data:datM_Vol, backgroundColor:'#007AFF', borderRadius:4, order:2 }, { type:'line', label:'% SLA', data:datM_SLA, borderColor:'#FF9500', borderWidth:3, tension:0.3, pointRadius:0, yAxisID:'y1', order:1 }] },
-                options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ y:{display:false}, y1:{display:false, min:0, max:100}, x:{grid:{display:false}} } }
+                data: { labels: keysM, datasets: [{ type:'bar', label:'Vol', data:datM_Vol, backgroundColor:'#007AFF', borderRadius:4, order:2 }, { type:'line', label:'% SLA', data:datM_SLA, borderColor:'#FF9500', borderWidth:3, tension:0.3, pointRadius:3, yAxisID:'y1', order:1 }] },
+                options: { 
+                    responsive:true, maintainAspectRatio:false, 
+                    plugins:{ 
+                        legend:{display:false},
+                        datalabels: {
+                            color: (context) => context.dataset.type === 'line' ? '#FF9500' : '#fff',
+                            anchor: (context) => context.dataset.type === 'line' ? 'start' : 'end',
+                            align: (context) => context.dataset.type === 'line' ? 'top' : 'bottom',
+                            font: { weight: 'bold', size: 10 },
+                            formatter: (val) => val > 0 ? val : ''
+                        }
+                    }, 
+                    scales:{ y:{display:false}, y1:{display:false, min:0, max:100}, x:{grid:{display:false}} } 
+                }
             });
 
             const days = {};
@@ -577,8 +686,21 @@
             if(chartMonthly) chartMonthly.destroy();
             chartMonthly = new Chart(chartMonthlyCanvas, {
                 type: 'bar',
-                data: { labels: lblD, datasets: [{ type:'bar', label:'Vol', data:datD_Vol, backgroundColor:'#34C759', borderRadius:4, order:2 }, { type:'line', label:'% SLA', data:datD_SLA, borderColor:'#007AFF', borderWidth:3, tension:0.3, pointRadius:0, yAxisID:'y1', order:1 }] },
-                options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ y:{display:false}, y1:{display:false, min:0, max:100}, x:{grid:{display:false}} } }
+                data: { labels: lblD, datasets: [{ type:'bar', label:'Vol', data:datD_Vol, backgroundColor:'#34C759', borderRadius:4, order:2 }, { type:'line', label:'% SLA', data:datD_SLA, borderColor:'#007AFF', borderWidth:3, tension:0.3, pointRadius:3, yAxisID:'y1', order:1 }] },
+                options: { 
+                    responsive:true, maintainAspectRatio:false, 
+                    plugins:{ 
+                        legend:{display:false},
+                        datalabels: {
+                            color: (context) => context.dataset.type === 'line' ? '#007AFF' : '#fff',
+                            anchor: (context) => context.dataset.type === 'line' ? 'start' : 'end',
+                            align: (context) => context.dataset.type === 'line' ? 'top' : 'bottom',
+                            font: { weight: 'bold', size: 9 },
+                            formatter: (val) => val > 0 ? val : ''
+                        }
+                    }, 
+                    scales:{ y:{display:false}, y1:{display:false, min:0, max:100}, x:{grid:{display:false}} } 
+                }
             });
         }
 
@@ -597,24 +719,58 @@
                     const ss = byStaging[key]; ss.total+=d.total; ss.ok+=d.ok; ss.inp+=d.inprogress; ss.mbh+=d.mbh; ss.miss+=d.missed; ss.claim+=d.claimed;
                 });
             });
+
+            const showClaim = filterType !== 'pickup';
+            document.querySelectorAll('.claim-col').forEach(el => el.style.display = showClaim ? 'table-cell' : 'none');
+
             const renderRow = (label, d) => {
                 const sla = d.total > 0 ? (d.ok / d.total * 100) : 0;
                 const slaColor = getSLAColor(sla, d.type);
-                const showClaim = filterType === 'delivery' || d.claim > 0;
-                return `<tr class="hover:bg-black/5">
-                    <td class="p-2 pl-4 font-bold text-slate-700">${label}</td>
-                    <td class="p-2 text-right font-bold text-slate-800">${d.total.toLocaleString()}</td>
-                    <td class="p-2 text-center"><div class="${slaColor} text-[10px] text-white font-bold px-2 py-0.5 rounded-full inline-block">${sla.toFixed(0)}%</div></td>
-                    <td class="p-2 text-right text-red-500 font-bold">${d.miss}</td>
-                    <td class="p-2 text-right pr-4 ${showClaim?'':'hidden'}">${d.claim}</td>
+                return `<tr class="hover:bg-black/5 border-b border-black/5">
+                    <td class="p-3 pl-4 font-bold text-slate-700">${label}</td>
+                    <td class="p-3 text-right font-bold text-slate-800">${d.total.toLocaleString()}</td>
+                    <td class="p-3 text-right font-medium text-slate-600">${d.ok.toLocaleString()}</td>
+                    <td class="p-3 text-center"><div class="${slaColor} text-[10px] text-white font-bold px-2 py-0.5 rounded-full inline-block">${sla.toFixed(0)}%</div></td>
+                    <td class="p-3 text-right text-slate-500">${d.inp}</td>
+                    <td class="p-3 text-right text-orange-500">${d.mbh}</td>
+                    <td class="p-3 text-right text-red-500 font-bold">${d.miss}</td>
+                    <td class="p-3 text-right pr-4 text-purple-600 font-medium ${showClaim?'':'hidden'}">${d.claim}</td>
                 </tr>`;
             };
+
+            const renderFooter = (list) => {
+                let t=0, o=0, i=0, mb=0, m=0, c=0;
+                list.forEach(x => { t+=x.total; o+=x.ok; i+=x.inp; mb+=x.mbh; m+=x.miss; c+=x.claim; });
+                
+                // Hitung Rata-rata %OK Total
+                const avgPct = t > 0 ? (o / t * 100) : 0;
+                const avgColor = getSLAColor(avgPct, filterType);
+
+                return `<tr class="bg-slate-200/50 font-bold text-slate-800 border-t-2 border-slate-300">
+                    <td class="p-3 pl-4">TOTAL</td>
+                    <td class="p-3 text-right">${t.toLocaleString()}</td>
+                    <td class="p-3 text-right">${o.toLocaleString()}</td>
+                    <td class="p-3 text-center"><div class="${avgColor} text-[10px] text-white font-bold px-2 py-0.5 rounded-full inline-block">${avgPct.toFixed(1)}%</div></td>
+                    <td class="p-3 text-right">${i}</td>
+                    <td class="p-3 text-right">${mb}</td>
+                    <td class="p-3 text-right text-red-600">${m}</td>
+                    <td class="p-3 text-right pr-4 ${showClaim?'':'hidden'}">${c}</td>
+                </tr>`;
+            }
+
+            const listSvc = Object.entries(byService).map(([k,v]) => ({label:k, ...v})).sort((a,b)=>b.total - a.total);
             const elSvc = document.getElementById('body-breakdown-service');
-            if (elSvc) elSvc.innerHTML = Object.entries(byService).map(([k,v]) => ({label:k, ...v})).sort((a,b)=>b.total - a.total).map(item => renderRow(item.label, item)).join('');
+            if (elSvc) {
+                elSvc.innerHTML = listSvc.map(item => renderRow(item.label, item)).join('');
+                document.getElementById('foot-breakdown-service').innerHTML = renderFooter(listSvc);
+            }
+
+            const listStg = Object.values(byStaging).sort((a,b)=>b.total - a.total);
             const elStg = document.getElementById('body-breakdown-staging');
-            if (elStg) elStg.innerHTML = Object.values(byStaging).sort((a,b)=>b.total - a.total).map(item => renderRow(item.name, item)).join('');
-            const showClaimGlobally = filterType !== 'pickup';
-            document.querySelectorAll('.claim-col').forEach(el => el.classList.toggle('hidden', !showClaimGlobally));
+            if (elStg) {
+                elStg.innerHTML = listStg.map(item => renderRow(item.name, item)).join('');
+                document.getElementById('foot-breakdown-staging').innerHTML = renderFooter(listStg);
+            }
         }
 
         function getSLAColor(pct, type) {
@@ -734,14 +890,36 @@
                     total_ext: parseInt(inps[isDel?8:7].value)||0, feed_ext: inps[isDel?9:8].value
                 });
             });
-            btn.disabled = true; const originalBtn = btn.innerHTML;
+            
+            btn.disabled = true; 
+            const originalContent = btn.innerHTML; // Simpan konten asli (termasuk span btn-submit-text)
             btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Loading...';
+            
             try {
                 const payload = { date, type, reporterName: picName, reporterId: picId, kodeSS, grandTotalVolume: gTotal, details, timestamp: serverTimestamp() };
-                if(editId) { await updateDoc(doc(db,'reports',editId), payload); showNotification("Data diperbarui!"); window.cancelEditMode(); }
-                else { await addDoc(collection(db,'reports'), payload); showNotification("Laporan tersimpan!"); document.getElementById('report-form').reset(); setupReportForm(); renderInputTable(); }
-            } catch(e) { console.error(e); showNotification("Gagal menyimpan", "error"); }
-            btn.disabled = false; btn.innerHTML = originalBtn;
+                if(editId) { 
+                    await updateDoc(doc(db,'reports',editId), payload); 
+                    showNotification("Data diperbarui!"); 
+                    // Kembalikan konten tombol sebelum memanggil cancelEditMode
+                    btn.innerHTML = originalContent;
+                    window.cancelEditMode(); 
+                }
+                else { 
+                    await addDoc(collection(db,'reports'), payload); 
+                    showNotification("Laporan tersimpan!"); 
+                    // Kembalikan konten tombol juga di sini
+                    btn.innerHTML = originalContent;
+                    document.getElementById('report-form').reset(); 
+                    setupReportForm(); 
+                    renderInputTable(); 
+                }
+            } catch(e) { 
+                console.error(e); 
+                showNotification("Gagal menyimpan", "error"); 
+                // Kembalikan konten tombol jika error
+                btn.innerHTML = originalContent;
+            }
+            btn.disabled = false; 
         });
 
         window.requestEditReport = (id) => { if(currentUser.role==='coordinator') loadReportToForm(id); else openAuthModal('editReport', id); }
@@ -775,7 +953,13 @@
             document.getElementById('report-form').reset();
             document.getElementById('report-id-hidden').value = '';
             document.getElementById('edit-mode-indicator').classList.add('hidden');
-            document.getElementById('btn-submit-text').textContent = "Simpan Laporan";
+            
+            // Safety Check: Pastikan elemen ada sebelum mengubah textContent
+            const btnText = document.getElementById('btn-submit-text');
+            if (btnText) {
+                btnText.textContent = "Simpan Laporan";
+            }
+            
             setupReportForm(); renderInputTable();
         }
 
