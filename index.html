@@ -386,7 +386,7 @@
                 </div>
                 <div class="glass-panel rounded-[32px] p-6">
                     <div class="flex justify-between items-center mb-4"><h3 class="text-sm font-bold text-slate-800">Riwayat Terkini</h3><select id="filter-user" class="ios-input py-1 px-3 text-xs font-bold"><option value="all">Semua</option></select></div>
-                    <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead class="text-slate-400 text-[10px] uppercase font-bold border-b border-black/5"><tr><th class="p-3">Tgl</th><th class="p-3">User</th><th class="p-3">Tipe</th><th class="p-3">Vol</th><th class="p-3 text-center">Aksi</th></tr></thead><tbody id="reports-table-body" class="text-xs font-medium divide-y divide-black/5"></tbody></table></div>
+                    <div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead class="text-slate-400 text-[10px] uppercase font-bold border-b border-black/5"><tr><th class="p-3">Tgl</th><th class="p-3">Identitas</th><th class="p-3">Tipe</th><th class="p-3 w-1/2">Rincian Per Service</th><th class="p-3 text-center">Aksi</th></tr></thead><tbody id="reports-table-body" class="text-xs font-medium divide-y divide-black/5"></tbody></table></div>
                 </div>
             </div>
 
@@ -656,13 +656,15 @@
                 type: 'bar',
                 data: { labels: keysM, datasets: [{ type:'bar', label:'Vol', data:datM_Vol, backgroundColor:'#007AFF', borderRadius:4, order:2 }, { type:'line', label:'% SLA', data:datM_SLA, borderColor:'#FF9500', borderWidth:3, tension:0.3, pointRadius:3, yAxisID:'y1', order:1 }] },
                 options: { 
+                    layout: { padding: { top: 20 } },
                     responsive:true, maintainAspectRatio:false, 
                     plugins:{ 
                         legend:{display:false},
                         datalabels: {
-                            color: (context) => context.dataset.type === 'line' ? '#FF9500' : '#fff',
+                            color: (context) => context.dataset.type === 'line' ? '#FF9500' : '#1e293b', 
                             anchor: (context) => context.dataset.type === 'line' ? 'start' : 'end',
-                            align: (context) => context.dataset.type === 'line' ? 'top' : 'bottom',
+                            align: (context) => context.dataset.type === 'line' ? 'top' : 'top', 
+                            offset: (context) => context.dataset.type === 'line' ? 4 : -5,
                             font: { weight: 'bold', size: 10 },
                             formatter: (val) => val > 0 ? val : ''
                         }
@@ -688,13 +690,15 @@
                 type: 'bar',
                 data: { labels: lblD, datasets: [{ type:'bar', label:'Vol', data:datD_Vol, backgroundColor:'#34C759', borderRadius:4, order:2 }, { type:'line', label:'% SLA', data:datD_SLA, borderColor:'#007AFF', borderWidth:3, tension:0.3, pointRadius:3, yAxisID:'y1', order:1 }] },
                 options: { 
+                    layout: { padding: { top: 20 } },
                     responsive:true, maintainAspectRatio:false, 
                     plugins:{ 
                         legend:{display:false},
                         datalabels: {
-                            color: (context) => context.dataset.type === 'line' ? '#007AFF' : '#fff',
+                            color: (context) => context.dataset.type === 'line' ? '#007AFF' : '#1e293b', 
                             anchor: (context) => context.dataset.type === 'line' ? 'start' : 'end',
-                            align: (context) => context.dataset.type === 'line' ? 'top' : 'bottom',
+                            align: (context) => context.dataset.type === 'line' ? 'top' : 'top', 
+                            offset: (context) => context.dataset.type === 'line' ? 4 : -5,
                             font: { weight: 'bold', size: 9 },
                             formatter: (val) => val > 0 ? val : ''
                         }
@@ -974,17 +978,50 @@
         function renderReportsTable() {
             const f = document.getElementById('filter-user').value; let d = allReports;
             if(f !== 'all') d = d.filter(x => x.reporterName === f);
+            
             document.getElementById('reports-table-body').innerHTML = d.map(r => {
                 const date = r.date ? new Date(r.date).toLocaleDateString('id-ID') : '-';
-                let det = '', ti=0, te=0; r.details?.forEach(x => { if(x.total>0) det += x.total; ti+=x.total_int||0; te+=x.total_ext||0; });
-                return `<tr class="border-b border-black/5 last:border-0 align-middle">
-                    <td class="p-3 text-[10px] font-mono text-slate-500">${date}</td>
-                    <td class="p-3"><div class="font-bold text-slate-800 text-xs truncate max-w-[80px]">${r.reporterName}</div></td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${r.type==='delivery'?'bg-blue-100 text-blue-600':'bg-orange-100 text-orange-600'}">${r.type.substr(0,3)}</span></td>
-                    <td class="p-3 font-bold text-xs text-slate-700">${det}</td>
-                    <td class="p-3 text-center"><div class="flex gap-2 justify-center"><button onclick="requestEditReport('${r.id}')" class="text-blue-500"><i class="fa-solid fa-pen"></i></button><button onclick="requestDeleteReport('${r.id}')" class="text-red-400"><i class="fa-solid fa-trash"></i></button></div></td>
+                
+                // Build Detail Breakdown Grid
+                let detailsHTML = '<div class="space-y-1.5">';
+                let hasDetails = false;
+                
+                r.details?.forEach(d => {
+                    if(d.total > 0) {
+                        hasDetails = true;
+                        detailsHTML += `
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] border-b border-dashed border-slate-200 pb-1 last:border-0">
+                            <span class="font-bold w-8 text-slate-700">${d.label}</span>
+                            <span class="bg-blue-50 text-blue-600 px-1.5 rounded font-bold">Tot:${d.total}</span>
+                            <span class="text-green-600">OK:${d.ok}</span>
+                            <span class="text-slate-400">Pr:${d.inprogress}</span>
+                            ${d.missed > 0 ? `<span class="text-red-500 font-bold">Ms:${d.missed}</span>` : ''}
+                            ${d.claimed > 0 ? `<span class="text-purple-500 font-bold">Cl:${d.claimed}</span>` : ''}
+                        </div>`;
+                    }
+                });
+                detailsHTML += '</div>';
+                
+                if (!hasDetails) detailsHTML = '<span class="text-slate-400 italic text-[10px]">Tidak ada data volume</span>';
+
+                return `<tr class="border-b border-black/5 last:border-0 align-top hover:bg-slate-50/50 transition-colors">
+                    <td class="p-3 text-[10px] font-mono text-slate-500 font-medium">${date}</td>
+                    <td class="p-3">
+                        <div class="font-bold text-slate-800 text-xs">${r.reporterName}</div>
+                        <div class="text-[9px] text-slate-500 font-mono font-bold mt-0.5 uppercase tracking-wide bg-slate-100 inline-block px-1 rounded">${r.kodeSS||'-'}</div>
+                    </td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border ${r.type==='delivery'?'bg-blue-50 text-blue-600 border-blue-100':'bg-orange-50 text-orange-600 border-orange-100'}">${r.type.substr(0,3)}</span>
+                    </td>
+                    <td class="p-3">${detailsHTML}</td>
+                    <td class="p-3 text-center">
+                        <div class="flex flex-col gap-2 items-center justify-center">
+                            <button onclick="requestEditReport('${r.id}')" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="requestDeleteReport('${r.id}')" class="text-red-400 hover:bg-red-50 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </td>
                 </tr>`;
-            }).join('') || '<tr><td colspan="5" class="p-6 text-center text-slate-400 italic text-xs">Kosong</td></tr>';
+            }).join('') || '<tr><td colspan="5" class="p-8 text-center text-slate-400 italic text-xs">Belum ada laporan masuk</td></tr>';
         }
         function updateFilterUser() {
             const sel = document.getElementById('filter-user'); const cur = sel.value;
