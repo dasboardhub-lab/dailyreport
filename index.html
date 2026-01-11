@@ -11,11 +11,11 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Chart.js & Datalabels Plugin -->
+    <!-- Chart.js & Datalabels -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
-    <!-- Font: San Francisco Alternative (Inter) -->
+    <!-- Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Config Tailwind -->
@@ -23,16 +23,27 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'] },
+                    fontFamily: { sans: ['Inter', '-apple-system', 'sans-serif'] },
                     colors: {
-                        ios: { blue: '#007AFF', blueDark: '#005ec4', gray: '#F2F2F7', light: '#FFFFFF', dark: '#1C1C1E', red: '#FF3B30', green: '#34C759', orange: '#FF9500' }
+                        ios: { 
+                            blue: '#007AFF', 
+                            bg: '#F2F2F7', 
+                            card: 'rgba(255, 255, 255, 0.72)',
+                            text: '#1C1C1E', 
+                            green: '#34C759', 
+                            red: '#FF3B30', 
+                            orange: '#FF9500',
+                            gray: '#8E8E93'
+                        }
                     },
                     boxShadow: {
-                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
-                        'ios': '0 4px 24px rgba(0,0,0,0.06)'
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.04)',
+                        'island': '0 8px 20px rgba(0,0,0,0.25)',
+                        'soft': '0 4px 20px -2px rgba(0,0,0,0.05)'
                     },
                     animation: {
-                        'bounce-short': 'bounce 0.5s ease-in-out 1.5'
+                        'island-pop': 'islandPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                        'fade-in': 'fadeIn 0.4s ease-out'
                     }
                 }
             }
@@ -42,223 +53,301 @@
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background: #F2F2F7;
-            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            background-color: #F5F5F7;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(0, 122, 255, 0.08) 0, transparent 50%), 
+                radial-gradient(at 90% 10%, rgba(255, 59, 48, 0.05) 0, transparent 50%), 
+                radial-gradient(at 50% 90%, rgba(52, 199, 89, 0.08) 0, transparent 50%);
             background-attachment: fixed;
             background-size: cover;
-            color: #1C1C1E;
+            color: #1D1D1F;
             -webkit-tap-highlight-color: transparent;
         }
-        .glass-panel { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.5); }
-        .glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-bottom: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03); }
-        .ios-input { background: rgba(118, 118, 128, 0.12); border: none; border-radius: 10px; padding: 10px 14px; font-size: 15px; transition: background 0.2s; }
-        .ios-input:focus { background: rgba(118, 118, 128, 0.2); outline: none; }
-        .ios-input:disabled, .ios-input[readonly] { background: rgba(118, 118, 128, 0.05); color: #9ca3af; cursor: not-allowed; }
-        .input-cell input { width: 100%; text-align: center; background: transparent; border: none; border-radius: 6px; padding: 6px; font-size: 0.95rem; font-weight: 600; }
-        .input-cell input:focus { background: rgba(0, 122, 255, 0.1); color: #007AFF; outline: none; }
+
+        /* Glassmorphism Classes */
+        .glass-panel { 
+            background: rgba(255, 255, 255, 0.65); 
+            backdrop-filter: blur(24px); 
+            -webkit-backdrop-filter: blur(24px); 
+            border: 1px solid rgba(255, 255, 255, 0.6); 
+            box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.04);
+        }
+        
+        .glass-nav { 
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: saturate(180%) blur(20px); 
+            -webkit-backdrop-filter: saturate(180%) blur(20px); 
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05); 
+        }
+
+        /* Inputs */
+        .ios-input { 
+            background: #EFEEF0; 
+            border: 1px solid transparent; 
+            border-radius: 12px; 
+            padding: 12px 16px; 
+            font-size: 14px; 
+            font-weight: 500;
+            transition: all 0.2s; 
+            color: #1D1D1F;
+        }
+        .ios-input:focus { 
+            background: #FFFFFF; 
+            border-color: #007AFF; 
+            outline: none; 
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15); 
+        }
+        
+        /* Table Input Cells */
+        .input-cell input { 
+            width: 100%; text-align: center; background: transparent; 
+            border: 1px solid transparent; border-radius: 8px; padding: 6px; 
+            font-size: 0.9rem; font-weight: 600; transition: all 0.2s;
+        }
+        .input-cell input:focus { 
+            background: white; border-color: #007AFF; outline: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
         .total-cell input { font-weight: 800; color: #007AFF; }
+        
+        /* Utility */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .animate-scale-in { animation: scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
-        .animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        @keyframes pop { 0% { opacity: 0; transform: scale(0.5); } 100% { opacity: 1; transform: scale(1); } }
-        .nav-active { background: #007AFF; color: white !important; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); }
-        .nav-active i { color: white !important; }
-        .nav-item:hover:not(.nav-active) { background: rgba(0,0,0,0.05); }
-        .hidden { display: none !important; }
-        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .kpi-card { transition: transform 0.2s; }
-        .kpi-card:hover { transform: translateY(-2px); }
-        .col-metric { width: 11%; text-align: right; }
         
-        /* Table Header Custom Style - Sticky Support */
-        .table-header-custom {
-            color: white;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
+        /* Dynamic Island Animation */
+        .dynamic-island {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: top center;
         }
+        .dynamic-island.active {
+            width: auto;
+            min-width: 300px;
+            border-radius: 28px;
+            padding: 12px 20px;
+        }
+        .dynamic-island.idle {
+            width: 0px; 
+            min-width: 0px;
+            height: 0px;
+            padding: 0;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.8) translateY(-20px);
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        
+        .nav-active { background: #007AFF; color: white !important; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25); }
+        .nav-item { transition: all 0.3s ease; }
+        
+        /* Table Header */
         .table-header-custom th { 
-            background-color: #1e293b; 
-            border-bottom: 2px solid rgba(255,255,255,0.1); 
+            background-color: #F9F9FB; 
+            color: #8E8E93; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            font-size: 0.7rem; 
+            letter-spacing: 0.05em; 
+            border-bottom: 1px solid #E5E5EA;
         }
         
-        /* Toggle Switch Style */
-        .type-toggle-btn.active { background-color: #007AFF; color: white; box-shadow: 0 2px 5px rgba(0,122,255,0.3); }
-        .type-toggle-btn { color: #64748b; background-color: transparent; }
+        /* Toggle Switch */
+        .type-toggle-btn.active { background-color: #FFFFFF; color: #007AFF; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .type-toggle-btn { color: #8E8E93; background-color: transparent; }
     </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col">
+<body class="antialiased min-h-screen flex flex-col overflow-x-hidden">
 
-    <!-- --- GLOBAL LOADER ANIMATION --- -->
-    <div id="global-loader" class="fixed inset-0 z-[60] bg-black/30 backdrop-blur-sm flex items-center justify-center hidden transition-opacity duration-300">
-        <div class="bg-white/90 p-6 rounded-[24px] shadow-2xl flex flex-col items-center animate-pop backdrop-blur-md border border-white/50">
-            <div class="relative w-16 h-16 mb-4">
-                <div class="absolute inset-0 rounded-full border-4 border-slate-100"></div>
-                <div class="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <i class="fa-solid fa-paper-plane text-blue-500 text-lg animate-pulse"></i>
+    <!-- --- DYNAMIC ISLAND NOTIFICATION --- -->
+    <div class="fixed top-4 left-0 right-0 z-[100] flex justify-center pointer-events-none">
+        <div id="dynamic-island" class="dynamic-island idle bg-black text-white shadow-island flex items-center justify-between gap-4 pointer-events-auto">
+            <!-- Content will be injected here via JS -->
+            <div class="flex items-center gap-3">
+                <div id="island-icon" class="text-xl"></div>
+                <div class="flex flex-col">
+                    <span id="island-title" class="text-xs font-bold text-gray-400 leading-none mb-0.5">Notification</span>
+                    <span id="island-msg" class="text-sm font-semibold leading-none">Message</span>
                 </div>
             </div>
-            <p id="loader-text" class="text-sm font-bold text-slate-600 tracking-wide">Memproses...</p>
+        </div>
+    </div>
+
+    <!-- --- GLOBAL LOADER --- -->
+    <div id="global-loader" class="fixed inset-0 z-[60] bg-white/80 backdrop-blur-md flex items-center justify-center hidden transition-all duration-300">
+        <div class="flex flex-col items-center">
+            <div class="relative w-12 h-12 mb-4">
+                <svg class="animate-spin text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </div>
+            <p id="loader-text" class="text-xs font-bold text-gray-400 tracking-wider uppercase animate-pulse">Loading...</p>
         </div>
     </div>
 
     <!-- --- LOGIN PAGE --- -->
-    <div id="login-page" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 w-full h-full bg-black/40 backdrop-blur-md">
-        <div class="glass-panel w-full max-w-[340px] p-8 rounded-[32px] shadow-2xl animate-scale-in flex flex-col items-center">
-            <div class="w-20 h-20 bg-gradient-to-tr from-blue-500 to-cyan-400 rounded-[22px] flex items-center justify-center mb-6 shadow-lg shadow-blue-500/30">
-                <i class="fa-solid fa-file-contract text-white text-3xl"></i>
+    <div id="login-page" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 w-full h-full bg-[#F5F5F7]">
+        <div class="w-full max-w-[360px] flex flex-col items-center animate-fade-in">
+            <div class="w-24 h-24 bg-gradient-to-br from-[#007AFF] to-[#00C7BE] rounded-[28px] flex items-center justify-center mb-8 shadow-2xl shadow-blue-500/20 transform hover:scale-105 transition-transform duration-500">
+                <i class="fa-solid fa-chart-pie text-white text-4xl"></i>
             </div>
-            <h1 class="text-2xl font-bold text-slate-800 mb-1">AReport</h1>
-            <p class="text-slate-500 text-sm mb-8 font-medium">Daily Report SLA</p>
+            
+            <div class="glass-panel w-full p-8 rounded-[32px] flex flex-col items-center relative overflow-hidden">
+                <h1 class="text-2xl font-bold text-[#1D1D1F] mb-1">Welcome Back</h1>
+                <p class="text-gray-400 text-sm mb-8 font-medium">Masuk untuk mengakses laporan</p>
 
-            <div class="bg-slate-200/50 p-1 rounded-xl w-full flex mb-6 relative">
-                <div class="w-full grid grid-cols-2 relative z-10">
-                    <button onclick="switchLoginTab('user')" id="tab-login-user" class="py-1.5 text-xs font-bold rounded-lg transition-all shadow-sm bg-white text-slate-800">PIC</button>
-                    <button onclick="switchLoginTab('admin')" id="tab-login-admin" class="py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500">Admin</button>
+                <div class="bg-[#EFEEF0] p-1 rounded-xl w-full flex mb-6 relative">
+                    <div class="w-full grid grid-cols-2 relative z-10">
+                        <button onclick="switchLoginTab('user')" id="tab-login-user" class="py-2 text-xs font-bold rounded-[10px] transition-all shadow-sm bg-white text-black">PIC / User</button>
+                        <button onclick="switchLoginTab('admin')" id="tab-login-admin" class="py-2 text-xs font-bold rounded-[10px] transition-all text-gray-500 hover:text-gray-700">Admin</button>
+                    </div>
                 </div>
-            </div>
 
-            <form id="login-form" class="w-full space-y-4">
-                <input type="hidden" id="login-type" value="user">
-                <div id="login-intro-text" class="hidden"></div>
-                <div id="username-container">
-                    <input type="text" id="username" class="ios-input w-full text-center font-medium placeholder:text-slate-400" placeholder="ID (Angka)" required>
+                <form id="login-form" class="w-full space-y-4">
+                    <input type="hidden" id="login-type" value="user">
+                    <div id="username-container">
+                        <input type="text" id="username" class="ios-input w-full text-center placeholder:text-gray-400" placeholder="Masukkan ID (Angka)" required>
+                    </div>
+                    <div>
+                        <input type="password" id="password" class="ios-input w-full text-center placeholder:text-gray-400" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="w-full bg-[#007AFF] hover:bg-[#0062cc] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all mt-4 text-sm">
+                        Sign In
+                    </button>
+                </form>
+                
+                <div id="login-error" class="mt-4 text-center text-red-500 text-xs font-bold hidden bg-red-50 px-4 py-2 rounded-lg w-full">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> <span>Error message</span>
                 </div>
-                <div>
-                    <input type="password" id="password" class="ios-input w-full text-center font-medium placeholder:text-slate-400" placeholder="Password" required>
-                </div>
-                <button type="submit" class="w-full bg-[#007AFF] hover:bg-[#0062cc] text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all mt-2">
-                    Masuk
-                </button>
-            </form>
-            <div id="login-error" class="mt-4 text-center text-red-500 text-xs font-bold hidden bg-red-50 px-3 py-2 rounded-lg">
-                <i class="fa-solid fa-circle-exclamation mr-1"></i> <span></span>
             </div>
+            <p class="mt-8 text-xs text-gray-400">© 2024 Daily Report System</p>
         </div>
     </div>
 
-
     <!-- --- MAIN APP --- -->
-    <div id="main-app" class="hidden flex-1 flex flex-col relative">
+    <div id="main-app" class="hidden flex-1 flex flex-col relative min-h-screen">
         
         <!-- TOP NAVIGATION -->
-        <header class="fixed top-0 left-0 right-0 z-40 glass-nav h-20 px-4 md:px-8 flex items-center justify-between">
+        <header class="fixed top-0 left-0 right-0 z-40 glass-nav h-16 px-4 md:px-8 flex items-center justify-between transition-all">
             <div class="flex items-center gap-3 shrink-0">
-                <div class="w-10 h-10 bg-gradient-to-b from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-md">
-                    <i class="fa-solid fa-chart-simple text-sm"></i>
+                <div class="w-8 h-8 bg-black text-white rounded-lg flex items-center justify-center shadow-md">
+                    <i class="fa-solid fa-bolt text-xs"></i>
                 </div>
-                <div class="hidden md:flex flex-col">
-                    <span class="font-bold text-slate-800 text-lg leading-tight">AReport</span>
-                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Dashboard Pro</span>
-                </div>
+                <span class="font-bold text-[#1D1D1F] text-lg tracking-tight">AReport</span>
             </div>
 
-            <nav class="flex-1 flex justify-center mx-4 overflow-x-auto no-scrollbar">
-                <div class="flex items-center bg-slate-100/70 p-1 rounded-2xl border border-slate-200/50 backdrop-blur-md">
-                    <button onclick="showTab('dashboard')" id="nav-dashboard" class="nav-item nav-active px-4 py-2 rounded-xl text-xs md:text-sm font-bold text-slate-500 transition-all flex items-center gap-2 whitespace-nowrap">
-                        <i class="fa-solid fa-table-columns"></i> <span>Dashboard</span>
+            <nav class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 hidden md:block">
+                <div class="flex items-center bg-[#EFEEF0] p-1 rounded-full border border-white/50">
+                    <button onclick="showTab('dashboard')" id="nav-dashboard" class="nav-item nav-active px-5 py-1.5 rounded-full text-xs font-bold text-gray-500 flex items-center gap-2">
+                        Dashboard
                     </button>
-                    <button onclick="showTab('reports')" id="nav-reports" class="nav-item px-4 py-2 rounded-xl text-xs md:text-sm font-bold text-slate-500 transition-all flex items-center gap-2 whitespace-nowrap">
-                        <i class="fa-solid fa-list-check"></i> <span>Riwayat Laporan</span>
+                    <button onclick="showTab('reports')" id="nav-reports" class="nav-item px-5 py-1.5 rounded-full text-xs font-bold text-gray-500 flex items-center gap-2">
+                        Reports
                     </button>
-                    <button onclick="showTab('settings')" id="nav-settings" class="nav-item hidden px-4 py-2 rounded-xl text-xs md:text-sm font-bold text-slate-500 transition-all flex items-center gap-2 whitespace-nowrap">
-                        <i class="fa-solid fa-users-gear"></i> <span>Admin</span>
+                    <button onclick="showTab('settings')" id="nav-settings" class="nav-item hidden px-5 py-1.5 rounded-full text-xs font-bold text-gray-500 flex items-center gap-2">
+                        Admin
                     </button>
                 </div>
             </nav>
 
-            <div class="flex items-center gap-3 shrink-0">
-                <div class="text-right hidden sm:block">
-                    <p id="user-display-name" class="text-xs font-bold text-slate-800">User</p>
-                    <p id="user-display-role" class="text-[9px] text-blue-500 font-bold uppercase">Role</p>
+            <!-- Mobile Nav Button (Visible on small screens) -->
+            <div class="md:hidden absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex bg-[#EFEEF0] p-1 rounded-xl">
+                 <button onclick="showTab('dashboard')" class="p-2 text-gray-600 active:text-blue-500"><i class="fa-solid fa-chart-pie"></i></button>
+                 <button onclick="showTab('reports')" class="p-2 text-gray-600 active:text-blue-500"><i class="fa-solid fa-list"></i></button>
+                 <button onclick="showTab('settings')" id="mobile-nav-settings" class="hidden p-2 text-gray-600 active:text-blue-500"><i class="fa-solid fa-gear"></i></button>
+            </div>
+
+            <div class="flex items-center gap-4 shrink-0">
+                <div class="text-right hidden sm:block leading-tight">
+                    <p id="user-display-name" class="text-xs font-bold text-[#1D1D1F]">User</p>
+                    <p id="user-display-role" class="text-[10px] text-blue-500 font-bold uppercase tracking-wide">Role</p>
                 </div>
-                <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs border border-white shadow-sm" id="avatar-initials">U</div>
-                <button onclick="logout()" class="w-9 h-9 bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-full flex items-center justify-center transition-colors border border-slate-200" title="Keluar">
-                    <i class="fa-solid fa-power-off text-xs"></i>
+                <button onclick="logout()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors flex items-center justify-center">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
                 </button>
             </div>
         </header>
 
         <!-- CONTENT AREA -->
-        <main class="flex-1 w-full max-w-[1920px] mx-auto pt-24 px-4 md:px-8 lg:px-12 pb-10 animate-scale-in">
+        <main class="flex-1 w-full max-w-[1400px] mx-auto pt-24 px-4 md:px-6 pb-12 animate-fade-in">
             
             <!-- 1. DASHBOARD TAB -->
             <div id="tab-dashboard" class="space-y-6">
-                <!-- Greeting Card -->
-                <div class="glass-panel p-6 md:p-8 rounded-[32px] relative overflow-hidden">
-                    <div class="relative z-10">
-                        <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-1">Overview</h2>
-                        <p class="text-slate-500 text-sm">Selamat datang kembali, <span id="dashboard-greeting-name" class="text-blue-600 font-bold">User</span>.</p>
+                <!-- Header & Filters -->
+                <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-[#1D1D1F] tracking-tight">Overview</h2>
+                        <p class="text-gray-500 text-sm">Update performa harian Anda.</p>
                     </div>
-                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl"></div>
-                </div>
-
-                <!-- Filter Bar (Global) -->
-                <div class="glass-panel p-2 rounded-2xl flex flex-col md:flex-row gap-2 md:items-center overflow-x-auto">
-                    <div class="flex items-center bg-slate-100/50 rounded-xl px-3 py-1.5 gap-2 border border-slate-200/50">
-                        <i class="fa-regular fa-calendar text-slate-400 text-xs"></i>
-                        <input type="date" id="dash-date-start" class="bg-transparent text-xs font-bold text-slate-600 outline-none w-24">
-                        <span class="text-slate-300 text-xs">→</span>
-                        <input type="date" id="dash-date-end" class="bg-transparent text-xs font-bold text-slate-600 outline-none w-24">
-                    </div>
-                    <div class="h-6 w-px bg-slate-200 hidden md:block"></div>
-                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 md:pb-0 items-center">
-                        <select id="dash-filter-ss" class="ios-input py-1.5 px-3 text-xs font-bold bg-slate-100/50 rounded-xl min-w-[100px]"><option value="all">Semua SS</option></select>
-                        <select id="dash-filter-service" class="ios-input py-1.5 px-3 text-xs font-bold bg-slate-100/50 rounded-xl min-w-[100px]">
-                            <option value="all">All Svc</option><option value="REG">REG</option><option value="ECO">ECO</option><option value="ND">ND</option><option value="SD/SDS">SD/SDS</option><option value="BIG">BIG</option>
+                    
+                    <div class="glass-panel p-1.5 rounded-2xl flex items-center gap-2 overflow-x-auto max-w-full no-scrollbar shadow-soft">
+                        <div class="flex items-center bg-[#F2F2F7] rounded-xl px-3 py-1.5 gap-2">
+                            <i class="fa-regular fa-calendar text-gray-400 text-xs"></i>
+                            <input type="date" id="dash-date-start" class="bg-transparent text-xs font-bold text-gray-700 outline-none w-24">
+                            <span class="text-gray-300 text-xs">→</span>
+                            <input type="date" id="dash-date-end" class="bg-transparent text-xs font-bold text-gray-700 outline-none w-24">
+                        </div>
+                        <div class="h-6 w-px bg-gray-200 hidden md:block"></div>
+                        <select id="dash-filter-ss" class="bg-transparent text-xs font-bold text-gray-600 px-2 py-1 outline-none"><option value="all">Semua SS</option></select>
+                        <select id="dash-filter-service" class="bg-transparent text-xs font-bold text-gray-600 px-2 py-1 outline-none">
+                            <option value="all">All Service</option><option value="REG">REG</option><option value="ECO">ECO</option><option value="ND">ND</option><option value="SD/SDS">SD/SDS</option><option value="BIG">BIG</option>
                         </select>
-                        <!-- Type Filter Removed from here -->
-                        <button onclick="resetFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ml-2" title="Reset Filter (30 Hari Terakhir)"><i class="fa-solid fa-rotate-right"></i></button>
+                        <button onclick="resetFilters()" class="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-500 transition-colors"><i class="fa-solid fa-rotate-cw text-xs"></i></button>
                     </div>
                 </div>
 
-                <!-- KPI CARDS GRID (Moved Up) -->
+                <!-- KPI CARDS GRID -->
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
-                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-layer-group"></i></div>
-                        <div><p class="text-xs font-bold text-slate-400 uppercase">Total</p><h3 id="kpi-val-total" class="text-2xl font-bold text-slate-800">0</h3></div>
+                    <!-- Card Template -->
+                    <div class="glass-panel p-5 rounded-[24px] flex flex-col justify-between h-32 hover:translate-y-[-4px] transition-transform duration-300">
+                        <div class="w-9 h-9 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-2"><i class="fa-solid fa-cube text-sm"></i></div>
+                        <div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Total Vol</p><h3 id="kpi-val-total" class="text-2xl font-bold text-[#1D1D1F]">0</h3></div>
                     </div>
-                    <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
-                        <div class="absolute top-4 right-4 bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-full" id="kpi-badge-ok">0%</div>
-                        <div class="w-10 h-10 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-check-circle"></i></div>
-                        <div><p class="text-xs font-bold text-slate-400 uppercase">OK</p><h3 id="kpi-val-ok" class="text-2xl font-bold text-slate-800">0</h3></div>
+                    <div class="glass-panel p-5 rounded-[24px] flex flex-col justify-between h-32 hover:translate-y-[-4px] transition-transform duration-300 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10"><i class="fa-solid fa-check-circle text-6xl text-green-500"></i></div>
+                        <div class="w-9 h-9 bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-2 z-10"><i class="fa-solid fa-check text-sm"></i></div>
+                        <div class="z-10">
+                            <div class="flex justify-between items-end">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Success</p>
+                                <span id="kpi-badge-ok" class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">0%</span>
+                            </div>
+                            <h3 id="kpi-val-ok" class="text-2xl font-bold text-[#1D1D1F]">0</h3>
+                        </div>
                     </div>
-                    <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
-                        <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-spinner"></i></div>
-                        <div><p class="text-xs font-bold text-slate-400 uppercase">Inprog</p><h3 id="kpi-val-prog" class="text-2xl font-bold text-slate-800">0</h3></div>
+                    <div class="glass-panel p-5 rounded-[24px] flex flex-col justify-between h-32 hover:translate-y-[-4px] transition-transform duration-300">
+                        <div class="w-9 h-9 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-2"><i class="fa-solid fa-spinner text-sm"></i></div>
+                        <div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">In Progress</p><h3 id="kpi-val-prog" class="text-2xl font-bold text-[#1D1D1F]">0</h3></div>
                     </div>
-                    <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
-                        <div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-hourglass-half"></i></div>
-                        <div><p class="text-xs font-bold text-slate-400 uppercase">MBH</p><h3 id="kpi-val-mbh" class="text-2xl font-bold text-slate-800">0</h3></div>
+                    <div class="glass-panel p-5 rounded-[24px] flex flex-col justify-between h-32 hover:translate-y-[-4px] transition-transform duration-300">
+                        <div class="w-9 h-9 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center mb-2"><i class="fa-solid fa-clock text-sm"></i></div>
+                        <div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">MBH</p><h3 id="kpi-val-mbh" class="text-2xl font-bold text-[#1D1D1F]">0</h3></div>
                     </div>
-                    <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
-                        <div class="w-10 h-10 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-circle-xmark"></i></div>
-                        <div><p class="text-xs font-bold text-slate-400 uppercase">Missed</p><h3 id="kpi-val-miss" class="text-2xl font-bold text-red-600">0</h3></div>
+                    <div class="glass-panel p-5 rounded-[24px] flex flex-col justify-between h-32 hover:translate-y-[-4px] transition-transform duration-300 border-red-100">
+                        <div class="w-9 h-9 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-2"><i class="fa-solid fa-xmark text-sm"></i></div>
+                        <div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Missed</p><h3 id="kpi-val-miss" class="text-2xl font-bold text-red-600">0</h3></div>
                     </div>
-                    <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative" id="kpi-card-claim">
-                        <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-                        <div><p class="text-xs font-bold text-slate-400 uppercase">Claim</p><h3 id="kpi-val-claim" class="text-2xl font-bold text-slate-800">0</h3></div>
+                    <div class="glass-panel p-5 rounded-[24px] flex flex-col justify-between h-32 hover:translate-y-[-4px] transition-transform duration-300" id="kpi-card-claim">
+                        <div class="w-9 h-9 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mb-2"><i class="fa-solid fa-coins text-sm"></i></div>
+                        <div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Claim</p><h3 id="kpi-val-claim" class="text-2xl font-bold text-[#1D1D1F]">0</h3></div>
                     </div>
                 </div>
 
-                <!-- Charts Area (Moved Up to include Filter Toggle) -->
+                <!-- Charts Area -->
                 <div class="space-y-6">
-                    <div class="glass-panel p-6 md:p-8 rounded-[32px] h-[400px] flex flex-col relative">
+                    <div class="glass-panel p-6 rounded-[32px] min-h-[400px] flex flex-col relative shadow-soft">
                         <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
-                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                <i class="fa-regular fa-calendar text-blue-500"></i> Tren Tahunan
-                            </h3>
-                            <!-- New Global Type Toggle -->
-                            <div class="flex bg-slate-100 p-1 rounded-xl w-max">
-                                <button onclick="setDashType('delivery')" id="dash-toggle-delivery" class="type-toggle-btn active px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
-                                    <i class="fa-solid fa-truck"></i> Delivery
+                            <div>
+                                <h3 class="text-lg font-bold text-[#1D1D1F]">Annual Trend</h3>
+                                <p class="text-xs text-gray-400">Performa volume & SLA tahun berjalan</p>
+                            </div>
+                            <!-- Type Toggle -->
+                            <div class="flex bg-[#F2F2F7] p-1 rounded-xl w-max self-start md:self-auto">
+                                <button onclick="setDashType('delivery')" id="dash-toggle-delivery" class="type-toggle-btn active px-4 py-1.5 rounded-[9px] text-xs font-bold transition-all flex items-center gap-2">
+                                    Delivery
                                 </button>
-                                <button onclick="setDashType('pickup')" id="dash-toggle-pickup" class="type-toggle-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
-                                    <i class="fa-solid fa-box-open"></i> Pickup
+                                <button onclick="setDashType('pickup')" id="dash-toggle-pickup" class="type-toggle-btn px-4 py-1.5 rounded-[9px] text-xs font-bold transition-all flex items-center gap-2">
+                                    Pickup
                                 </button>
                             </div>
                         </div>
@@ -267,78 +356,79 @@
                 </div>
 
                 <!-- Monthly Chart -->
-                 <div class="glass-panel p-6 md:p-8 rounded-[32px] h-[400px] flex flex-col">
-                    <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2"><i class="fa-solid fa-chart-line text-green-500"></i> Performa 30 Hari</h3>
+                 <div class="glass-panel p-6 rounded-[32px] h-[350px] flex flex-col shadow-soft">
+                    <div class="mb-4">
+                        <h3 class="text-lg font-bold text-[#1D1D1F]">Daily Performance</h3>
+                        <p class="text-xs text-gray-400">Grafik 30 hari terakhir</p>
+                    </div>
                     <div class="flex-1 w-full relative"><canvas id="chartMonthly"></canvas></div>
                 </div>
 
                 <!-- Tables -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="glass-panel rounded-[28px] overflow-hidden flex flex-col">
-                        <div class="p-5 border-b border-black/5 bg-slate-50/30">
-                            <h3 class="text-sm font-bold text-slate-800">Staging Performance</h3>
+                    <div class="glass-panel rounded-[24px] overflow-hidden flex flex-col shadow-soft">
+                        <div class="p-5 border-b border-gray-100 bg-white/40 backdrop-blur-sm">
+                            <h3 class="text-sm font-bold text-[#1D1D1F]">Staging Performance</h3>
                         </div>
-                        <div class="overflow-x-auto p-2">
+                        <div class="overflow-x-auto">
                             <table class="w-full text-xs text-left border-collapse">
                                 <thead class="table-header-custom">
                                     <tr>
-                                        <th class="p-3 pl-4">SS</th>
-                                        <th class="p-3 col-metric">Total</th>
-                                        <th class="p-3 col-metric">OK</th>
-                                        <th class="p-3 col-metric text-center">%OK</th>
-                                        <th class="p-3 col-metric text-slate-300">Inp</th>
-                                        <th class="p-3 col-metric text-orange-400">MBH</th>
-                                        <th class="p-3 col-metric text-red-400">Mis</th>
-                                        <th class="p-3 col-metric pr-4 text-purple-400 claim-col">Clm</th>
+                                        <th class="p-3 pl-5">SS Name</th>
+                                        <th class="p-3 text-right">Total</th>
+                                        <th class="p-3 text-right">OK</th>
+                                        <th class="p-3 text-center">% SLA</th>
+                                        <th class="p-3 text-right text-gray-400">Inp</th>
+                                        <th class="p-3 text-right text-orange-400">MBH</th>
+                                        <th class="p-3 text-right text-red-400">Mis</th>
+                                        <th class="p-3 text-right pr-5 text-purple-400 claim-col">Clm</th>
                                     </tr>
                                 </thead>
-                                <tbody id="body-breakdown-staging" class="divide-y divide-black/5"></tbody>
-                                <tfoot id="foot-breakdown-staging" class="bg-slate-200/50 font-bold text-slate-800 border-t border-black/10"></tfoot>
+                                <tbody id="body-breakdown-staging" class="divide-y divide-gray-100"></tbody>
                             </table>
                         </div>
                     </div>
-                    <div class="glass-panel rounded-[28px] overflow-hidden flex flex-col">
-                        <div class="p-5 border-b border-black/5 bg-slate-50/30">
-                            <h3 class="text-sm font-bold text-slate-800">Service Breakdown</h3>
+                    <div class="glass-panel rounded-[24px] overflow-hidden flex flex-col shadow-soft">
+                        <div class="p-5 border-b border-gray-100 bg-white/40 backdrop-blur-sm">
+                            <h3 class="text-sm font-bold text-[#1D1D1F]">Service Breakdown</h3>
                         </div>
-                        <div class="overflow-x-auto p-2">
+                        <div class="overflow-x-auto">
                             <table class="w-full text-xs text-left border-collapse">
                                 <thead class="table-header-custom">
                                     <tr>
-                                        <th class="p-3 pl-4">Svc</th>
-                                        <th class="p-3 col-metric">Total</th>
-                                        <th class="p-3 col-metric">OK</th>
-                                        <th class="p-3 col-metric text-center">%OK</th>
-                                        <th class="p-3 col-metric text-slate-300">Inp</th>
-                                        <th class="p-3 col-metric text-orange-400">MBH</th>
-                                        <th class="p-3 col-metric text-red-400">Mis</th>
-                                        <th class="p-3 col-metric pr-4 text-purple-400 claim-col">Clm</th>
+                                        <th class="p-3 pl-5">Service</th>
+                                        <th class="p-3 text-right">Total</th>
+                                        <th class="p-3 text-right">OK</th>
+                                        <th class="p-3 text-center">% SLA</th>
+                                        <th class="p-3 text-right text-gray-400">Inp</th>
+                                        <th class="p-3 text-right text-orange-400">MBH</th>
+                                        <th class="p-3 text-right text-red-400">Mis</th>
+                                        <th class="p-3 text-right pr-5 text-purple-400 claim-col">Clm</th>
                                     </tr>
                                 </thead>
-                                <tbody id="body-breakdown-service" class="divide-y divide-black/5"></tbody>
-                                <tfoot id="foot-breakdown-service" class="bg-slate-200/50 font-bold text-slate-800 border-t border-black/10"></tfoot>
+                                <tbody id="body-breakdown-service" class="divide-y divide-gray-100"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
                 <!-- Feedback -->
-                <div class="glass-panel p-6 rounded-[28px]">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4">Feedback Issues</h3>
+                <div class="glass-panel p-6 rounded-[24px] shadow-soft">
+                    <h3 class="text-sm font-bold text-[#1D1D1F] mb-4">Feedback Issues</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="bg-blue-50/50 rounded-2xl p-4 border border-blue-100/50">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs font-bold text-blue-600">INTERNAL</span>
-                                <span id="feedback-total-int" class="font-bold text-lg text-blue-700">0</span>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-[10px] font-bold text-blue-500 bg-white px-2 py-1 rounded-md shadow-sm">INTERNAL</span>
+                                <span id="feedback-total-int" class="font-bold text-lg text-blue-600">0</span>
                             </div>
-                            <ul id="feedback-list-int" class="text-xs space-y-2 max-h-40 overflow-y-auto no-scrollbar"></ul>
+                            <ul id="feedback-list-int" class="text-xs space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar"></ul>
                         </div>
                         <div class="bg-orange-50/50 rounded-2xl p-4 border border-orange-100/50">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs font-bold text-orange-600">EXTERNAL</span>
-                                <span id="feedback-total-ext" class="font-bold text-lg text-orange-700">0</span>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-[10px] font-bold text-orange-500 bg-white px-2 py-1 rounded-md shadow-sm">EXTERNAL</span>
+                                <span id="feedback-total-ext" class="font-bold text-lg text-orange-600">0</span>
                             </div>
-                            <ul id="feedback-list-ext" class="text-xs space-y-2 max-h-40 overflow-y-auto no-scrollbar"></ul>
+                            <ul id="feedback-list-ext" class="text-xs space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar"></ul>
                         </div>
                     </div>
                 </div>
@@ -347,100 +437,102 @@
             <!-- 2. REPORTS TAB -->
             <div id="tab-reports" class="hidden space-y-6">
                 <!-- HISTORY LIST -->
-                <div id="view-reports-list" class="glass-panel rounded-[32px] p-6 animate-scale-in">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                <div id="view-reports-list" class="glass-panel rounded-[32px] p-6 animate-fade-in shadow-soft">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <div>
-                            <h3 class="text-lg font-bold text-slate-800">Riwayat Laporan</h3>
-                            <p class="text-xs text-slate-500">Daftar laporan harian tim.</p>
+                            <h3 class="text-xl font-bold text-[#1D1D1F]">Riwayat Laporan</h3>
+                            <p class="text-xs text-gray-400">Database laporan masuk.</p>
                         </div>
                         <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                            <div class="flex items-center bg-slate-100/50 rounded-xl px-2 py-1.5 gap-2 border border-slate-200/50">
-                                <input type="date" id="hist-date-start" class="bg-transparent text-xs font-bold text-slate-600 outline-none w-24">
-                                <span class="text-slate-300 text-xs">→</span>
-                                <input type="date" id="hist-date-end" class="bg-transparent text-xs font-bold text-slate-600 outline-none w-24">
+                            <div class="flex items-center bg-[#F2F2F7] rounded-xl px-3 py-2 gap-2">
+                                <input type="date" id="hist-date-start" class="bg-transparent text-xs font-bold text-gray-600 outline-none w-24">
+                                <span class="text-gray-300 text-xs">→</span>
+                                <input type="date" id="hist-date-end" class="bg-transparent text-xs font-bold text-gray-600 outline-none w-24">
                             </div>
                             <div class="relative">
-                                <select id="filter-user" class="ios-input py-2 px-4 text-xs font-bold pr-8 appearance-none"><option value="all">Semua SS</option></select>
-                                <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none text-slate-400"><i class="fa-solid fa-chevron-down text-[10px]"></i></div>
+                                <select id="filter-user" class="appearance-none bg-[#F2F2F7] rounded-xl py-2 px-4 pr-8 text-xs font-bold text-gray-600 outline-none"><option value="all">Semua SS</option></select>
+                                <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400"><i class="fa-solid fa-chevron-down text-[10px]"></i></div>
                             </div>
-                            <!-- Tombol Plus (Hanya muncul jika bukan visitor) -->
-                            <button onclick="toggleReportForm(true)" id="btn-add-report" class="bg-[#007AFF] hover:bg-[#0062cc] text-white w-9 h-9 rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center transition-all transform hover:scale-105">
+                            <button onclick="toggleReportForm(true)" id="btn-add-report" class="bg-[#1D1D1F] hover:bg-black text-white w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-105 shadow-lg">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
                     </div>
-                    <!-- UPDATE: Max Height for Sticky Table & Sticky Thead -->
-                    <div class="overflow-auto max-h-[70vh] relative">
+                    
+                    <div class="overflow-auto max-h-[70vh] relative rounded-xl border border-gray-100">
                         <table class="w-full text-left border-collapse">
-                            <thead class="table-header-custom sticky top-0 z-20 shadow-md">
+                            <thead class="bg-[#F9F9FB] sticky top-0 z-20">
                                 <tr>
-                                    <th class="p-3 w-24">Tgl</th>
-                                    <th class="p-3 w-32">Identitas</th>
-                                    <th class="p-3 w-20">Tipe</th>
-                                    <th class="p-3">Rincian Per Service</th>
-                                    <th class="p-3 text-center w-16">Int</th>
-                                    <th class="p-3 text-center w-16">Ext</th>
-                                    <th class="p-3 w-64">Feedback</th>
-                                    <th class="p-3 text-center w-24">Aksi</th>
+                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200">Date</th>
+                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200">Identity</th>
+                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200">Type</th>
+                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200">Details</th>
+                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200 text-center">Int</th>
+                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200 text-center">Ext</th>
+                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200 w-64">Notes</th>
+                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200 text-center">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="reports-table-body" class="text-xs font-medium divide-y divide-black/5"></tbody>
+                            <tbody id="reports-table-body" class="text-xs divide-y divide-gray-100 bg-white"></tbody>
                         </table>
                     </div>
                 </div>
 
                 <!-- INPUT FORM -->
-                <div id="view-reports-form" class="hidden glass-panel rounded-[32px] p-6 md:p-8 relative animate-scale-in">
-                     <div id="edit-mode-indicator" class="hidden absolute top-0 left-0 right-0 bg-yellow-400 text-white text-center py-1 text-xs font-bold rounded-t-[32px] z-20">
-                        Mode Edit Laporan
+                <div id="view-reports-form" class="hidden glass-panel rounded-[32px] p-6 md:p-8 relative animate-fade-in shadow-soft">
+                     <div id="edit-mode-indicator" class="hidden absolute top-0 left-0 right-0 bg-orange-400 text-white text-center py-1.5 text-xs font-bold rounded-t-[32px] z-20">
+                        Editing Mode
                     </div>
                     
-                    <div class="flex justify-between items-center mb-6 mt-2">
-                        <div class="flex items-center gap-3">
-                            <button onclick="toggleReportForm(false); cancelEditMode()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors">
-                                <i class="fa-solid fa-arrow-left"></i>
-                            </button>
-                            <h2 class="text-xl font-bold text-slate-800">Form Input Laporan</h2>
+                    <div class="flex items-center gap-4 mb-8 mt-2">
+                        <button onclick="toggleReportForm(false); cancelEditMode()" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <div>
+                            <h2 class="text-2xl font-bold text-[#1D1D1F]">New Report</h2>
+                            <p class="text-sm text-gray-400">Pastikan data valid sebelum submit.</p>
                         </div>
                     </div>
 
                     <form id="report-form" class="space-y-6" onkeydown="return event.key != 'Enter';">
                         <input type="hidden" id="report-id-hidden">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="bg-white/40 p-4 rounded-2xl border border-white/50">
-                                <label class="block text-xs font-bold text-slate-400 uppercase mb-3 ml-1">Tanggal & Tipe</label>
-                                <div class="flex flex-col gap-3">
-                                    <input type="date" id="input-date" class="ios-input w-full font-bold text-slate-700">
-                                    <div class="bg-slate-200/50 p-1 rounded-xl flex">
-                                        <button type="button" onclick="selectReportType('delivery')" id="btn-type-delivery" class="flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm bg-white text-[#007AFF]">
-                                            <i class="fa-solid fa-truck"></i> Delivery
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="p-4 rounded-2xl border border-gray-200 bg-white/50">
+                                <label class="block text-xs font-bold text-gray-400 uppercase mb-3 ml-1">General Info</label>
+                                <div class="space-y-4">
+                                    <input type="date" id="input-date" class="ios-input w-full font-bold text-[#1D1D1F]">
+                                    <div class="bg-[#EFEEF0] p-1 rounded-xl flex">
+                                        <button type="button" onclick="selectReportType('delivery')" id="btn-type-delivery" class="flex-1 py-2.5 rounded-[9px] text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm bg-white text-[#007AFF]">
+                                            Delivery
                                         </button>
-                                        <button type="button" onclick="selectReportType('pickup')" id="btn-type-pickup" class="flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all text-slate-500">
-                                            <i class="fa-solid fa-box-open"></i> Pickup
+                                        <button type="button" onclick="selectReportType('pickup')" id="btn-type-pickup" class="flex-1 py-2.5 rounded-[9px] text-xs font-bold flex items-center justify-center gap-2 transition-all text-gray-500">
+                                            Pickup
                                         </button>
                                     </div>
                                     <input type="hidden" id="input-type" value="delivery">
                                 </div>
                             </div>
-                            <div class="bg-white/40 p-4 rounded-2xl border border-white/50">
-                                <div id="admin-user-select-container" class="hidden mb-2">
-                                    <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1 ml-1">Pilih User (Admin)</label>
-                                    <select id="input-admin-select-user" onchange="updateReporterInfo()" class="ios-input w-full text-xs"><option value="">-- Pilih --</option></select>
+                            <div class="p-4 rounded-2xl border border-gray-200 bg-white/50">
+                                <div id="admin-user-select-container" class="hidden mb-4">
+                                    <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1 ml-1">Input As (Admin Mode)</label>
+                                    <select id="input-admin-select-user" onchange="updateReporterInfo()" class="ios-input w-full text-xs"><option value="">-- Pilih User --</option></select>
                                 </div>
-                                <div id="leader-user-info" class="flex gap-2">
-                                    <div class="w-full"><label class="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">PIC</label><input type="text" id="input-pic-name" class="ios-input w-full text-slate-600 font-bold bg-slate-100/50" readonly><input type="hidden" id="input-pic-id"></div>
-                                    <div class="w-24 shrink-0"><label class="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">SS</label><input type="text" id="input-kode-ss" class="ios-input w-full text-slate-600 font-bold bg-slate-100/50 text-center" readonly></div>
+                                <div class="space-y-4">
+                                    <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">PIC Name</label><input type="text" id="input-pic-name" class="ios-input w-full text-gray-500 bg-gray-100" readonly><input type="hidden" id="input-pic-id"></div>
+                                    <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">SS Code</label><input type="text" id="input-kode-ss" class="ios-input w-full text-gray-500 bg-gray-100" readonly></div>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white/50 rounded-2xl overflow-hidden border border-white/60 shadow-sm">
+                        
+                        <div class="rounded-2xl overflow-hidden border border-gray-200 shadow-sm bg-white">
                             <div class="overflow-x-auto">
-                                <table class="w-full text-sm border-collapse"><thead id="table-header" class="table-header-custom"></thead><tbody id="table-body" class="divide-y divide-slate-100"></tbody></table>
+                                <table class="w-full text-sm border-collapse"><thead id="table-header" class="bg-[#F9F9FB] border-b border-gray-200"></thead><tbody id="table-body" class="divide-y divide-gray-100"></tbody></table>
                             </div>
                         </div>
-                        <div class="flex justify-end pt-2">
-                            <button type="submit" id="btn-submit-report" class="bg-[#007AFF] hover:bg-[#0062cc] text-white font-bold py-3.5 px-8 rounded-2xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all flex items-center gap-2">
-                                <i class="fa-solid fa-paper-plane"></i> <span id="btn-submit-text">Simpan Laporan</span>
+
+                        <div class="flex justify-end pt-4">
+                            <button type="submit" id="btn-submit-report" class="bg-[#007AFF] hover:bg-[#0062cc] text-white font-bold py-4 px-10 rounded-2xl shadow-lg shadow-blue-500/30 active:scale-95 transition-all flex items-center gap-2">
+                                <span id="btn-submit-text">Submit Report</span> <i class="fa-solid fa-arrow-right"></i>
                             </button>
                         </div>
                     </form>
@@ -449,58 +541,64 @@
 
             <!-- 3. SETTINGS TAB -->
             <div id="tab-settings" class="hidden space-y-6">
-                <div class="glass-panel p-6 rounded-[32px] flex flex-col md:flex-row gap-4 items-end">
-                    <div class="w-full"><label class="text-xs font-bold text-slate-500 uppercase ml-1">Security Code</label><input type="text" id="setting-admin-code" class="ios-input w-full mt-1 text-center font-mono tracking-[4px] text-lg font-bold text-slate-700" placeholder="••••••"></div>
-                    <button onclick="saveGlobalSettings()" class="bg-slate-800 text-white font-bold py-3 px-6 rounded-2xl text-sm w-full md:w-auto">Save</button>
+                <div class="glass-panel p-8 rounded-[32px] flex flex-col md:flex-row gap-6 items-end shadow-soft">
+                    <div class="w-full">
+                        <h3 class="text-lg font-bold text-[#1D1D1F] mb-1">Global Configuration</h3>
+                        <p class="text-xs text-gray-400 mb-4">Pengaturan keamanan aplikasi.</p>
+                        <label class="text-xs font-bold text-gray-500 uppercase ml-1">Admin Passcode</label>
+                        <input type="text" id="setting-admin-code" class="ios-input w-full mt-1 text-center font-mono tracking-[4px] text-lg font-bold text-[#1D1D1F]" placeholder="••••••">
+                    </div>
+                    <button onclick="saveGlobalSettings()" class="bg-[#1D1D1F] text-white font-bold py-3 px-8 rounded-xl text-sm w-full md:w-auto hover:scale-105 transition-transform">Save Changes</button>
                 </div>
-                <div class="glass-panel rounded-[32px] overflow-hidden flex flex-col">
-                    <div class="p-5 border-b border-black/5 bg-slate-50/30 flex justify-between items-center"><h3 class="text-sm font-bold text-slate-800">Team Users</h3><button onclick="prepareAddUser()" class="bg-[#007AFF] text-white p-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-plus"></i></button></div>
-                    <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="table-header-custom"><tr><th class="p-4">Nama</th><th class="p-4">Role</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Edit</th></tr></thead><tbody id="users-table-body" class="divide-y divide-black/5 text-xs"></tbody></table></div>
+                
+                <div class="glass-panel rounded-[32px] overflow-hidden flex flex-col shadow-soft">
+                    <div class="p-6 border-b border-gray-100 bg-white/40 flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-bold text-[#1D1D1F]">User Management</h3>
+                            <p class="text-xs text-gray-400">Kelola akses tim.</p>
+                        </div>
+                        <button onclick="prepareAddUser()" class="bg-[#007AFF] text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 hover:scale-105 transition-transform"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="bg-[#F9F9FB] border-b border-gray-200"><tr><th class="p-4 text-xs font-bold text-gray-500 uppercase">User Info</th><th class="p-4 text-xs font-bold text-gray-500 uppercase">Role</th><th class="p-4 text-center text-xs font-bold text-gray-500 uppercase">Status</th><th class="p-4 text-center text-xs font-bold text-gray-500 uppercase">Action</th></tr></thead><tbody id="users-table-body" class="divide-y divide-gray-100 bg-white text-xs"></tbody></table></div>
                 </div>
             </div>
 
         </main>
     </div>
 
-    <!-- MODALS -->
-    <div id="modal-add-user" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
-        <div class="bg-white/90 backdrop-blur-xl w-full max-w-sm rounded-[24px] p-6 shadow-2xl animate-scale-in">
-            <div class="flex justify-between items-center mb-4"><h3 id="modal-title" class="font-bold text-lg">User Baru</h3><button onclick="closeAddUserModal()" class="w-8 h-8 bg-slate-200 rounded-full text-slate-500"><i class="fa-solid fa-xmark"></i></button></div>
-            <form id="add-user-form" class="space-y-3">
+    <!-- MODALS (Re-styled) -->
+    <div id="modal-add-user" class="fixed inset-0 bg-black/30 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
+        <div class="bg-white/90 backdrop-blur-xl w-full max-w-sm rounded-[28px] p-6 shadow-2xl animate-island-pop">
+            <div class="flex justify-between items-center mb-6"><h3 id="modal-title" class="font-bold text-xl text-[#1D1D1F]">New User</h3><button onclick="closeAddUserModal()" class="w-8 h-8 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200"><i class="fa-solid fa-xmark"></i></button></div>
+            <form id="add-user-form" class="space-y-4">
                 <input type="hidden" id="edit-user-id">
                 <div class="grid grid-cols-2 gap-3">
-                    <select id="new-role" onchange="toggleFormFields()" class="ios-input w-full text-xs font-bold">
-                        <option value="leader">Leader</option>
-                        <option value="coordinator">Coordinator</option>
-                        <option value="visitor">Visitor</option>
-                    </select>
+                    <select id="new-role" onchange="toggleFormFields()" class="ios-input w-full text-xs font-bold"><option value="leader">Leader</option><option value="coordinator">Coordinator</option><option value="visitor">Visitor</option></select>
                     <select id="new-account-status" class="ios-input w-full text-xs font-bold"><option value="active">Active</option><option value="inactive">Inactive</option></select>
                 </div>
-                <input type="text" id="new-name" class="ios-input w-full font-bold" placeholder="Nama Lengkap" required>
-                <div class="grid grid-cols-2 gap-3"><input type="text" id="new-username" class="ios-input w-full" placeholder="ID (Angka)" required><input type="text" id="new-password" class="ios-input w-full" placeholder="Password (Min 6)" required></div>
-                <div id="leader-fields" class="grid grid-cols-2 gap-3"><input type="text" id="new-kode-ss" class="ios-input w-full" placeholder="Kode SS"><input type="text" id="new-kota" class="ios-input w-full" placeholder="Kota"></div>
-                <button type="submit" class="w-full bg-[#007AFF] text-white font-bold py-3 rounded-xl mt-2">Simpan</button>
+                <input type="text" id="new-name" class="ios-input w-full font-bold" placeholder="Full Name" required>
+                <div class="grid grid-cols-2 gap-3"><input type="text" id="new-username" class="ios-input w-full" placeholder="Numeric ID" required><input type="text" id="new-password" class="ios-input w-full" placeholder="Password" required></div>
+                <div id="leader-fields" class="grid grid-cols-2 gap-3"><input type="text" id="new-kode-ss" class="ios-input w-full" placeholder="SS Code"><input type="text" id="new-kota" class="ios-input w-full" placeholder="City"></div>
+                <button type="submit" class="w-full bg-[#007AFF] text-white font-bold py-3.5 rounded-xl mt-2 shadow-lg shadow-blue-500/20">Save User</button>
             </form>
         </div>
     </div>
 
-    <div id="modal-auth-code" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
-        <div class="bg-white/90 backdrop-blur-xl w-full max-w-xs rounded-[24px] p-6 shadow-2xl text-center animate-scale-in">
-            <h3 class="font-bold text-lg mb-1">Security Check</h3><p class="text-xs text-slate-500 mb-4">Masukkan kode admin.</p><input type="password" id="auth-code-input" class="ios-input w-full text-center tracking-[4px] text-lg font-bold mb-4" placeholder="••••••">
-            <div class="grid grid-cols-2 gap-3"><button onclick="closeAuthModal()" class="py-2.5 bg-slate-200 rounded-xl font-bold text-xs text-slate-600">Batal</button><button onclick="verifyAuthCode()" class="py-2.5 bg-[#007AFF] text-white rounded-xl font-bold text-xs">Verifikasi</button></div>
+    <div id="modal-auth-code" class="fixed inset-0 bg-black/30 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
+        <div class="bg-white/90 backdrop-blur-xl w-full max-w-xs rounded-[28px] p-8 shadow-2xl text-center animate-island-pop">
+            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-lock text-gray-500"></i></div>
+            <h3 class="font-bold text-lg mb-1">Security Check</h3><p class="text-xs text-gray-400 mb-6">Enter admin passcode to continue.</p><input type="password" id="auth-code-input" class="ios-input w-full text-center tracking-[4px] text-lg font-bold mb-6" placeholder="••••••">
+            <div class="grid grid-cols-2 gap-3"><button onclick="closeAuthModal()" class="py-3 bg-gray-100 rounded-xl font-bold text-xs text-gray-600">Cancel</button><button onclick="verifyAuthCode()" class="py-3 bg-[#007AFF] text-white rounded-xl font-bold text-xs">Verify</button></div>
         </div>
     </div>
     
-    <div id="modal-confirm-delete" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
-        <div class="bg-white/90 backdrop-blur-xl w-full max-w-xs rounded-[24px] p-6 shadow-2xl text-center animate-scale-in">
-            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 text-red-500 text-xl"><i class="fa-solid fa-trash-can"></i></div>
-            <h3 class="font-bold text-lg mb-1">Hapus Data?</h3><p id="delete-confirmation-text" class="text-xs text-slate-500 mb-4">Tindakan ini permanen.</p>
-            <div class="grid grid-cols-2 gap-3"><button onclick="closeDeleteModal()" class="py-2.5 bg-slate-200 rounded-xl font-bold text-xs text-slate-600">Batal</button><button onclick="executeDelete()" class="py-2.5 bg-red-500 text-white rounded-xl font-bold text-xs">Hapus</button></div>
+    <div id="modal-confirm-delete" class="fixed inset-0 bg-black/30 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
+        <div class="bg-white/90 backdrop-blur-xl w-full max-w-xs rounded-[28px] p-8 shadow-2xl text-center animate-island-pop">
+            <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-xl"><i class="fa-solid fa-trash-can"></i></div>
+            <h3 class="font-bold text-lg mb-1">Are you sure?</h3><p id="delete-confirmation-text" class="text-xs text-gray-400 mb-6">This action cannot be undone.</p>
+            <div class="grid grid-cols-2 gap-3"><button onclick="closeDeleteModal()" class="py-3 bg-gray-100 rounded-xl font-bold text-xs text-gray-600">Cancel</button><button onclick="executeDelete()" class="py-3 bg-red-500 text-white rounded-xl font-bold text-xs shadow-lg shadow-red-500/20">Delete</button></div>
         </div>
     </div>
-
-    <!-- UPDATE: Toast Container Centered -->
-    <div id="toast-container" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] flex flex-col gap-2 items-center w-max max-w-[90%] pointer-events-none"></div>
 
     <!-- JAVASCRIPT LOGIC -->
     <script type="module">
@@ -508,7 +606,6 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot, deleteDoc, updateDoc, doc, getDoc, setDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Register Plugin Chart JS Datalabels
         Chart.register(ChartDataLabels);
 
         const firebaseConfig = { apiKey: "AIzaSyAqbDeVLDBRDEIfi4RliLMC-3Qrwh8p96k", authDomain: "logsheet-5r.firebaseapp.com", projectId: "logsheet-5r", storageBucket: "logsheet-5r.firebasestorage.app", messagingSenderId: "358725557740", appId: "1:358725557740:web:664cca8d2ae984221ff4c9" };
@@ -521,39 +618,48 @@
         let pendingAction = null, targetId = null, currentAdminCode = "123456";
         const ROW_LABELS = ['REG', 'ECO', 'ND', 'SD/SDS', 'BIG'];
         let reportsUnsubscribe = null, usersUnsubscribe = null;
-        
-        // --- NEW: Global Filter Toggle State (Default Delivery) ---
         let currentDashType = 'delivery'; 
 
-        // AUTH INIT
         const initAuth = async () => {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth failed", error);
-            }
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+                else await signInAnonymously(auth);
+            } catch (error) { console.error("Auth failed", error); }
         };
         onAuthStateChanged(auth, (user) => { if(!user) initAuth(); });
         initAuth();
 
+        // --- DYNAMIC ISLAND NOTIFICATION LOGIC ---
+        let islandTimeout;
         function showNotification(msg, type='success') {
-            const div = document.createElement('div');
-            // Added animate-pop and shadow-2xl for better center visibility
-            div.className = `glass-panel px-6 py-4 rounded-2xl shadow-2xl text-sm font-bold flex items-center gap-3 animate-pop text-slate-800 border-l-4 ${type==='success'?'border-green-500':'border-red-500'} pointer-events-auto min-w-[280px] justify-center bg-white/95 backdrop-blur-xl`;
-            div.innerHTML = `<i class="fa-solid ${type==='success'?'fa-circle-check text-green-500 text-xl':'fa-circle-xmark text-red-500 text-xl'}"></i> <span>${msg}</span>`;
-            document.getElementById('toast-container').appendChild(div);
-            
-            // Auto remove with fade out
-            setTimeout(() => {
-                div.style.transition = 'opacity 0.3s, transform 0.3s';
-                div.style.opacity = '0';
-                div.style.transform = 'scale(0.9)';
-                setTimeout(() => div.remove(), 300);
-            }, 2500);
+            const island = document.getElementById('dynamic-island');
+            const iconEl = document.getElementById('island-icon');
+            const titleEl = document.getElementById('island-title');
+            const msgEl = document.getElementById('island-msg');
+
+            // Reset current state
+            clearTimeout(islandTimeout);
+            island.classList.remove('active', 'idle');
+            void island.offsetWidth; // Trigger reflow
+
+            // Set Content
+            if(type === 'success') {
+                iconEl.innerHTML = '<i class="fa-solid fa-circle-check text-green-500"></i>';
+                titleEl.textContent = 'Success';
+            } else {
+                iconEl.innerHTML = '<i class="fa-solid fa-circle-exclamation text-red-500"></i>';
+                titleEl.textContent = 'Error';
+            }
+            msgEl.textContent = msg;
+
+            // Animate In
+            island.classList.add('active');
+
+            // Auto Hide
+            islandTimeout = setTimeout(() => {
+                island.classList.remove('active');
+                island.classList.add('idle');
+            }, 3000);
         }
         window.showNotification = showNotification;
 
@@ -564,25 +670,20 @@
             const btnAdmin = document.getElementById('tab-login-admin');
             
             if(type==='admin') {
-                btnAdmin.className = "py-1.5 text-xs font-bold rounded-lg transition-all shadow-sm bg-white text-slate-800";
-                btnUser.className = "py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500";
+                btnAdmin.className = "py-2 text-xs font-bold rounded-[10px] transition-all shadow-sm bg-white text-[#1D1D1F]";
+                btnUser.className = "py-2 text-xs font-bold rounded-[10px] transition-all text-gray-500 hover:text-gray-700";
                 uInput.classList.add('hidden'); document.getElementById('username').value='admin';
             } else {
-                btnUser.className = "py-1.5 text-xs font-bold rounded-lg transition-all shadow-sm bg-white text-slate-800";
-                btnAdmin.className = "py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500";
+                btnUser.className = "py-2 text-xs font-bold rounded-[10px] transition-all shadow-sm bg-white text-[#1D1D1F]";
+                btnAdmin.className = "py-2 text-xs font-bold rounded-[10px] transition-all text-gray-500 hover:text-gray-700";
                 uInput.classList.remove('hidden'); if(document.getElementById('username').value==='admin') document.getElementById('username').value='';
             }
         }
 
-        function showGlobalLoader(show, text="Memproses...") {
+        function showGlobalLoader(show, text="Loading...") {
             const el = document.getElementById('global-loader');
             const txt = document.getElementById('loader-text');
-            if(show) {
-                txt.textContent = text;
-                el.classList.remove('hidden');
-            } else {
-                el.classList.add('hidden');
-            }
+            if(show) { txt.textContent = text; el.classList.remove('hidden'); } else { el.classList.add('hidden'); }
         }
 
         document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -592,8 +693,7 @@
             const p = document.getElementById('password').value.trim();
             const errEl = document.getElementById('login-error');
             
-            // Show Loader for Login
-            showGlobalLoader(true, "Masuk...");
+            showGlobalLoader(true, "Authenticating...");
 
             try {
                 if (!auth.currentUser) await initAuth();
@@ -603,44 +703,34 @@
                 let success = false;
                 if(!snap.empty) {
                     const data = snap.docs[0].data();
-                    if(data.password !== p) throw new Error("Password salah.");
-                    if(data.status === 'inactive') throw new Error("Akun Non-Aktif.");
-                    if(type === 'admin' && u !== 'admin') throw new Error("Bukan akun Admin.");
-                    if(type === 'user' && u === 'admin') throw new Error("Gunakan tab Admin.");
+                    if(data.password !== p) throw new Error("Password invalid.");
+                    if(data.status === 'inactive') throw new Error("Account inactive.");
+                    if(type === 'admin' && u !== 'admin') throw new Error("Not an admin account.");
+                    if(type === 'user' && u === 'admin') throw new Error("Use Admin tab.");
                     currentUser = { id: snap.docs[0].id, ...data };
                     success = true;
                 } else {
                     if(type==='admin' && u==='admin' && p==='TAB123') {
-                        // Cek apakah sudah ada admin lain (role coordinator)
                         const qCoord = query(collection(db, 'artifacts', appId, 'public', 'data', 'users'), where("role", "==", "coordinator"));
                         const snapCoord = await getDocs(qCoord);
-                        
                         if (snapCoord.empty) {
                             const newAdm = {name:"Super Admin", username:"admin", password:"TAB123", role:"coordinator", status:"active", createdAt:serverTimestamp()};
                             const ref = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), newAdm);
                             currentUser = {id:ref.id, ...newAdm};
                             success = true;
-                        } else {
-                            throw new Error("Username tidak ditemukan.");
-                        }
-                    } else throw new Error("Username tidak ditemukan.");
+                        } else throw new Error("User not found.");
+                    } else throw new Error("User not found.");
                 }
 
                 if(success) {
-                    // Artificial delay for animation smoothness
-                    setTimeout(() => {
-                        showGlobalLoader(false);
-                        finishLogin();
-                    }, 800);
+                    setTimeout(() => { showGlobalLoader(false); finishLogin(); showNotification(`Welcome, ${currentUser.name}!`); }, 800);
                 }
 
             } catch(err) {
                 showGlobalLoader(false);
                 errEl.querySelector('span').textContent = err.message;
                 errEl.classList.remove('hidden');
-                // Shake animation on error
-                document.querySelector('.glass-panel').classList.add('animate-bounce-short');
-                setTimeout(()=> document.querySelector('.glass-panel').classList.remove('animate-bounce-short'), 500);
+                showNotification(err.message, "error");
             }
         });
 
@@ -648,49 +738,35 @@
             document.getElementById('login-page').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             document.getElementById('user-display-name').textContent = currentUser.name;
-            document.getElementById('dashboard-greeting-name').textContent = currentUser.name;
             document.getElementById('user-display-role').textContent = currentUser.role;
-            document.getElementById('avatar-initials').textContent = currentUser.name.charAt(0).toUpperCase();
 
-            // Handle Role Visibility
             const navSettings = document.getElementById('nav-settings');
+            const mobNavSettings = document.getElementById('mobile-nav-settings');
             const btnAddReport = document.getElementById('btn-add-report');
 
             if(currentUser.role === 'coordinator') {
                 navSettings.classList.remove('hidden');
-                navSettings.classList.add('flex');
+                mobNavSettings.classList.remove('hidden');
             } else {
                 navSettings.classList.add('hidden');
-                navSettings.classList.remove('flex');
+                mobNavSettings.classList.add('hidden');
             }
 
-            if(currentUser.role === 'visitor') {
-                btnAddReport.classList.add('hidden');
-            } else {
-                btnAddReport.classList.remove('hidden');
-            }
+            if(currentUser.role === 'visitor') btnAddReport.classList.add('hidden');
+            else btnAddReport.classList.remove('hidden');
             
-            fetchGlobalSettings(); 
-            listenToReports();
+            fetchGlobalSettings(); listenToReports();
             if(currentUser.role === 'coordinator') listenToUsers();
             setupReportForm(); setupDashboardFilters(); renderInputTable(); window.showTab('dashboard');
         }
 
         async function logout() {
             try {
-                if(reportsUnsubscribe) reportsUnsubscribe(); 
-                if(usersUnsubscribe) usersUnsubscribe();
+                if(reportsUnsubscribe) reportsUnsubscribe(); if(usersUnsubscribe) usersUnsubscribe();
                 currentUser = null; allReports = []; allUsers = [];
-                
                 document.getElementById('main-app').classList.add('hidden');
                 document.getElementById('login-page').classList.remove('hidden');
-                
-                const navSettings = document.getElementById('nav-settings');
-                navSettings.classList.add('hidden');
-                navSettings.classList.remove('flex');
-
-                document.getElementById('login-form').reset(); 
-                document.getElementById('login-error').classList.add('hidden');
+                document.getElementById('login-form').reset(); document.getElementById('login-error').classList.add('hidden');
                 switchLoginTab('user');
             } catch (error) { window.location.reload(); }
         }
@@ -708,32 +784,21 @@
             const code = document.getElementById('setting-admin-code').value.trim();
             if(!code) return showNotification("Kode kosong", "error");
             await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'globalConfig'), {adminCode: code}, {merge:true});
-            currentAdminCode = code; showNotification("Disimpan!");
+            currentAdminCode = code; showNotification("Settings Saved!");
         }
 
         function getLast30Days() {
-            const end = new Date();
-            const start = new Date();
-            start.setDate(end.getDate() - 30);
-            return {
-                start: start.toISOString().split('T')[0],
-                end: end.toISOString().split('T')[0]
-            };
+            const end = new Date(); const start = new Date(); start.setDate(end.getDate() - 30);
+            return { start: start.toISOString().split('T')[0], end: end.toISOString().split('T')[0] };
         }
 
-        // --- NEW: Toggle Switch Logic ---
         window.setDashType = (type) => {
             currentDashType = type;
             const btnDel = document.getElementById('dash-toggle-delivery');
             const btnPick = document.getElementById('dash-toggle-pickup');
             
-            if(type === 'delivery') {
-                btnDel.classList.add('active');
-                btnPick.classList.remove('active');
-            } else {
-                btnPick.classList.add('active');
-                btnDel.classList.remove('active');
-            }
+            if(type === 'delivery') { btnDel.classList.add('active'); btnPick.classList.remove('active'); } 
+            else { btnPick.classList.add('active'); btnDel.classList.remove('active'); }
             renderDashboard();
         }
 
@@ -745,22 +810,19 @@
                 ssSel.innerHTML = '<option value="all">Semua SS</option>' + [...ssSet].map(ss => `<option value="${ss}">${ss}</option>`).join('');
                 if([...ssSet].includes(cur)) ssSel.value = cur;
             }
-            
             const { start, end } = getLast30Days();
             const startIn = document.getElementById('dash-date-start');
             const endIn = document.getElementById('dash-date-end');
             if(startIn && !startIn.value) startIn.value = start;
             if(endIn && !endIn.value) endIn.value = end;
 
-            // Hist Filters
             const histSS = document.getElementById('filter-user');
-             if(histSS) {
+            if(histSS) {
                  const cur = histSS.value;
                  histSS.innerHTML = '<option value="all">Semua SS</option>' + [...ssSet].map(ss => `<option value="${ss}">${ss}</option>`).join('');
                  if([...ssSet].includes(cur)) histSS.value = cur;
-                 histSS.addEventListener('change', renderReportsTable);
-             }
-            
+                 histSS.addEventListener('render', renderReportsTable);
+            }
             const histStart = document.getElementById('hist-date-start');
             const histEnd = document.getElementById('hist-date-end');
             if(histStart && !histStart.value) histStart.value = start;
@@ -768,6 +830,7 @@
             
             if(histStart) histStart.addEventListener('change', renderReportsTable);
             if(histEnd) histEnd.addEventListener('change', renderReportsTable);
+            if(histSS) histSS.addEventListener('change', renderReportsTable);
 
             ['dash-date-start', 'dash-date-end', 'dash-filter-ss', 'dash-filter-service'].forEach(id => {
                 const el = document.getElementById(id); if(el) el.addEventListener('change', renderDashboard);
@@ -780,7 +843,7 @@
             document.getElementById('dash-date-end').value = end;
             document.getElementById('dash-filter-ss').value = 'all';
             document.getElementById('dash-filter-service').value = 'all';
-            setDashType('delivery'); // Reset to default
+            setDashType('delivery');
         }
 
         function renderDashboard() {
@@ -789,25 +852,19 @@
             const end = document.getElementById('dash-date-end').value;
             const fSS = document.getElementById('dash-filter-ss').value;
             const fSvc = document.getElementById('dash-filter-service').value;
-            // Use currentDashType global variable instead of old select
 
             const filteredByDate = allReports.filter(r => {
-                let rDate;
-                if (r.date) rDate = r.date;
-                else if (r.timestamp && r.timestamp.seconds) rDate = new Date(r.timestamp.seconds*1000).toISOString().split('T')[0];
-                else rDate = new Date().toISOString().split('T')[0];
-
+                let rDate = r.date || (r.timestamp && r.timestamp.seconds ? new Date(r.timestamp.seconds*1000).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
                 const inDate = (!start || rDate >= start) && (!end || rDate <= end);
                 const inSS = fSS === 'all' || r.kodeSS === fSS;
-                const inType = r.type === currentDashType; // Strict Filtering
+                const inType = r.type === currentDashType;
                 const inSvc = fSvc === 'all' || r.details.some(d => d.label === fSvc && d.total > 0);
-                
                 return inDate && inSS && inType && inSvc;
             });
             
             const filteredForAnnual = allReports.filter(r => {
                 const inSS = fSS === 'all' || r.kodeSS === fSS;
-                const inType = r.type === currentDashType; // Strict Filtering
+                const inType = r.type === currentDashType;
                 const inSvc = fSvc === 'all' || r.details.some(d => d.label === fSvc && d.total > 0);
                 return inSS && inType && inSvc;
             });
@@ -835,9 +892,7 @@
             document.getElementById('kpi-val-mbh').textContent = mbh.toLocaleString('id-ID');
             document.getElementById('kpi-val-miss').textContent = miss.toLocaleString('id-ID');
             document.getElementById('kpi-val-claim').textContent = claim.toLocaleString('id-ID');
-
-            const isPickup = filterType === 'pickup';
-            document.getElementById('kpi-card-claim').style.display = isPickup ? 'none' : 'flex';
+            document.getElementById('kpi-card-claim').style.display = (filterType === 'pickup') ? 'none' : 'flex';
         }
 
         function processCharts(dataByDate, dataAnnual, filterSvc, startDate, endDate) {
@@ -869,19 +924,16 @@
             if(chartAnnual) chartAnnual.destroy();
             chartAnnual = new Chart(chartAnnualCanvas, {
                 type: 'bar',
-                data: { labels: keysM, datasets: [{ type:'bar', label:'Vol', data:datM_Vol, backgroundColor:'#007AFF', borderRadius:4, order:2 }, { type:'line', label:'% SLA', data:datM_SLA, borderColor:'#FF9500', borderWidth:3, tension:0.3, pointRadius:3, yAxisID:'y1', order:1 }] },
+                data: { labels: keysM, datasets: [{ type:'bar', label:'Vol', data:datM_Vol, backgroundColor:'#007AFF', borderRadius:6, order:2 }, { type:'line', label:'% SLA', data:datM_SLA, borderColor:'#FF9500', borderWidth:3, tension:0.4, pointRadius:0, pointHoverRadius:4, yAxisID:'y1', order:1 }] },
                 options: { 
-                    layout: { padding: { top: 20 } },
-                    responsive:true, maintainAspectRatio:false, 
+                    layout: { padding: { top: 20 } }, responsive:true, maintainAspectRatio:false, 
                     plugins:{ 
                         legend:{display:false},
                         datalabels: {
-                            color: (context) => context.dataset.type === 'line' ? '#FF9500' : '#1e293b', 
-                            anchor: (context) => context.dataset.type === 'line' ? 'start' : 'end',
-                            align: (context) => context.dataset.type === 'line' ? 'top' : 'top', 
-                            offset: (context) => context.dataset.type === 'line' ? 4 : -5,
-                            font: { weight: 'bold', size: 10 },
-                            formatter: (val) => val > 0 ? val.toLocaleString('id-ID') : ''
+                            color: (c) => c.dataset.type === 'line' ? '#FF9500' : '#1D1D1F', 
+                            anchor: (c) => c.dataset.type === 'line' ? 'start' : 'end',
+                            align: 'top', offset: 0, font: { weight: 'bold', size: 10 },
+                            formatter: (v) => v > 0 ? v.toLocaleString('id-ID') : ''
                         }
                     }, 
                     scales:{ y:{display:false}, y1:{display:false, min:0, max:100}, x:{grid:{display:false}} } 
@@ -889,15 +941,12 @@
             });
 
             const days = {};
-            const sDate = new Date(startDate);
-            const eDate = new Date(endDate);
-            
+            const sDate = new Date(startDate); const eDate = new Date(endDate);
             for(let d = new Date(sDate); d <= eDate; d.setDate(d.getDate() + 1)) {
                 const k = d.toISOString().split('T')[0];
                 const label = d.getDate() + '/' + (d.getMonth()+1);
                 days[k] = { label: label, total:0, ok:0 };
             }
-            
             dataByDate.forEach(r => { 
                 const dateStr = r.date || (r.timestamp ? new Date(r.timestamp.seconds*1000).toISOString().split('T')[0] : '');
                 if(days[dateStr]) { 
@@ -907,7 +956,6 @@
                     }); 
                 } 
             });
-            
             const sortedKeys = Object.keys(days).sort();
             const lblD = sortedKeys.map(k=>days[k].label);
             const datD_Vol = sortedKeys.map(k=>days[k].total);
@@ -916,19 +964,16 @@
             if(chartMonthly) chartMonthly.destroy();
             chartMonthly = new Chart(chartMonthlyCanvas, {
                 type: 'bar',
-                data: { labels: lblD, datasets: [{ type:'bar', label:'Vol', data:datD_Vol, backgroundColor:'#34C759', borderRadius:4, order:2 }, { type:'line', label:'% SLA', data:datD_SLA, borderColor:'#007AFF', borderWidth:3, tension:0.3, pointRadius:3, yAxisID:'y1', order:1 }] },
+                data: { labels: lblD, datasets: [{ type:'bar', label:'Vol', data:datD_Vol, backgroundColor:'#34C759', borderRadius:4, order:2 }, { type:'line', label:'% SLA', data:datD_SLA, borderColor:'#007AFF', borderWidth:3, tension:0.4, pointRadius:0, pointHoverRadius:4, yAxisID:'y1', order:1 }] },
                 options: { 
-                    layout: { padding: { top: 20 } },
-                    responsive:true, maintainAspectRatio:false, 
+                    layout: { padding: { top: 20 } }, responsive:true, maintainAspectRatio:false, 
                     plugins:{ 
                         legend:{display:false},
                         datalabels: {
-                            color: (context) => context.dataset.type === 'line' ? '#007AFF' : '#1e293b', 
-                            anchor: (context) => context.dataset.type === 'line' ? 'start' : 'end',
-                            align: (context) => context.dataset.type === 'line' ? 'top' : 'top', 
-                            offset: (context) => context.dataset.type === 'line' ? 4 : -5,
-                            font: { weight: 'bold', size: 9 },
-                            formatter: (val) => val > 0 ? val.toLocaleString('id-ID') : ''
+                            color: (c) => c.dataset.type === 'line' ? '#007AFF' : '#1D1D1F', 
+                            anchor: (c) => c.dataset.type === 'line' ? 'start' : 'end',
+                            align: 'top', offset: 0, font: { weight: 'bold', size: 9 },
+                            formatter: (v) => v > 0 ? v.toLocaleString('id-ID') : ''
                         }
                     }, 
                     scales:{ y:{display:false}, y1:{display:false, min:0, max:100}, x:{grid:{display:false}} } 
@@ -942,7 +987,6 @@
                 const type = r.type; 
                 r.details?.forEach(d => {
                     if (filterSvc !== 'all' && d.label !== filterSvc) return;
-                    
                     if(!byService[d.label]) byService[d.label] = { total:0, ok:0, inp:0, mbh:0, miss:0, claim:0, type: type };
                     else if(byService[d.label].type !== type) byService[d.label].type = 'mixed';
                     const s = byService[d.label]; s.total+=d.total; s.ok+=d.ok; s.inp+=d.inprogress; s.mbh+=d.mbh; s.miss+=d.missed; s.claim+=d.claimed;
@@ -960,101 +1004,77 @@
             const renderRow = (label, d, isStaging = false) => {
                 const sla = d.total > 0 ? (d.ok / d.total * 100) : 0;
                 const slaColor = getSLAColor(sla, d.type);
-                
-                // --- NEW: Staging SS Big, PIC Small ---
                 let labelHTML = label;
                 if(isStaging) {
-                    const isRed = (sla < 96.3 && d.type !== 'pickup') || (sla < 95 && d.type === 'pickup'); // Logic Red
-                    
-                    // SS smaller (text-lg), Warning inline
-                    labelHTML = `
-                        <div class="flex flex-col">
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-slate-800 text-lg tracking-tight leading-none">${d.ss}</span>
-                                ${isRed ? '<i class="fa-solid fa-triangle-exclamation text-red-500 text-xs animate-pulse" title="Warning: Low SLA"></i>' : ''}
-                            </div>
-                            <span class="text-[10px] text-slate-400 font-medium uppercase mt-0.5">${d.pic}</span>
-                        </div>`;
+                    const isRed = (sla < 96.3 && d.type !== 'pickup') || (sla < 95 && d.type === 'pickup');
+                    labelHTML = `<div class="flex flex-col"><div class="flex items-center gap-2"><span class="font-bold text-[#1D1D1F] text-sm tracking-tight">${d.ss}</span>${isRed ? '<i class="fa-solid fa-circle-exclamation text-red-500 text-[10px] animate-pulse"></i>' : ''}</div><span class="text-[10px] text-gray-400 font-medium uppercase">${d.pic}</span></div>`;
                 }
 
-                // Add h-14 to maintain consistent height
-                return `<tr class="hover:bg-black/5 border-b border-black/5 h-14">
-                    <td class="p-3 pl-4 font-bold text-slate-700 align-middle">${labelHTML}</td>
-                    <td class="p-3 col-metric font-bold text-slate-800 align-middle">${d.total.toLocaleString('id-ID')}</td>
-                    <td class="p-3 col-metric font-medium text-slate-600 align-middle">${d.ok.toLocaleString('id-ID')}</td>
-                    <td class="p-3 col-metric text-center align-middle"><div class="${slaColor} text-[10px] text-white font-bold px-2 py-0.5 rounded-full inline-block">${sla.toLocaleString('id-ID', {maximumFractionDigits:1})}%</div></td>
-                    <td class="p-3 col-metric text-slate-500 align-middle">${d.inp.toLocaleString('id-ID')}</td>
-                    <td class="p-3 col-metric text-orange-500 align-middle">${d.mbh.toLocaleString('id-ID')}</td>
-                    <td class="p-3 col-metric text-red-500 font-bold align-middle">${d.miss.toLocaleString('id-ID')}</td>
-                    <td class="p-3 col-metric pr-4 text-purple-600 font-medium ${showClaim?'':'hidden'} align-middle">${d.claim.toLocaleString('id-ID')}</td>
+                return `<tr class="hover:bg-gray-50 border-b border-gray-100 last:border-0 h-12 transition-colors">
+                    <td class="p-3 pl-5 font-bold text-gray-700 align-middle">${labelHTML}</td>
+                    <td class="p-3 text-right font-bold text-[#1D1D1F] align-middle">${d.total.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-right font-medium text-gray-600 align-middle">${d.ok.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-center align-middle"><div class="${slaColor} text-[10px] text-white font-bold px-2 py-0.5 rounded-md inline-block shadow-sm">${sla.toLocaleString('id-ID', {maximumFractionDigits:1})}%</div></td>
+                    <td class="p-3 text-right text-gray-400 align-middle">${d.inp.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-right text-orange-500 align-middle">${d.mbh.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-right text-red-500 font-bold align-middle">${d.miss.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-right pr-5 text-purple-600 font-medium ${showClaim?'':'hidden'} align-middle">${d.claim.toLocaleString('id-ID')}</td>
                 </tr>`;
             };
 
             const renderFooter = (list) => {
                 let t=0, o=0, i=0, mb=0, m=0, c=0;
                 list.forEach(x => { t+=x.total; o+=x.ok; i+=x.inp; mb+=x.mbh; m+=x.miss; c+=x.claim; });
-                
                 const avgPct = t > 0 ? (o / t * 100) : 0;
                 const avgColor = getSLAColor(avgPct, filterType);
 
-                return `<tr class="bg-slate-200/50 font-bold text-slate-800 border-t-2 border-slate-300">
-                    <td class="p-3 pl-4">TOTAL</td>
-                    <td class="p-3 col-metric">${t.toLocaleString('id-ID')}</td>
-                    <td class="p-3 col-metric">${o.toLocaleString('id-ID')}</td>
-                    <td class="p-3 col-metric text-center"><div class="${avgColor} text-[10px] text-white font-bold px-2 py-0.5 rounded-full inline-block">${avgPct.toLocaleString('id-ID', {maximumFractionDigits:1})}%</div></td>
-                    <td class="p-3 col-metric">${i.toLocaleString('id-ID')}</td>
-                    <td class="p-3 col-metric">${mb.toLocaleString('id-ID')}</td>
-                    <td class="p-3 col-metric text-red-600">${m.toLocaleString('id-ID')}</td>
-                    <td class="p-3 col-metric pr-4 ${showClaim?'':'hidden'}">${c.toLocaleString('id-ID')}</td>
+                return `<tr class="bg-gray-50/50 font-bold text-[#1D1D1F] border-t border-gray-200">
+                    <td class="p-3 pl-5">TOTAL</td>
+                    <td class="p-3 text-right">${t.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-right">${o.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-center"><div class="${avgColor} text-[10px] text-white font-bold px-2 py-0.5 rounded-md inline-block shadow-sm">${avgPct.toLocaleString('id-ID', {maximumFractionDigits:1})}%</div></td>
+                    <td class="p-3 text-right">${i.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-right">${mb.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-right text-red-600">${m.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-right pr-5 ${showClaim?'':'hidden'}">${c.toLocaleString('id-ID')}</td>
                 </tr>`;
             }
 
             const listSvc = Object.entries(byService).map(([k,v]) => ({label:k, ...v})).sort((a,b)=>b.total - a.total);
             const elSvc = document.getElementById('body-breakdown-service');
             if (elSvc) {
-                elSvc.innerHTML = listSvc.map(item => renderRow(item.label, item, false)).join('');
-                document.getElementById('foot-breakdown-service').innerHTML = renderFooter(listSvc);
+                elSvc.innerHTML = listSvc.map(item => renderRow(item.label, item, false)).join('') + renderFooter(listSvc);
             }
 
             const listStg = Object.values(byStaging).sort((a,b)=>b.total - a.total);
             const elStg = document.getElementById('body-breakdown-staging');
             if (elStg) {
-                elStg.innerHTML = listStg.map(item => renderRow(item.name, item, true)).join('');
-                document.getElementById('foot-breakdown-staging').innerHTML = renderFooter(listStg);
+                elStg.innerHTML = listStg.map(item => renderRow(item.name, item, true)).join('') + renderFooter(listStg);
             }
         }
 
         function getSLAColor(pct, type) {
-            let color = 'bg-[#FF3B30]';
-            if(type === 'pickup') { if(pct > 95) color = 'bg-[#34C759]'; else if(pct >= 93) color = 'bg-[#FF9500]'; } 
-            else { if(pct > 96.3) color = 'bg-[#34C759]'; else if(pct >= 95) color = 'bg-[#FF9500]'; }
-            return color;
+            if(type === 'pickup') { if(pct > 95) return 'bg-[#34C759]'; else if(pct >= 93) return 'bg-[#FF9500]'; } 
+            else { if(pct > 96.3) return 'bg-[#34C759]'; else if(pct >= 95) return 'bg-[#FF9500]'; }
+            return 'bg-[#FF3B30]';
         }
 
-        // --- NEW: Feedback Logic (Deduplicate strings) ---
         function processFeedback(data, filterSvc) {
-            // Use Objects to store text as Key and count as Value
-            const feedInt = {}; 
-            const feedExt = {}; 
+            const feedInt = {}; const feedExt = {}; 
             let totInt = 0, totExt = 0;
             
             data.forEach(r => { 
                 r.details?.forEach(d => {
                     if (filterSvc !== 'all' && d.label !== filterSvc) return;
-                    
                     if(d.total_int > 0) totInt += d.total_int;
                     if(d.feed_int && d.feed_int.trim() !== '-' && d.feed_int.trim() !== '') { 
                         const t = d.feed_int.trim();
-                        // Store lowercase key for check, but original text for display if needed (simplified here)
-                        const key = t.toLowerCase();
-                        feedInt[key] = { text: t, count: (feedInt[key]?.count || 0) + d.total_int };
+                        feedInt[t.toLowerCase()] = { text: t, count: (feedInt[t.toLowerCase()]?.count || 0) + d.total_int };
                     }
-                    
                     if(d.total_ext > 0) totExt += d.total_ext;
                     if(d.feed_ext && d.feed_ext.trim() !== '-' && d.feed_ext.trim() !== '') { 
                         const t = d.feed_ext.trim();
-                        const key = t.toLowerCase();
-                        feedExt[key] = { text: t, count: (feedExt[key]?.count || 0) + d.total_ext };
+                        feedExt[t.toLowerCase()] = { text: t, count: (feedExt[t.toLowerCase()]?.count || 0) + d.total_ext };
                     }
                 });
             });
@@ -1062,13 +1082,12 @@
             document.getElementById('feedback-total-int').textContent = totInt;
             document.getElementById('feedback-total-ext').textContent = totExt;
             
-            // Render unique list with small count
             const render = (obj) => Object.values(obj).map(item => `
-                <li class="flex justify-between items-start border-b border-black/5 pb-2 last:border-0">
-                    <span class="capitalize text-slate-700 text-xs mr-2 leading-tight">${item.text}</span>
-                    <span class="font-mono text-[10px] text-slate-400 bg-slate-100 px-1.5 rounded-md shrink-0 mt-0.5">${item.count}</span>
+                <li class="flex justify-between items-start border-b border-gray-100 pb-2 last:border-0">
+                    <span class="text-gray-600 text-xs mr-2 leading-tight">${item.text}</span>
+                    <span class="font-mono text-[10px] text-gray-500 bg-gray-100 px-1.5 rounded-md shrink-0 mt-0.5">${item.count}</span>
                 </li>
-            `).join('') || '<li class="text-slate-400 italic text-xs">Kosong</li>';
+            `).join('') || '<li class="text-gray-400 italic text-xs">No feedback</li>';
             
             document.getElementById('feedback-list-int').innerHTML = render(feedInt);
             document.getElementById('feedback-list-ext').innerHTML = render(feedExt);
@@ -1089,7 +1108,7 @@
         }
         function populateAdminUserSelect() {
             const sel = document.getElementById('input-admin-select-user');
-            sel.innerHTML = '<option value="">-- Pilih --</option>';
+            sel.innerHTML = '<option value="">-- Pilih User --</option>';
             allUsers.filter(u=>u.username!=='admin' && u.status!=='inactive').forEach(u => sel.innerHTML += `<option value="${u.id}">${u.name} (${u.kodeSS||'-'})</option>`);
         }
         window.updateReporterInfo = () => {
@@ -1118,48 +1137,42 @@
             const btnPick = document.getElementById('btn-type-pickup');
             
             if(type === 'delivery') {
-                btnDel.classList.remove('text-slate-500');
-                btnDel.classList.add('bg-blue-50', 'text-[#007AFF]', 'border-blue-200'); 
-                btnPick.classList.add('text-slate-500');
-                btnPick.classList.remove('bg-orange-50', 'text-[#FF9500]', 'border-orange-200');
+                btnDel.classList.remove('text-gray-500'); btnDel.classList.add('bg-white', 'text-[#007AFF]', 'shadow-sm'); 
+                btnPick.classList.add('text-gray-500'); btnPick.classList.remove('bg-white', 'text-[#FF9500]', 'shadow-sm');
             } else {
-                btnPick.classList.remove('text-slate-500');
-                btnPick.classList.add('bg-orange-50', 'text-[#FF9500]', 'border-orange-200'); 
-                btnDel.classList.add('text-slate-500');
-                btnDel.classList.remove('bg-blue-50', 'text-[#007AFF]', 'border-blue-200');
+                btnPick.classList.remove('text-gray-500'); btnPick.classList.add('bg-white', 'text-[#FF9500]', 'shadow-sm'); 
+                btnDel.classList.add('text-gray-500'); btnDel.classList.remove('bg-white', 'text-[#007AFF]', 'shadow-sm');
             }
             renderInputTable();
         }
 
         window.formatNumberInput = (input) => {
             let val = input.value.replace(/\D/g, ''); 
-            if (val) {
-                val = parseInt(val, 10).toLocaleString('id-ID'); 
-            }
+            if (val) val = parseInt(val, 10).toLocaleString('id-ID'); 
             input.value = val;
         }
 
         window.renderInputTable = () => {
             const isDel = document.getElementById('input-type').value === 'delivery';
             let head = `<tr>
-                <th class="p-3 border-b border-white/10 w-24">Layanan</th>
-                <th class="p-3 border-b border-white/10 bg-blue-50 text-blue-600 w-20">Total</th>
-                <th class="p-3 border-b border-white/10 w-20">OK</th>
-                <th class="p-3 border-b border-white/10 text-xs text-slate-300 w-20">P</th>
-                <th class="p-3 border-b border-white/10 text-xs text-slate-300 w-20">M</th>
-                <th class="p-3 border-b border-white/10 text-xs text-red-400 w-20">Mis</th>
-                ${isDel?'<th class="p-3 border-b border-white/10 text-xs w-20">Clm</th>':''}
-                <th class="p-3 border-b border-white/10 border-l border-slate-600 pl-2 text-xs w-20">In</th>
-                <th class="p-3 border-b border-white/10 text-xs w-auto">Ket</th>
-                <th class="p-3 border-b border-white/10 text-xs w-16">Ex</th>
-                <th class="p-3 border-b border-white/10 text-xs w-auto">Ket</th>
+                <th class="p-3 border-b border-gray-200 w-24 text-xs font-bold text-gray-500 uppercase">Service</th>
+                <th class="p-3 border-b border-gray-200 bg-blue-50/50 text-blue-600 w-20 text-xs font-bold uppercase text-center">Total</th>
+                <th class="p-3 border-b border-gray-200 w-20 text-xs font-bold text-gray-500 uppercase text-center">OK</th>
+                <th class="p-3 border-b border-gray-200 text-xs text-gray-400 w-20 text-center">Prog</th>
+                <th class="p-3 border-b border-gray-200 text-xs text-gray-400 w-20 text-center">MBH</th>
+                <th class="p-3 border-b border-gray-200 text-xs text-red-400 w-20 text-center">Miss</th>
+                ${isDel?'<th class="p-3 border-b border-gray-200 text-xs text-purple-400 w-20 text-center">Claim</th>':''}
+                <th class="p-3 border-b border-gray-200 border-l border-gray-300 pl-2 text-xs text-blue-500 w-20 text-center">Int Vol</th>
+                <th class="p-3 border-b border-gray-200 text-xs text-blue-500 w-auto">Int Note</th>
+                <th class="p-3 border-b border-gray-200 text-xs text-orange-500 w-20 text-center">Ext Vol</th>
+                <th class="p-3 border-b border-gray-200 text-xs text-orange-500 w-auto">Ext Note</th>
             </tr>`;
             document.getElementById('table-header').innerHTML = head;
             let body = '';
             ROW_LABELS.forEach((lbl, i) => {
                 const rid = `row-${i}`;
-                body += `<tr data-label="${lbl}" class="border-b border-slate-100 last:border-0">
-                    <td class="p-2 font-bold text-slate-600 text-xs bg-slate-50/50">${lbl}</td>
+                body += `<tr data-label="${lbl}" class="border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors">
+                    <td class="p-2 font-bold text-gray-600 text-xs">${lbl}</td>
                     <td class="p-2 total-cell input-cell w-20"><input type="text" id="${rid}-total" readonly value="0"></td>
                     <td class="p-2 input-cell w-20"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
                     <td class="p-2 input-cell w-20"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
@@ -1167,9 +1180,9 @@
                     <td class="p-2 input-cell w-20"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
                     ${isDel ? `<td class="p-2 input-cell w-20"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>` : ''}
                     <td class="p-2 input-cell w-20 border-l pl-2"><input type="text" oninput="formatNumberInput(this)"></td>
-                    <td class="p-2 w-auto"><input type="text" class="w-full text-xs bg-transparent border-b border-slate-200 outline-none"></td>
+                    <td class="p-2 w-auto"><input type="text" class="w-full text-xs bg-transparent border-b border-gray-200 outline-none text-gray-600 focus:border-blue-500 transition-colors"></td>
                     <td class="p-2 input-cell w-20"><input type="text" oninput="formatNumberInput(this)"></td>
-                    <td class="p-2 w-auto"><input type="text" class="w-full text-xs bg-transparent border-b border-slate-200 outline-none"></td>
+                    <td class="p-2 w-auto"><input type="text" class="w-full text-xs bg-transparent border-b border-gray-200 outline-none text-gray-600 focus:border-orange-500 transition-colors"></td>
                 </tr>`;
             });
             document.getElementById('table-body').innerHTML = body;
@@ -1194,118 +1207,62 @@
             const picName = document.getElementById('input-pic-name').value;
             const kodeSS = document.getElementById('input-kode-ss').value;
 
-            if(!picId || !date) return showNotification("Identitas/Tanggal kosong", "error");
+            if(!picId || !date) return showNotification("Missing Info", "error");
             if(!editId) {
                 const qDup = query(collection(db,'artifacts', appId, 'public', 'data', 'reports'), where('reporterId','==',picId), where('date','==',date), where('type','==',type));
                 const dupSnap = await getDocs(qDup);
-                if(!dupSnap.empty) return showNotification(`Laporan ${type} tanggal ${date} sudah ada!`, "error");
+                if(!dupSnap.empty) return showNotification("Laporan sudah ada!", "error");
             }
             
-            let gTotal = 0; 
-            const details = [];
-            
+            let gTotal = 0; const details = [];
             document.querySelectorAll('#table-body tr').forEach(tr => {
-                const inps = tr.querySelectorAll('input'); 
-                const isDel = type === 'delivery';
-                
-                const getVal = (idx) => {
-                    if (!inps[idx]) return 0;
-                    return parseInt(inps[idx].value.replace(/\./g, '')) || 0;
-                };
-                const getStr = (idx) => inps[idx] ? inps[idx].value : '';
-
-                const tot = getVal(0);
-                gTotal += tot;
-                
+                const inps = tr.querySelectorAll('input'); const isDel = type === 'delivery';
+                const getVal = (idx) => parseInt(inps[idx]?.value.replace(/\./g, '')||0);
+                const getStr = (idx) => inps[idx]?.value || '';
+                const tot = getVal(0); gTotal += tot;
                 details.push({
-                    label: tr.getAttribute('data-label'),
-                    total: tot, 
-                    ok: getVal(1), 
-                    inprogress: getVal(2), 
-                    mbh: getVal(3), 
-                    missed: getVal(4),
-                    claimed: isDel ? getVal(5) : 0,
-                    
-                    total_int: isDel ? getVal(6) : getVal(5), 
-                    feed_int: isDel ? getStr(7) : getStr(6),
-                    
-                    total_ext: isDel ? getVal(8) : getVal(7), 
-                    feed_ext: isDel ? getStr(9) : getStr(8)
+                    label: tr.getAttribute('data-label'), total: tot, ok: getVal(1), inprogress: getVal(2), mbh: getVal(3), missed: getVal(4), claimed: isDel ? getVal(5) : 0,
+                    total_int: isDel ? getVal(6) : getVal(5), feed_int: isDel ? getStr(7) : getStr(6),
+                    total_ext: isDel ? getVal(8) : getVal(7), feed_ext: isDel ? getStr(9) : getStr(8)
                 });
             });
 
-            // --- Validation: Check if Total > 0 ---
-            if (gTotal === 0) {
-                return showNotification("Mohon isi minimal satu layanan (Total > 0)", "error");
-            }
+            if (gTotal === 0) return showNotification("Total must be > 0", "error");
             
-            btn.disabled = true; 
-            // Show Loader for Submit
-            showGlobalLoader(true, "Menyimpan Data...");
-            
+            btn.disabled = true; showGlobalLoader(true, "Saving Report...");
             try {
                 const payload = { date, type, reporterName: picName, reporterId: picId, kodeSS, grandTotalVolume: gTotal, details, timestamp: serverTimestamp() };
                 if(editId) { 
                     await updateDoc(doc(db,'artifacts', appId, 'public', 'data', 'reports', editId), payload); 
-                    // Add artificial delay for better UX
-                    setTimeout(() => {
-                        showGlobalLoader(false);
-                        showNotification("Data diperbarui!"); 
-                        btn.disabled = false;
-                        window.cancelEditMode(); 
-                        toggleReportForm(false);
-                    }, 600);
-                }
-                else { 
+                    setTimeout(() => { showGlobalLoader(false); showNotification("Report Updated!"); btn.disabled = false; cancelEditMode(); toggleReportForm(false); }, 600);
+                } else { 
                     await addDoc(collection(db,'artifacts', appId, 'public', 'data', 'reports'), payload); 
-                    setTimeout(() => {
-                        showGlobalLoader(false);
-                        showNotification("Laporan tersimpan!"); 
-                        btn.disabled = false;
-                        document.getElementById('report-form').reset(); 
-                        setupReportForm(); 
-                        renderInputTable(); 
-                        toggleReportForm(false);
-                    }, 600);
+                    setTimeout(() => { showGlobalLoader(false); showNotification("Report Sent!"); btn.disabled = false; document.getElementById('report-form').reset(); setupReportForm(); renderInputTable(); toggleReportForm(false); }, 600);
                 }
-            } catch(e) { 
-                console.error(e); 
-                showGlobalLoader(false);
-                showNotification("Gagal menyimpan", "error"); 
-                btn.disabled = false; 
-            }
+            } catch(e) { console.error(e); showGlobalLoader(false); showNotification("Save Failed", "error"); btn.disabled = false; }
         });
 
         window.requestEditReport = (id) => { 
-            if(currentUser.role==='coordinator') {
-                loadReportToForm(id); 
-            } else {
-                openAuthModal('editReport', id); 
-            }
+            if(currentUser.role==='coordinator') loadReportToForm(id); else openAuthModal('editReport', id); 
         }
         window.requestDeleteReport = (id) => { if(currentUser.role==='coordinator') openConfirmDelete(id); else openAuthModal('deleteReport', id); }
         
         function loadReportToForm(id) {
             const r = allReports.find(x => x.id === id); if(!r) return;
             toggleReportForm(true);
-            document.getElementById('report-id-hidden').value = r.id;
-            document.getElementById('input-date').value = r.date;
-            selectReportType(r.type);
+            document.getElementById('report-id-hidden').value = r.id; document.getElementById('input-date').value = r.date; selectReportType(r.type);
             if(currentUser.role === 'coordinator') { document.getElementById('input-admin-select-user').value = r.reporterId; updateReporterInfo(); }
-            document.getElementById('edit-mode-indicator').classList.remove('hidden');
-            document.getElementById('btn-submit-text').textContent = "Update Laporan";
+            document.getElementById('edit-mode-indicator').classList.remove('hidden'); document.getElementById('btn-submit-text').textContent = "Update Report";
             const rows = document.querySelectorAll('#table-body tr');
             r.details?.forEach(d => {
                 rows.forEach(tr => {
                     if(tr.getAttribute('data-label') === d.label) {
-                        const inps = tr.querySelectorAll('input'); 
-                        const isDel = r.type === 'delivery';
+                        const inps = tr.querySelectorAll('input'); const isDel = r.type === 'delivery';
                         const setVal = (idx, val) => { if(inps[idx]) inps[idx].value = val ? val.toLocaleString('id-ID') : ''; };
                         const setStr = (idx, val) => { if(inps[idx]) inps[idx].value = val || ''; }
                         setVal(1, d.ok); setVal(2, d.inprogress); setVal(3, d.mbh); setVal(4, d.missed);
                         if(isDel) setVal(5, d.claimed);
-                        const off = isDel ? 6 : 5;
-                        setVal(off, d.total_int); setStr(off+1, d.feed_int); setVal(off+2, d.total_ext); setStr(off+3, d.feed_ext);
+                        const off = isDel ? 6 : 5; setVal(off, d.total_int); setStr(off+1, d.feed_int); setVal(off+2, d.total_ext); setStr(off+3, d.feed_ext);
                         calcRow(tr.querySelector('.sla-input').getAttribute('data-row'));
                     }
                 })
@@ -1313,14 +1270,9 @@
             document.getElementById('view-reports-form').scrollIntoView({behavior: 'smooth'});
         }
         window.cancelEditMode = () => {
-            document.getElementById('report-form').reset();
-            document.getElementById('report-id-hidden').value = '';
-            document.getElementById('edit-mode-indicator').classList.add('hidden');
-            selectReportType('delivery');
-            const btnText = document.getElementById('btn-submit-text');
-            if (btnText) {
-                btnText.textContent = "Simpan Laporan";
-            }
+            document.getElementById('report-form').reset(); document.getElementById('report-id-hidden').value = '';
+            document.getElementById('edit-mode-indicator').classList.add('hidden'); selectReportType('delivery');
+            const btnText = document.getElementById('btn-submit-text'); if (btnText) btnText.textContent = "Submit Report";
             setupReportForm(); renderInputTable();
         }
 
@@ -1329,20 +1281,15 @@
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'reports'));
             reportsUnsubscribe = onSnapshot(q, (s) => { 
                 let rawDocs = s.docs.map(d=>({id:d.id, ...d.data()}));
-                rawDocs.sort((a,b) => {
-                    const dateA = new Date(a.date);
-                    const dateB = new Date(b.date);
-                    return dateB - dateA;
-                });
-                allReports = rawDocs;
-                renderDashboard(); setupDashboardFilters(); renderReportsTable(); updateFilterUser(); 
-            }, (error) => console.error("Reports listener error", error));
+                rawDocs.sort((a,b) => new Date(b.date) - new Date(a.date));
+                allReports = rawDocs; renderDashboard(); setupDashboardFilters(); renderReportsTable(); 
+            });
         }
         function listenToUsers() {
             if(!auth.currentUser) return;
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'users'), (s) => { 
+            usersUnsubscribe = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'users'), (s) => { 
                 allUsers = s.docs.map(d=>({id:d.id, ...d.data()})); renderUsersTable(); if(currentUser.role === 'coordinator') populateAdminUserSelect(); 
-            }, (error) => console.error("Users listener error", error));
+            });
         }
 
         function renderReportsTable() {
@@ -1352,126 +1299,88 @@
             
             let d = allReports.filter(r => {
                 let matchUser = fUser === 'all' || r.kodeSS === fUser || r.reporterName === fUser;
-                let matchDate = true;
-                if(fStart && fEnd) {
-                    matchDate = r.date >= fStart && r.date <= fEnd;
-                }
+                let matchDate = (!fStart || r.date >= fStart) && (!fEnd || r.date <= fEnd);
                 return matchUser && matchDate;
             });
             
             document.getElementById('reports-table-body').innerHTML = d.map(r => {
                 const date = r.date ? new Date(r.date).toLocaleDateString('id-ID') : '-';
                 
-                let detailsHTML = '<div class="space-y-1">';
+                // Collect Feedback Deduplicated
+                const uniqueFeedInt = new Set(); const uniqueFeedExt = new Set();
                 let hasDetails = false;
+                let detailsHTML = '<div class="space-y-1">';
                 
-                // --- NEW: Collect Feedbacks Deduplicated ---
-                const uniqueFeedInt = new Set();
-                const uniqueFeedExt = new Set();
-
                 r.details?.forEach(d => {
                     if(d.total > 0) {
                         hasDetails = true;
                         const sla = d.total > 0 ? (d.ok / d.total * 100).toFixed(1) : 0;
-                        const slaColor = getSLAColor(sla, r.type);
-
+                        const slaColor = getSLAColor(sla, r.type).replace('bg-','text-').replace('500','600');
                         detailsHTML += `
-                        <div class="grid grid-cols-12 gap-1 text-[10px] items-center border-b border-dashed border-slate-100 pb-0.5 last:border-0">
-                            <div class="col-span-2 font-bold text-slate-700 truncate" title="${d.label}">${d.label}</div>
-                            <div class="col-span-2 text-right font-mono bg-blue-50 text-blue-600 rounded px-0.5">${d.total.toLocaleString('id-ID')}</div>
-                            <div class="col-span-1 text-right font-mono text-green-600">${d.ok.toLocaleString('id-ID')}</div>
-                            <div class="col-span-2 text-center font-bold ${slaColor.replace('bg-', 'text-').replace('500','600')}">${sla}%</div>
-                            <div class="col-span-1 text-right font-mono text-slate-400">${d.inprogress.toLocaleString('id-ID')}</div>
-                            <div class="col-span-1 text-right font-mono text-orange-500">${d.mbh.toLocaleString('id-ID')}</div>
-                            <div class="col-span-1 text-right font-mono text-red-500 font-bold">${d.missed > 0 ? d.missed.toLocaleString('id-ID') : '-'}</div>
-                            <div class="col-span-2 text-right font-mono text-purple-500 font-bold">${d.claimed > 0 ? d.claimed.toLocaleString('id-ID') : '-'}</div>
+                        <div class="grid grid-cols-12 gap-1 text-[10px] items-center border-b border-dashed border-gray-100 pb-0.5 last:border-0">
+                            <div class="col-span-2 font-bold text-gray-600 truncate">${d.label}</div>
+                            <div class="col-span-2 text-right font-mono text-[#1D1D1F]">${d.total}</div>
+                            <div class="col-span-2 text-center font-bold ${slaColor}">${sla}%</div>
+                            <div class="col-span-6 text-right text-gray-400 font-mono text-[9px]">${d.inprogress}/${d.mbh}/${d.missed}</div>
                         </div>`;
-
-                        if(d.feed_int && d.feed_int.trim() && d.feed_int !== '-') uniqueFeedInt.add(d.feed_int.trim());
-                        if(d.feed_ext && d.feed_ext.trim() && d.feed_ext !== '-') uniqueFeedExt.add(d.feed_ext.trim());
+                        if(d.feed_int && d.feed_int.trim() !== '-') uniqueFeedInt.add(d.feed_int.trim());
+                        if(d.feed_ext && d.feed_ext.trim() !== '-') uniqueFeedExt.add(d.feed_ext.trim());
                     }
                 });
                 detailsHTML += '</div>';
+                if (!hasDetails) detailsHTML = '<span class="text-gray-300 italic text-[10px]">No Data</span>';
                 
-                const miniHeader = `
-                <div class="grid grid-cols-12 gap-1 text-[9px] font-bold text-slate-400 border-b border-slate-200 pb-1 mb-1">
-                    <div class="col-span-2">Svc</div>
-                    <div class="col-span-2 text-right">Tot</div>
-                    <div class="col-span-1 text-right">OK</div>
-                    <div class="col-span-2 text-center">%SLA</div>
-                    <div class="col-span-1 text-right">Prg</div>
-                    <div class="col-span-1 text-right">MBH</div>
-                    <div class="col-span-1 text-right">Mss</div>
-                    <div class="col-span-2 text-right">Clm</div>
-                </div>`;
+                let totInt = 0, totExt = 0; r.details?.forEach(x => { totInt += (x.total_int || 0); totExt += (x.total_ext || 0); });
+                let showButtons = (currentUser.role === 'coordinator') || (currentUser.role === 'leader' && r.reporterId === currentUser.id);
 
-                if (!hasDetails) detailsHTML = '<span class="text-slate-400 italic text-[10px]">Tidak ada data volume</span>';
-                else detailsHTML = miniHeader + detailsHTML;
-
-                let totInt = 0, totExt = 0;
-                r.details?.forEach(x => { totInt += (x.total_int || 0); totExt += (x.total_ext || 0); });
-
-                let showButtons = false;
-                if(currentUser.role === 'coordinator') showButtons = true;
-                else if(currentUser.role === 'leader' && r.reporterId === currentUser.id) showButtons = true;
-
-                // --- NEW: Combine Feedbacks for Table Display ---
                 const feedbackLines = [];
-                uniqueFeedInt.forEach(txt => feedbackLines.push(`<span class="text-blue-600 font-bold text-[9px]">[In] :</span> ${txt}`));
-                uniqueFeedExt.forEach(txt => feedbackLines.push(`<span class="text-orange-600 font-bold text-[9px]">[Ex] :</span> ${txt}`));
+                uniqueFeedInt.forEach(txt => feedbackLines.push(`<span class="text-blue-600 font-bold text-[9px]">IN:</span> ${txt}`));
+                uniqueFeedExt.forEach(txt => feedbackLines.push(`<span class="text-orange-600 font-bold text-[9px]">EX:</span> ${txt}`));
 
-                // --- NEW: SS Code Smaller & PIC Small ---
-                return `<tr class="border-b border-black/5 last:border-0 align-top hover:bg-slate-50/50 transition-colors">
-                    <td class="p-3 text-[10px] font-mono text-slate-500 font-bold">${date}</td>
-                    <td class="p-3">
-                         <div class="font-bold text-slate-800 text-lg tracking-tight leading-none">${r.kodeSS||'-'}</div>
-                        <div class="text-[10px] text-slate-400 font-medium uppercase mt-0.5">${r.reporterName}</div>
-                    </td>
-                    <td class="p-3">
-                        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border ${r.type==='delivery'?'bg-blue-50 text-blue-600 border-blue-100':'bg-orange-50 text-orange-600 border-orange-100'}">${r.type.substr(0,3)}</span>
-                    </td>
+                return `<tr class="border-b border-gray-100 last:border-0 align-top hover:bg-gray-50 transition-colors">
+                    <td class="p-3 text-[10px] font-mono text-gray-500 font-bold">${date}</td>
+                    <td class="p-3"><div class="font-bold text-[#1D1D1F] text-xs">${r.kodeSS||'-'}</div><div class="text-[9px] text-gray-400 uppercase">${r.reporterName}</div></td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${r.type==='delivery'?'bg-blue-50 text-blue-600 border-blue-100':'bg-orange-50 text-orange-600 border-orange-100'}">${r.type.substr(0,3)}</span></td>
                     <td class="p-3">${detailsHTML}</td>
-                    <td class="p-3 text-center text-xs font-bold text-blue-600">${totInt > 0 ? totInt.toLocaleString('id-ID') : '-'}</td>
-                    <td class="p-3 text-center text-xs font-bold text-orange-600">${totExt > 0 ? totExt.toLocaleString('id-ID') : '-'}</td>
-                    <td class="p-3 text-[10px] text-slate-600 leading-tight">
-                        ${feedbackLines.length > 0 ? feedbackLines.join('<br>') : '<span class="text-slate-300 italic">-</span>'}
-                    </td>
+                    <td class="p-3 text-center text-xs font-bold text-blue-600">${totInt > 0 ? totInt : '-'}</td>
+                    <td class="p-3 text-center text-xs font-bold text-orange-600">${totExt > 0 ? totExt : '-'}</td>
+                    <td class="p-3 text-[10px] text-gray-600 leading-tight">${feedbackLines.length > 0 ? feedbackLines.join('<br>') : '<span class="text-gray-300 italic">-</span>'}</td>
                     <td class="p-3 text-center">
                         <div class="flex flex-col gap-2 items-center justify-center ${showButtons ? '' : 'hidden'}">
-                            <button onclick="requestEditReport('${r.id}')" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button onclick="requestDeleteReport('${r.id}')" class="text-red-400 hover:bg-red-50 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-trash-can"></i></button>
+                            <button onclick="requestEditReport('${r.id}')" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="requestDeleteReport('${r.id}')" class="text-red-400 hover:bg-red-50 p-1.5 rounded-lg"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     </td>
                 </tr>`;
-            }).join('') || '<tr><td colspan="8" class="p-8 text-center text-slate-400 italic text-xs">Belum ada laporan masuk</td></tr>';
-        }
-        
-        function updateFilterUser() {
-            const sel = document.getElementById('filter-user'); 
-            if(!sel) return;
-            const cur = sel.value;
-            const ssList = [...new Set(allReports.map(r=>r.kodeSS).filter(Boolean))].sort();
-            sel.innerHTML = '<option value="all">Semua SS</option>' + ssList.map(ss => `<option value="${ss}">${ss}</option>`).join('');
-            sel.value = cur;
+            }).join('') || '<tr><td colspan="8" class="p-8 text-center text-gray-400 italic text-xs">No reports found</td></tr>';
+            
+            // Populate Filter User Dropdown
+            if(document.getElementById('filter-user')) {
+                 const sel = document.getElementById('filter-user'); 
+                 const cur = sel.value;
+                 const ssList = [...new Set(allReports.map(r=>r.kodeSS).filter(Boolean))].sort();
+                 sel.innerHTML = '<option value="all">Semua SS</option>' + ssList.map(ss => `<option value="${ss}">${ss}</option>`).join('');
+                 sel.value = cur;
+            }
         }
 
         window.toggleUserStatus = async (id, currentStatus) => {
             const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-            try { await updateDoc(doc(db,'artifacts', appId, 'public', 'data', 'users', id), {status: newStatus}); showNotification("Status diubah"); } catch(e) { showNotification("Gagal", "error"); }
+            try { await updateDoc(doc(db,'artifacts', appId, 'public', 'data', 'users', id), {status: newStatus}); showNotification("Status Updated"); } catch(e) { showNotification("Failed", "error"); }
         }
         function renderUsersTable() {
             const tbody = document.getElementById('users-table-body');
-            if (allUsers.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400 italic">Kosong</td></tr>`; return; }
+            if (allUsers.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400 italic">Empty</td></tr>`; return; }
             tbody.innerHTML = allUsers.map(u => {
                 const isActive = u.status !== 'inactive';
                 const toggleBtn = (u.username !== 'admin' && u.id !== currentUser.id)
-                    ? `<button onclick="toggleUserStatus('${u.id}', '${isActive?'active':'inactive'}')" class="relative inline-flex items-center h-5 rounded-full w-9 transition-colors focus:outline-none ${isActive ? 'bg-[#34C759]' : 'bg-slate-300'}"><span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform shadow-sm ${isActive ? 'translate-x-4' : 'translate-x-0.5'}"></span></button>`
-                    : `<span class="text-[9px] text-slate-300 font-bold bg-slate-100 px-1 rounded">LOCKED</span>`;
-                return `<tr class="border-b border-black/5 ${!isActive?'opacity-50 grayscale':''}">
-                    <td class="p-4 font-bold text-slate-700">${u.name}<br><span class="text-[10px] text-slate-400 font-normal">ID: ${u.username}</span></td>
-                    <td class="p-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 text-slate-500">${u.role}</span></td>
+                    ? `<button onclick="toggleUserStatus('${u.id}', '${isActive?'active':'inactive'}')" class="relative inline-flex items-center h-5 rounded-full w-9 transition-colors focus:outline-none ${isActive ? 'bg-[#34C759]' : 'bg-gray-300'}"><span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform shadow-sm ${isActive ? 'translate-x-4' : 'translate-x-0.5'}"></span></button>`
+                    : `<span class="text-[9px] text-gray-300 font-bold bg-gray-100 px-1 rounded">LOCKED</span>`;
+                return `<tr class="border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors ${!isActive?'opacity-50 grayscale':''}">
+                    <td class="p-4 font-bold text-gray-700">${u.name}<br><span class="text-[10px] text-gray-400 font-normal">ID: ${u.username}</span></td>
+                    <td class="p-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-gray-100 text-gray-500">${u.role}</span></td>
                     <td class="p-4 text-center">${toggleBtn}</td>
-                    <td class="p-4 text-center"><div class="flex justify-center gap-3"><button onclick="editUser('${u.id}')" class="text-blue-500"><i class="fa-solid fa-pen"></i></button>${u.id!==currentUser.id && u.username!=='admin' ? `<button onclick="openDeleteModal('${u.id}', '${u.username}')" class="text-red-400"><i class="fa-solid fa-trash"></i></button>` : ''}</div></td>
+                    <td class="p-4 text-center"><div class="flex justify-center gap-3"><button onclick="editUser('${u.id}')" class="text-blue-500 hover:text-blue-600"><i class="fa-solid fa-pen"></i></button>${u.id!==currentUser.id && u.username!=='admin' ? `<button onclick="openDeleteModal('${u.id}', '${u.username}')" class="text-red-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>` : ''}</div></td>
                 </tr>`;
             }).join('');
         }
@@ -1489,7 +1398,7 @@
         window.prepareAddUser = () => { 
             document.getElementById('add-user-form').reset(); document.getElementById('edit-user-id').value=''; 
             document.getElementById('new-role').disabled = false; document.getElementById('new-username').readOnly = false;
-            document.getElementById('new-account-status').disabled = false; document.getElementById('modal-title').textContent = "User Baru";
+            document.getElementById('new-account-status').disabled = false; document.getElementById('modal-title').textContent = "New User";
             document.getElementById('modal-add-user').classList.remove('hidden'); 
         }
         window.closeAddUserModal = () => document.getElementById('modal-add-user').classList.add('hidden');
@@ -1503,29 +1412,30 @@
             const rawUsername = document.getElementById('new-username').value;
             const cleanUsername = rawUsername.trim().toLowerCase();
             const cleanPassword = document.getElementById('new-password').value.trim();
-            if (!/^\d+$/.test(cleanUsername) && cleanUsername !== 'admin') { showNotification("ID harus berupa angka!", "error"); return; }
-            if (cleanPassword.length < 6) { showNotification("Password minimal 6 karakter!", "error"); return; }
+            if (!/^\d+$/.test(cleanUsername) && cleanUsername !== 'admin') { showNotification("ID must be numeric", "error"); return; }
+            if (cleanPassword.length < 6) { showNotification("Password min 6 chars", "error"); return; }
             const data = { role: roleVal, name: document.getElementById('new-name').value, username: cleanUsername, password: cleanPassword, kodeSS: document.getElementById('new-kode-ss').value, kotaArea: document.getElementById('new-kota').value, status: statusVal };
             if(!uid) data.createdAt = serverTimestamp();
             try { 
                 if(!uid) {
                     const qCheck = query(collection(db, 'artifacts', appId, 'public', 'data', 'users'), where("username", "==", cleanUsername));
                     const snapCheck = await getDocs(qCheck);
-                    if(!snapCheck.empty) { showNotification("ID sudah dipakai!", "error"); return; }
+                    if(!snapCheck.empty) { showNotification("ID already taken", "error"); return; }
                 }
-                if(uid) await updateDoc(doc(db,'artifacts', appId, 'public', 'data', 'users', uid), data); else await addDoc(collection(db,'artifacts', appId, 'public', 'data', 'users'), data); showNotification("Tersimpan!"); closeAddUserModal(); 
-            } catch(e) { showNotification("Gagal", "error"); }
+                if(uid) await updateDoc(doc(db,'artifacts', appId, 'public', 'data', 'users', uid), data); else await addDoc(collection(db,'artifacts', appId, 'public', 'data', 'users'), data); 
+                showNotification("User Saved!"); closeAddUserModal(); 
+            } catch(e) { showNotification("Save Failed", "error"); }
         });
 
         window.openAuthModal = (action, id) => { targetId = id; pendingAction = action; document.getElementById('auth-code-input').value=''; document.getElementById('modal-auth-code').classList.remove('hidden'); setTimeout(() => document.getElementById('auth-code-input').focus(), 100); }
         window.closeAuthModal = () => document.getElementById('modal-auth-code').classList.add('hidden');
-        window.verifyAuthCode = () => { if(document.getElementById('auth-code-input').value === currentAdminCode) { closeAuthModal(); if(pendingAction === 'deleteReport') openConfirmDelete(targetId); if(pendingAction === 'editReport') loadReportToForm(targetId); } else showNotification("Kode Salah", "error"); }
-        function openConfirmDelete(id, username) { targetId = id; pendingAction = username ? 'deleteUser' : 'deleteReport'; document.getElementById('delete-confirmation-text').textContent = username ? `Hapus user ${username}?` : "Hapus laporan ini?"; document.getElementById('modal-confirm-delete').classList.remove('hidden'); }
+        window.verifyAuthCode = () => { if(document.getElementById('auth-code-input').value === currentAdminCode) { closeAuthModal(); if(pendingAction === 'deleteReport') openConfirmDelete(targetId); if(pendingAction === 'editReport') loadReportToForm(targetId); } else showNotification("Wrong Code", "error"); }
+        function openConfirmDelete(id, username) { targetId = id; pendingAction = username ? 'deleteUser' : 'deleteReport'; document.getElementById('delete-confirmation-text').textContent = username ? `Delete user ${username}?` : "Delete this report?"; document.getElementById('modal-confirm-delete').classList.remove('hidden'); }
         window.openDeleteModal = openConfirmDelete; window.closeDeleteModal = () => document.getElementById('modal-confirm-delete').classList.add('hidden');
-        window.executeDelete = async () => { try { if(pendingAction === 'deleteReport') await deleteDoc(doc(db,'artifacts', appId, 'public', 'data', 'reports', targetId)); if(pendingAction === 'deleteUser') await deleteDoc(doc(db,'artifacts', appId, 'public', 'data', 'users', targetId)); showNotification("Dihapus."); closeDeleteModal(); } catch(e) { showNotification("Gagal", "error"); } }
+        window.executeDelete = async () => { try { if(pendingAction === 'deleteReport') await deleteDoc(doc(db,'artifacts', appId, 'public', 'data', 'reports', targetId)); if(pendingAction === 'deleteUser') await deleteDoc(doc(db,'artifacts', appId, 'public', 'data', 'users', targetId)); showNotification("Deleted."); closeDeleteModal(); } catch(e) { showNotification("Delete Failed", "error"); } }
 
         window.showTab = (t) => {
-            if (t === 'settings' && currentUser && currentUser.role !== 'coordinator') { showNotification("Akses ditolak!", "error"); return; }
+            if (t === 'settings' && currentUser && currentUser.role !== 'coordinator') { showNotification("Access Denied", "error"); return; }
             const tabs = ['dashboard', 'reports', 'settings'];
             tabs.forEach(x => { document.getElementById('tab-' + x).classList.add('hidden'); document.getElementById('nav-' + x).classList.remove('nav-active'); });
             document.getElementById('tab-' + t).classList.remove('hidden'); document.getElementById('nav-' + t).classList.add('nav-active');
