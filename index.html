@@ -207,7 +207,7 @@
                 <form id="login-form" class="w-full space-y-4">
                     <input type="hidden" id="login-type" value="user">
                     <div id="username-container">
-                        <input type="text" id="username" class="ios-input w-full text-center placeholder:text-gray-400" placeholder="Masukkan ID (Angka)" required>
+                        <input type="text" id="username" class="ios-input w-full text-center placeholder:text-gray-400" placeholder="Masukkan NIK Anda" required>
                     </div>
                     <div>
                         <input type="password" id="password" class="ios-input w-full text-center placeholder:text-gray-400" placeholder="Password" required>
@@ -221,7 +221,7 @@
                     <i class="fa-solid fa-circle-exclamation mr-1"></i> <span>Error message</span>
                 </div>
             </div>
-            <p class="mt-8 text-xs text-gray-400">© 2024 Daily Report System</p>
+            <p class="mt-8 text-xs text-gray-400">© 2026 Daily Report System</p>
         </div>
     </div>
 
@@ -940,13 +940,20 @@
                 }
             });
 
+            // FIX: Use UTC to generate axis labels to match YYYY-MM-DD strings exactly
             const days = {};
-            const sDate = new Date(startDate); const eDate = new Date(endDate);
-            for(let d = new Date(sDate); d <= eDate; d.setDate(d.getDate() + 1)) {
+            // Parse inputs as UTC midnight
+            const sDate = new Date(startDate); 
+            const eDate = new Date(endDate);
+            
+            // Loop adds 1 day in UTC
+            for(let d = new Date(sDate); d <= eDate; d.setUTCDate(d.getUTCDate() + 1)) {
                 const k = d.toISOString().split('T')[0];
-                const label = d.getDate() + '/' + (d.getMonth()+1);
+                // Label using UTC date/month
+                const label = d.getUTCDate() + '/' + (d.getUTCMonth()+1);
                 days[k] = { label: label, total:0, ok:0 };
             }
+
             dataByDate.forEach(r => { 
                 const dateStr = r.date || (r.timestamp ? new Date(r.timestamp.seconds*1000).toISOString().split('T')[0] : '');
                 if(days[dateStr]) { 
