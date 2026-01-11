@@ -143,13 +143,13 @@
         
         /* Table Header */
         .table-header-custom th { 
-            background-color: #F9F9FB; 
-            color: #8E8E93; 
-            font-weight: 600; 
+            background-color: #DBEAFE; /* Blue-100 for color */
+            color: #1E3A8A; /* Blue-900 for text contrast */
+            font-weight: 700; 
             text-transform: uppercase; 
             font-size: 0.7rem; 
             letter-spacing: 0.05em; 
-            border-bottom: 1px solid #E5E5EA;
+            border-bottom: 2px solid #BFDBFE;
         }
         
         /* Toggle Switch */
@@ -207,7 +207,7 @@
                 <form id="login-form" class="w-full space-y-4">
                     <input type="hidden" id="login-type" value="user">
                     <div id="username-container">
-                        <input type="text" id="username" class="ios-input w-full text-center placeholder:text-gray-400" placeholder="Masukkan NIK Anda" required>
+                        <input type="text" id="username" class="ios-input w-full text-center placeholder:text-gray-400" placeholder="Masukkan NIK" required>
                     </div>
                     <div>
                         <input type="password" id="password" class="ios-input w-full text-center placeholder:text-gray-400" placeholder="Password" required>
@@ -263,7 +263,7 @@
                     <p id="user-display-name" class="text-xs font-bold text-[#1D1D1F]">User</p>
                     <p id="user-display-role" class="text-[10px] text-blue-500 font-bold uppercase tracking-wide">Role</p>
                 </div>
-                <button onclick="logout()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors flex items-center justify-center">
+                <button onclick="openConfirmLogout()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors flex items-center justify-center">
                     <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
                 </button>
             </div>
@@ -310,7 +310,7 @@
                         <div class="z-10">
                             <div class="flex justify-between items-end">
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Success</p>
-                                <span id="kpi-badge-ok" class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">0%</span>
+                                <span id="kpi-badge-ok" class="text-[10px] font-bold text-white px-2 py-0.5 rounded-full transition-colors duration-300 bg-gray-300">0%</span>
                             </div>
                             <h3 id="kpi-val-ok" class="text-2xl font-bold text-[#1D1D1F]">0</h3>
                         </div>
@@ -441,7 +441,7 @@
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <div>
                             <h3 class="text-xl font-bold text-[#1D1D1F]">Riwayat Laporan</h3>
-                            <p class="text-xs text-gray-400">Database laporan masuk.</p>
+                            <p class="text-xs text-gray-400">Database SLA PICKUP & Delivery</p>
                         </div>
                         <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                             <div class="flex items-center bg-[#F2F2F7] rounded-xl px-3 py-2 gap-2">
@@ -461,16 +461,16 @@
                     
                     <div class="overflow-auto max-h-[70vh] relative rounded-xl border border-gray-100">
                         <table class="w-full text-left border-collapse">
-                            <thead class="bg-[#F9F9FB] sticky top-0 z-20">
+                            <thead class="bg-[#F9F9FB] sticky top-0 z-20 table-header-custom">
                                 <tr>
-                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200">Date</th>
-                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200">Identity</th>
-                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200">Type</th>
-                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200">Details</th>
-                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200 text-center">Int</th>
-                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200 text-center">Ext</th>
-                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200 w-64">Notes</th>
-                                    <th class="p-3 text-xs font-bold text-gray-500 uppercase border-b border-gray-200 text-center">Action</th>
+                                    <th class="p-3 text-xs border-b border-blue-200">Date</th>
+                                    <th class="p-3 text-xs border-b border-blue-200">Identity</th>
+                                    <th class="p-3 text-xs border-b border-blue-200">Type</th>
+                                    <th class="p-3 text-xs border-b border-blue-200">Details</th>
+                                    <th class="p-3 text-xs border-b border-blue-200 text-center">Int</th>
+                                    <th class="p-3 text-xs border-b border-blue-200 text-center">Ext</th>
+                                    <th class="p-3 text-xs border-b border-blue-200 w-64">Notes</th>
+                                    <th class="p-3 text-xs border-b border-blue-200 text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="reports-table-body" class="text-xs divide-y divide-gray-100 bg-white"></tbody>
@@ -526,7 +526,7 @@
                         
                         <div class="rounded-2xl overflow-hidden border border-gray-200 shadow-sm bg-white">
                             <div class="overflow-x-auto">
-                                <table class="w-full text-sm border-collapse"><thead id="table-header" class="bg-[#F9F9FB] border-b border-gray-200"></thead><tbody id="table-body" class="divide-y divide-gray-100"></tbody></table>
+                                <table class="w-full text-sm border-collapse"><thead id="table-header" class="table-header-custom border-b border-blue-200"></thead><tbody id="table-body" class="divide-y divide-gray-100"></tbody></table>
                             </div>
                         </div>
 
@@ -594,9 +594,9 @@
     
     <div id="modal-confirm-delete" class="fixed inset-0 bg-black/30 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
         <div class="bg-white/90 backdrop-blur-xl w-full max-w-xs rounded-[28px] p-8 shadow-2xl text-center animate-island-pop">
-            <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-xl"><i class="fa-solid fa-trash-can"></i></div>
-            <h3 class="font-bold text-lg mb-1">Are you sure?</h3><p id="delete-confirmation-text" class="text-xs text-gray-400 mb-6">This action cannot be undone.</p>
-            <div class="grid grid-cols-2 gap-3"><button onclick="closeDeleteModal()" class="py-3 bg-gray-100 rounded-xl font-bold text-xs text-gray-600">Cancel</button><button onclick="executeDelete()" class="py-3 bg-red-500 text-white rounded-xl font-bold text-xs shadow-lg shadow-red-500/20">Delete</button></div>
+            <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-xl"><i id="modal-icon" class="fa-solid fa-trash-can"></i></div>
+            <h3 id="modal-confirm-title" class="font-bold text-lg mb-1">Are you sure?</h3><p id="delete-confirmation-text" class="text-xs text-gray-400 mb-6">This action cannot be undone.</p>
+            <div class="grid grid-cols-2 gap-3"><button onclick="closeDeleteModal()" class="py-3 bg-gray-100 rounded-xl font-bold text-xs text-gray-600">Cancel</button><button onclick="executeDelete()" id="btn-confirm-action" class="py-3 bg-red-500 text-white rounded-xl font-bold text-xs shadow-lg shadow-red-500/20">Delete</button></div>
         </div>
     </div>
 
@@ -772,6 +772,17 @@
         }
         window.logout = logout;
 
+        window.openConfirmLogout = () => {
+            targetId = null;
+            pendingAction = 'logout';
+            document.getElementById('modal-confirm-title').textContent = "Konfirmasi Logout";
+            document.getElementById('delete-confirmation-text').textContent = "Apakah Anda yakin ingin keluar?";
+            document.getElementById('btn-confirm-action').textContent = "Ya, Keluar";
+            document.getElementById('btn-confirm-action').className = "py-3 bg-red-500 text-white rounded-xl font-bold text-xs shadow-lg shadow-red-500/20";
+            document.getElementById('modal-icon').className = "fa-solid fa-arrow-right-from-bracket";
+            document.getElementById('modal-confirm-delete').classList.remove('hidden');
+        }
+
         async function fetchGlobalSettings() {
             if(!auth.currentUser) return;
             const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'globalConfig'));
@@ -887,7 +898,13 @@
             
             document.getElementById('kpi-val-total').textContent = total.toLocaleString('id-ID');
             document.getElementById('kpi-val-ok').textContent = ok.toLocaleString('id-ID');
-            document.getElementById('kpi-badge-ok').textContent = pct.toLocaleString('id-ID') + '%';
+            const badge = document.getElementById('kpi-badge-ok');
+            badge.textContent = pct.toLocaleString('id-ID') + '%';
+            
+            // Dynamic Color Logic for Badge
+            const colorClass = getSLAColor(pct, filterType);
+            badge.className = `text-[10px] font-bold text-white px-2 py-0.5 rounded-full transition-colors duration-300 ${colorClass}`;
+
             document.getElementById('kpi-val-prog').textContent = prog.toLocaleString('id-ID');
             document.getElementById('kpi-val-mbh').textContent = mbh.toLocaleString('id-ID');
             document.getElementById('kpi-val-miss').textContent = miss.toLocaleString('id-ID');
@@ -1035,15 +1052,15 @@
                 const avgPct = t > 0 ? (o / t * 100) : 0;
                 const avgColor = getSLAColor(avgPct, filterType);
 
-                return `<tr class="bg-gray-50/50 font-bold text-[#1D1D1F] border-t border-gray-200">
-                    <td class="p-3 pl-5">TOTAL</td>
-                    <td class="p-3 text-right">${t.toLocaleString('id-ID')}</td>
-                    <td class="p-3 text-right">${o.toLocaleString('id-ID')}</td>
+                return `<tr class="bg-blue-50 font-bold text-[#1D1D1F] border-t-2 border-blue-200">
+                    <td class="p-3 pl-5 text-blue-900">TOTAL</td>
+                    <td class="p-3 text-right text-blue-900">${t.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-right text-blue-900">${o.toLocaleString('id-ID')}</td>
                     <td class="p-3 text-center"><div class="${avgColor} text-[10px] text-white font-bold px-2 py-0.5 rounded-md inline-block shadow-sm">${avgPct.toLocaleString('id-ID', {maximumFractionDigits:1})}%</div></td>
-                    <td class="p-3 text-right">${i.toLocaleString('id-ID')}</td>
-                    <td class="p-3 text-right">${mb.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-right text-blue-900">${i.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-right text-blue-900">${mb.toLocaleString('id-ID')}</td>
                     <td class="p-3 text-right text-red-600">${m.toLocaleString('id-ID')}</td>
-                    <td class="p-3 text-right pr-5 ${showClaim?'':'hidden'}">${c.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-right pr-5 ${showClaim?'':'hidden'} text-blue-900">${c.toLocaleString('id-ID')}</td>
                 </tr>`;
             }
 
@@ -1437,9 +1454,27 @@
         window.openAuthModal = (action, id) => { targetId = id; pendingAction = action; document.getElementById('auth-code-input').value=''; document.getElementById('modal-auth-code').classList.remove('hidden'); setTimeout(() => document.getElementById('auth-code-input').focus(), 100); }
         window.closeAuthModal = () => document.getElementById('modal-auth-code').classList.add('hidden');
         window.verifyAuthCode = () => { if(document.getElementById('auth-code-input').value === currentAdminCode) { closeAuthModal(); if(pendingAction === 'deleteReport') openConfirmDelete(targetId); if(pendingAction === 'editReport') loadReportToForm(targetId); } else showNotification("Wrong Code", "error"); }
-        function openConfirmDelete(id, username) { targetId = id; pendingAction = username ? 'deleteUser' : 'deleteReport'; document.getElementById('delete-confirmation-text').textContent = username ? `Delete user ${username}?` : "Delete this report?"; document.getElementById('modal-confirm-delete').classList.remove('hidden'); }
+        function openConfirmDelete(id, username) { 
+            targetId = id; 
+            pendingAction = username ? 'deleteUser' : 'deleteReport'; 
+            document.getElementById('modal-confirm-title').textContent = "Are you sure?";
+            document.getElementById('delete-confirmation-text').textContent = username ? `Delete user ${username}?` : "Delete this report?"; 
+            document.getElementById('btn-confirm-action').textContent = "Delete";
+            document.getElementById('btn-confirm-action').className = "py-3 bg-red-500 text-white rounded-xl font-bold text-xs shadow-lg shadow-red-500/20";
+            document.getElementById('modal-icon').className = "fa-solid fa-trash-can";
+            document.getElementById('modal-confirm-delete').classList.remove('hidden'); 
+        }
         window.openDeleteModal = openConfirmDelete; window.closeDeleteModal = () => document.getElementById('modal-confirm-delete').classList.add('hidden');
-        window.executeDelete = async () => { try { if(pendingAction === 'deleteReport') await deleteDoc(doc(db,'artifacts', appId, 'public', 'data', 'reports', targetId)); if(pendingAction === 'deleteUser') await deleteDoc(doc(db,'artifacts', appId, 'public', 'data', 'users', targetId)); showNotification("Deleted."); closeDeleteModal(); } catch(e) { showNotification("Delete Failed", "error"); } }
+        
+        window.executeDelete = async () => { 
+            try { 
+                if(pendingAction === 'deleteReport') await deleteDoc(doc(db,'artifacts', appId, 'public', 'data', 'reports', targetId)); 
+                if(pendingAction === 'deleteUser') await deleteDoc(doc(db,'artifacts', appId, 'public', 'data', 'users', targetId));
+                if(pendingAction === 'logout') { logout(); closeDeleteModal(); return; } // Handle logout
+                
+                showNotification("Deleted."); closeDeleteModal(); 
+            } catch(e) { showNotification("Delete Failed", "error"); } 
+        }
 
         window.showTab = (t) => {
             if (t === 'settings' && currentUser && currentUser.role !== 'coordinator') { showNotification("Access Denied", "error"); return; }
