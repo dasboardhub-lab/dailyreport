@@ -39,79 +39,48 @@
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background: #F2F2F7; /* Apple System Gray 6 */
+            background: #F2F2F7;
             background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
             background-attachment: fixed;
             background-size: cover;
             color: #1C1C1E;
             -webkit-tap-highlight-color: transparent;
         }
-
-        /* Glassmorphism Utilities */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-        
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
-        }
-
-        /* Input Styles iOS-like */
-        .ios-input {
-            background: rgba(118, 118, 128, 0.12);
-            border: none;
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-size: 15px;
-            transition: background 0.2s;
-        }
+        .glass-panel { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        .glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-bottom: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03); }
+        .ios-input { background: rgba(118, 118, 128, 0.12); border: none; border-radius: 10px; padding: 10px 14px; font-size: 15px; transition: background 0.2s; }
         .ios-input:focus { background: rgba(118, 118, 128, 0.2); outline: none; }
         .ios-input:disabled, .ios-input[readonly] { background: rgba(118, 118, 128, 0.05); color: #9ca3af; cursor: not-allowed; }
-        
-        /* Table Input */
-        .input-cell input { 
-            width: 100%; text-align: center; 
-            background: transparent; border: none;
-            border-radius: 6px; padding: 6px; font-size: 0.95rem; font-weight: 600; 
-        }
+        .input-cell input { width: 100%; text-align: center; background: transparent; border: none; border-radius: 6px; padding: 6px; font-size: 0.95rem; font-weight: 600; }
         .input-cell input:focus { background: rgba(0, 122, 255, 0.1); color: #007AFF; outline: none; }
         .total-cell input { font-weight: 800; color: #007AFF; }
-
-        /* Scrollbar Hide */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* Animation */
         .animate-scale-in { animation: scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-        /* Sidebar/Nav Active */
-        .nav-active { 
-            background: #007AFF; 
-            color: white !important; 
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); 
-        }
+        .nav-active { background: #007AFF; color: white !important; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); }
         .nav-active i { color: white !important; }
-        .nav-item:hover:not(.nav-active) {
-            background: rgba(0,0,0,0.05);
-        }
-
+        .nav-item:hover:not(.nav-active) { background: rgba(0,0,0,0.05); }
         .hidden { display: none !important; }
         input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        
-        /* KPI Card Hover */
         .kpi-card { transition: transform 0.2s; }
         .kpi-card:hover { transform: translateY(-2px); }
-
-        /* Custom Widths for Dashboard Table - Equal Widths */
-        .col-metric { width: 11%; text-align: right; } 
+        .col-metric { width: 11%; text-align: right; }
+        
+        /* Table Header Custom Style */
+        .table-header-custom {
+            background-color: #1e293b; /* Slate 800 */
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+        .table-header-custom th { border-bottom: 2px solid rgba(255,255,255,0.1); }
+        
+        /* Toggle Switch Style */
+        .type-toggle-btn.active { background-color: #007AFF; color: white; box-shadow: 0 2px 5px rgba(0,122,255,0.3); }
+        .type-toggle-btn { color: #64748b; background-color: transparent; }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col">
@@ -193,7 +162,7 @@
             </div>
         </header>
 
-        <!-- CONTENT AREA (SUPER WIDE) -->
+        <!-- CONTENT AREA -->
         <main class="flex-1 w-full max-w-[1920px] mx-auto pt-24 px-4 md:px-8 lg:px-12 pb-10 animate-scale-in">
             
             <!-- 1. DASHBOARD TAB -->
@@ -207,7 +176,7 @@
                     <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl"></div>
                 </div>
 
-                <!-- Filter Bar -->
+                <!-- Filter Bar (Global) -->
                 <div class="glass-panel p-2 rounded-2xl flex flex-col md:flex-row gap-2 md:items-center overflow-x-auto">
                     <div class="flex items-center bg-slate-100/50 rounded-xl px-3 py-1.5 gap-2 border border-slate-200/50">
                         <i class="fa-regular fa-calendar text-slate-400 text-xs"></i>
@@ -221,63 +190,65 @@
                         <select id="dash-filter-service" class="ios-input py-1.5 px-3 text-xs font-bold bg-slate-100/50 rounded-xl min-w-[100px]">
                             <option value="all">All Svc</option><option value="REG">REG</option><option value="ECO">ECO</option><option value="ND">ND</option><option value="SD/SDS">SD/SDS</option><option value="BIG">BIG</option>
                         </select>
-                        <!-- Type Filter Removed Here, Moved to Chart -->
+                        <!-- Type Filter Removed from here -->
                         <button onclick="resetFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ml-2" title="Reset Filter (30 Hari Terakhir)"><i class="fa-solid fa-rotate-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Charts Area (Moved Up to include Filter Toggle) -->
+                <div class="space-y-6">
+                    <div class="glass-panel p-6 md:p-8 rounded-[32px] h-[400px] flex flex-col relative">
+                        <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fa-regular fa-calendar text-blue-500"></i> Tren Tahunan
+                            </h3>
+                            <!-- New Global Type Toggle -->
+                            <div class="flex bg-slate-100 p-1 rounded-xl w-max">
+                                <button onclick="setDashType('delivery')" id="dash-toggle-delivery" class="type-toggle-btn active px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-truck"></i> Delivery
+                                </button>
+                                <button onclick="setDashType('pickup')" id="dash-toggle-pickup" class="type-toggle-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-box-open"></i> Pickup
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex-1 w-full relative"><canvas id="chartAnnual"></canvas></div>
                     </div>
                 </div>
 
                 <!-- KPI CARDS GRID -->
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    <!-- Total -->
                     <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
                         <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-layer-group"></i></div>
                         <div><p class="text-xs font-bold text-slate-400 uppercase">Total</p><h3 id="kpi-val-total" class="text-2xl font-bold text-slate-800">0</h3></div>
                     </div>
-                    <!-- OK -->
                     <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
                         <div class="absolute top-4 right-4 bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-full" id="kpi-badge-ok">0%</div>
                         <div class="w-10 h-10 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-check-circle"></i></div>
                         <div><p class="text-xs font-bold text-slate-400 uppercase">OK</p><h3 id="kpi-val-ok" class="text-2xl font-bold text-slate-800">0</h3></div>
                     </div>
-                    <!-- Inprogress -->
                     <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
                         <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-spinner"></i></div>
                         <div><p class="text-xs font-bold text-slate-400 uppercase">Inprog</p><h3 id="kpi-val-prog" class="text-2xl font-bold text-slate-800">0</h3></div>
                     </div>
-                    <!-- MBH -->
                     <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
                         <div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-hourglass-half"></i></div>
                         <div><p class="text-xs font-bold text-slate-400 uppercase">MBH</p><h3 id="kpi-val-mbh" class="text-2xl font-bold text-slate-800">0</h3></div>
                     </div>
-                    <!-- Missed -->
                     <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
                         <div class="w-10 h-10 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-circle-xmark"></i></div>
                         <div><p class="text-xs font-bold text-slate-400 uppercase">Missed</p><h3 id="kpi-val-miss" class="text-2xl font-bold text-red-600">0</h3></div>
                     </div>
-                    <!-- Claimed -->
                     <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative" id="kpi-card-claim">
                         <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-file-invoice-dollar"></i></div>
                         <div><p class="text-xs font-bold text-slate-400 uppercase">Claim</p><h3 id="kpi-val-claim" class="text-2xl font-bold text-slate-800">0</h3></div>
                     </div>
                 </div>
 
-                <!-- Charts -->
-                <div class="space-y-6">
-                    <div class="glass-panel p-6 md:p-8 rounded-[32px] h-[400px] flex flex-col relative">
-                        <!-- Toggle for Type Filter in Chart Header -->
-                        <div class="flex justify-between items-start mb-6">
-                             <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i class="fa-regular fa-calendar text-blue-500"></i> Tren Tahunan</h3>
-                             <div class="flex bg-slate-200/70 p-1 rounded-xl">
-                                 <button onclick="setGlobalType('delivery')" id="chart-toggle-del" class="px-4 py-1.5 text-[10px] font-bold rounded-lg transition-all shadow-sm bg-white text-[#007AFF]">Delivery</button>
-                                 <button onclick="setGlobalType('pickup')" id="chart-toggle-pick" class="px-4 py-1.5 text-[10px] font-bold rounded-lg transition-all text-slate-500">Pickup</button>
-                             </div>
-                        </div>
-                        <div class="flex-1 w-full relative"><canvas id="chartAnnual"></canvas></div>
-                    </div>
-                    <div class="glass-panel p-6 md:p-8 rounded-[32px] h-[400px] flex flex-col">
-                        <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2"><i class="fa-solid fa-chart-line text-green-500"></i> Performa 30 Hari</h3>
-                        <div class="flex-1 w-full relative"><canvas id="chartMonthly"></canvas></div>
-                    </div>
+                <!-- Monthly Chart -->
+                 <div class="glass-panel p-6 md:p-8 rounded-[32px] h-[400px] flex flex-col">
+                    <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2"><i class="fa-solid fa-chart-line text-green-500"></i> Performa 30 Hari</h3>
+                    <div class="flex-1 w-full relative"><canvas id="chartMonthly"></canvas></div>
                 </div>
 
                 <!-- Tables -->
@@ -288,20 +259,20 @@
                         </div>
                         <div class="overflow-x-auto p-2">
                             <table class="w-full text-xs text-left border-collapse">
-                                <thead class="font-bold border-b border-black/5 bg-blue-100 text-blue-900">
+                                <thead class="table-header-custom">
                                     <tr>
                                         <th class="p-3 pl-4">SS</th>
                                         <th class="p-3 col-metric">Total</th>
                                         <th class="p-3 col-metric">OK</th>
                                         <th class="p-3 col-metric text-center">%OK</th>
-                                        <th class="p-3 col-metric text-slate-500">Inprog</th>
-                                        <th class="p-3 col-metric text-orange-500">MBH</th>
-                                        <th class="p-3 col-metric text-red-500">Miss</th>
-                                        <th class="p-3 col-metric pr-4 text-purple-500 claim-col">Claim</th>
+                                        <th class="p-3 col-metric text-slate-300">Inp</th>
+                                        <th class="p-3 col-metric text-orange-400">MBH</th>
+                                        <th class="p-3 col-metric text-red-400">Mis</th>
+                                        <th class="p-3 col-metric pr-4 text-purple-400 claim-col">Clm</th>
                                     </tr>
                                 </thead>
                                 <tbody id="body-breakdown-staging" class="divide-y divide-black/5"></tbody>
-                                <tfoot id="foot-breakdown-staging" class="bg-slate-100/50 font-bold text-slate-800 border-t border-black/10"></tfoot>
+                                <tfoot id="foot-breakdown-staging" class="bg-slate-200/50 font-bold text-slate-800 border-t border-black/10"></tfoot>
                             </table>
                         </div>
                     </div>
@@ -311,20 +282,20 @@
                         </div>
                         <div class="overflow-x-auto p-2">
                             <table class="w-full text-xs text-left border-collapse">
-                                <thead class="font-bold border-b border-black/5 bg-blue-100 text-blue-900">
+                                <thead class="table-header-custom">
                                     <tr>
                                         <th class="p-3 pl-4">Svc</th>
                                         <th class="p-3 col-metric">Total</th>
                                         <th class="p-3 col-metric">OK</th>
                                         <th class="p-3 col-metric text-center">%OK</th>
-                                        <th class="p-3 col-metric text-slate-500">Inprog</th>
-                                        <th class="p-3 col-metric text-orange-500">MBH</th>
-                                        <th class="p-3 col-metric text-red-500">Miss</th>
-                                        <th class="p-3 col-metric pr-4 text-purple-500 claim-col">Claim</th>
+                                        <th class="p-3 col-metric text-slate-300">Inp</th>
+                                        <th class="p-3 col-metric text-orange-400">MBH</th>
+                                        <th class="p-3 col-metric text-red-400">Mis</th>
+                                        <th class="p-3 col-metric pr-4 text-purple-400 claim-col">Clm</th>
                                     </tr>
                                 </thead>
                                 <tbody id="body-breakdown-service" class="divide-y divide-black/5"></tbody>
-                                <tfoot id="foot-breakdown-service" class="bg-slate-100/50 font-bold text-slate-800 border-t border-black/10"></tfoot>
+                                <tfoot id="foot-breakdown-service" class="bg-slate-200/50 font-bold text-slate-800 border-t border-black/10"></tfoot>
                             </table>
                         </div>
                     </div>
@@ -335,12 +306,18 @@
                     <h3 class="text-sm font-bold text-slate-800 mb-4">Feedback Issues</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="bg-blue-50/50 rounded-2xl p-4 border border-blue-100/50">
-                            <div class="flex justify-between items-center mb-2"><span class="text-xs font-bold text-blue-600">INTERNAL</span><span id="feedback-total-int" class="text-sm font-bold text-blue-700">0</span></div>
-                            <ul id="feedback-list-int" class="text-xs space-y-1 max-h-32 overflow-y-auto no-scrollbar"></ul>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-blue-600">INTERNAL</span>
+                                <span id="feedback-total-int" class="font-bold text-lg text-blue-700">0</span>
+                            </div>
+                            <ul id="feedback-list-int" class="text-xs space-y-2 max-h-40 overflow-y-auto no-scrollbar"></ul>
                         </div>
                         <div class="bg-orange-50/50 rounded-2xl p-4 border border-orange-100/50">
-                            <div class="flex justify-between items-center mb-2"><span class="text-xs font-bold text-orange-600">EXTERNAL</span><span id="feedback-total-ext" class="text-sm font-bold text-orange-700">0</span></div>
-                            <ul id="feedback-list-ext" class="text-xs space-y-1 max-h-32 overflow-y-auto no-scrollbar"></ul>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-orange-600">EXTERNAL</span>
+                                <span id="feedback-total-ext" class="font-bold text-lg text-orange-700">0</span>
+                            </div>
+                            <ul id="feedback-list-ext" class="text-xs space-y-2 max-h-40 overflow-y-auto no-scrollbar"></ul>
                         </div>
                     </div>
                 </div>
@@ -365,7 +342,7 @@
                                 <select id="filter-user" class="ios-input py-2 px-4 text-xs font-bold pr-8 appearance-none"><option value="all">Semua SS</option></select>
                                 <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none text-slate-400"><i class="fa-solid fa-chevron-down text-[10px]"></i></div>
                             </div>
-                            <!-- Tombol Plus -->
+                            <!-- Tombol Plus (Hanya muncul jika bukan visitor) -->
                             <button onclick="toggleReportForm(true)" id="btn-add-report" class="bg-[#007AFF] hover:bg-[#0062cc] text-white w-9 h-9 rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center transition-all transform hover:scale-105">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
@@ -373,7 +350,7 @@
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
-                            <thead class="text-blue-900 text-[10px] uppercase font-bold border-b border-black/5 bg-blue-100">
+                            <thead class="table-header-custom">
                                 <tr>
                                     <th class="p-3 w-24">Tgl</th>
                                     <th class="p-3 w-32">Identitas</th>
@@ -413,7 +390,7 @@
                                 <div class="flex flex-col gap-3">
                                     <input type="date" id="input-date" class="ios-input w-full font-bold text-slate-700">
                                     <div class="bg-slate-200/50 p-1 rounded-xl flex">
-                                        <button type="button" onclick="selectReportType('delivery')" id="btn-type-delivery" class="flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm bg-blue-50 text-[#007AFF] border-blue-200">
+                                        <button type="button" onclick="selectReportType('delivery')" id="btn-type-delivery" class="flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm bg-white text-[#007AFF]">
                                             <i class="fa-solid fa-truck"></i> Delivery
                                         </button>
                                         <button type="button" onclick="selectReportType('pickup')" id="btn-type-pickup" class="flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all text-slate-500">
@@ -436,7 +413,7 @@
                         </div>
                         <div class="bg-white/50 rounded-2xl overflow-hidden border border-white/60 shadow-sm">
                             <div class="overflow-x-auto">
-                                <table class="w-full text-sm border-collapse"><thead id="table-header" class="bg-blue-100 text-blue-900 font-bold text-xs uppercase text-center border-b border-slate-200"></thead><tbody id="table-body" class="divide-y divide-slate-100"></tbody></table>
+                                <table class="w-full text-sm border-collapse"><thead id="table-header" class="table-header-custom"></thead><tbody id="table-body" class="divide-y divide-slate-100"></tbody></table>
                             </div>
                         </div>
                         <div class="flex justify-end pt-2">
@@ -456,7 +433,7 @@
                 </div>
                 <div class="glass-panel rounded-[32px] overflow-hidden flex flex-col">
                     <div class="p-5 border-b border-black/5 bg-slate-50/30 flex justify-between items-center"><h3 class="text-sm font-bold text-slate-800">Team Users</h3><button onclick="prepareAddUser()" class="bg-[#007AFF] text-white p-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-plus"></i></button></div>
-                    <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-blue-900 text-xs font-bold bg-blue-100"><tr><th class="p-4">Nama</th><th class="p-4">Role</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Edit</th></tr></thead><tbody id="users-table-body" class="divide-y divide-black/5 text-xs"></tbody></table></div>
+                    <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="table-header-custom"><tr><th class="p-4">Nama</th><th class="p-4">Role</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Edit</th></tr></thead><tbody id="users-table-body" class="divide-y divide-black/5 text-xs"></tbody></table></div>
                 </div>
             </div>
 
@@ -508,18 +485,35 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot, deleteDoc, updateDoc, doc, getDoc, setDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // Register Plugin Chart JS Datalabels
         Chart.register(ChartDataLabels);
+
         const firebaseConfig = { apiKey: "AIzaSyAqbDeVLDBRDEIfi4RliLMC-3Qrwh8p96k", authDomain: "logsheet-5r.firebaseapp.com", projectId: "logsheet-5r", storageBucket: "logsheet-5r.firebasestorage.app", messagingSenderId: "358725557740", appId: "1:358725557740:web:664cca8d2ae984221ff4c9" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        let currentUser = null, allReports = [], allUsers = [], chartAnnual = null, chartMonthly = null, globalType = 'delivery';
+
+        let currentUser = null, allReports = [], allUsers = [], chartAnnual = null, chartMonthly = null;
         let pendingAction = null, targetId = null, currentAdminCode = "123456";
         const ROW_LABELS = ['REG', 'ECO', 'ND', 'SD/SDS', 'BIG'];
         let reportsUnsubscribe = null, usersUnsubscribe = null;
         
-        const initAuth = async () => { try { if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token); else await signInAnonymously(auth); } catch (e) { console.error(e); } };
+        // --- NEW: Global Filter Toggle State (Default Delivery) ---
+        let currentDashType = 'delivery'; 
+
+        // AUTH INIT
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth failed", error);
+            }
+        };
         onAuthStateChanged(auth, (user) => { if(!user) initAuth(); });
         initAuth();
 
@@ -532,25 +526,12 @@
         }
         window.showNotification = showNotification;
 
-        window.setGlobalType = (type) => {
-            globalType = type;
-            const btnDel = document.getElementById('chart-toggle-del');
-            const btnPick = document.getElementById('chart-toggle-pick');
-            if(type === 'delivery') {
-                btnDel.className = "px-4 py-1.5 text-[10px] font-bold rounded-lg transition-all shadow-sm bg-white text-[#007AFF]";
-                btnPick.className = "px-4 py-1.5 text-[10px] font-bold rounded-lg transition-all text-slate-400";
-            } else {
-                btnPick.className = "px-4 py-1.5 text-[10px] font-bold rounded-lg transition-all shadow-sm bg-white text-[#007AFF]";
-                btnDel.className = "px-4 py-1.5 text-[10px] font-bold rounded-lg transition-all text-slate-400";
-            }
-            renderDashboard();
-        }
-
         window.switchLoginTab = (type) => {
             document.getElementById('login-type').value = type;
             const uInput = document.getElementById('username-container');
             const btnUser = document.getElementById('tab-login-user');
             const btnAdmin = document.getElementById('tab-login-admin');
+            
             if(type==='admin') {
                 btnAdmin.className = "py-1.5 text-xs font-bold rounded-lg transition-all shadow-sm bg-white text-slate-800";
                 btnUser.className = "py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500";
@@ -568,10 +549,12 @@
             const u = document.getElementById('username').value.trim().toLowerCase();
             const p = document.getElementById('password').value.trim();
             const errEl = document.getElementById('login-error');
+            
             try {
                 if (!auth.currentUser) await initAuth();
                 const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'users'), where("username", "==", u));
                 const snap = await getDocs(q);
+                
                 if(!snap.empty) {
                     const data = snap.docs[0].data();
                     if(data.password !== p) throw new Error("Password salah.");
@@ -582,14 +565,18 @@
                     finishLogin();
                 } else {
                     if(type==='admin' && u==='admin' && p==='TAB123') {
+                        // Cek apakah sudah ada admin lain (role coordinator)
                         const qCoord = query(collection(db, 'artifacts', appId, 'public', 'data', 'users'), where("role", "==", "coordinator"));
                         const snapCoord = await getDocs(qCoord);
+                        
                         if (snapCoord.empty) {
                             const newAdm = {name:"Super Admin", username:"admin", password:"TAB123", role:"coordinator", status:"active", createdAt:serverTimestamp()};
                             const ref = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), newAdm);
                             currentUser = {id:ref.id, ...newAdm};
                             finishLogin();
-                        } else throw new Error("Username tidak ditemukan.");
+                        } else {
+                            throw new Error("Username tidak ditemukan.");
+                        }
                     } else throw new Error("Username tidak ditemukan.");
                 }
             } catch(err) {
@@ -606,23 +593,45 @@
             document.getElementById('user-display-role').textContent = currentUser.role;
             document.getElementById('avatar-initials').textContent = currentUser.name.charAt(0).toUpperCase();
 
+            // Handle Role Visibility
             const navSettings = document.getElementById('nav-settings');
             const btnAddReport = document.getElementById('btn-add-report');
-            if(currentUser.role === 'coordinator') { navSettings.classList.remove('hidden'); navSettings.classList.add('flex'); } 
-            else { navSettings.classList.add('hidden'); navSettings.classList.remove('flex'); }
-            if(currentUser.role === 'visitor') btnAddReport.classList.add('hidden'); else btnAddReport.classList.remove('hidden');
+
+            if(currentUser.role === 'coordinator') {
+                navSettings.classList.remove('hidden');
+                navSettings.classList.add('flex');
+            } else {
+                navSettings.classList.add('hidden');
+                navSettings.classList.remove('flex');
+            }
+
+            if(currentUser.role === 'visitor') {
+                btnAddReport.classList.add('hidden');
+            } else {
+                btnAddReport.classList.remove('hidden');
+            }
             
-            fetchGlobalSettings(); listenToReports();
+            fetchGlobalSettings(); 
+            listenToReports();
             if(currentUser.role === 'coordinator') listenToUsers();
             setupReportForm(); setupDashboardFilters(); renderInputTable(); window.showTab('dashboard');
         }
 
         async function logout() {
             try {
-                if(reportsUnsubscribe) reportsUnsubscribe(); if(usersUnsubscribe) usersUnsubscribe();
+                if(reportsUnsubscribe) reportsUnsubscribe(); 
+                if(usersUnsubscribe) usersUnsubscribe();
                 currentUser = null; allReports = []; allUsers = [];
-                document.getElementById('main-app').classList.add('hidden'); document.getElementById('login-page').classList.remove('hidden');
-                document.getElementById('nav-settings').classList.add('hidden'); document.getElementById('login-form').reset(); document.getElementById('login-error').classList.add('hidden');
+                
+                document.getElementById('main-app').classList.add('hidden');
+                document.getElementById('login-page').classList.remove('hidden');
+                
+                const navSettings = document.getElementById('nav-settings');
+                navSettings.classList.add('hidden');
+                navSettings.classList.remove('flex');
+
+                document.getElementById('login-form').reset(); 
+                document.getElementById('login-error').classList.add('hidden');
                 switchLoginTab('user');
             } catch (error) { window.location.reload(); }
         }
@@ -644,8 +653,29 @@
         }
 
         function getLast30Days() {
-            const end = new Date(); const start = new Date(); start.setDate(end.getDate() - 30);
-            return { start: start.toISOString().split('T')[0], end: end.toISOString().split('T')[0] };
+            const end = new Date();
+            const start = new Date();
+            start.setDate(end.getDate() - 30);
+            return {
+                start: start.toISOString().split('T')[0],
+                end: end.toISOString().split('T')[0]
+            };
+        }
+
+        // --- NEW: Toggle Switch Logic ---
+        window.setDashType = (type) => {
+            currentDashType = type;
+            const btnDel = document.getElementById('dash-toggle-delivery');
+            const btnPick = document.getElementById('dash-toggle-pickup');
+            
+            if(type === 'delivery') {
+                btnDel.classList.add('active');
+                btnPick.classList.remove('active');
+            } else {
+                btnPick.classList.add('active');
+                btnDel.classList.remove('active');
+            }
+            renderDashboard();
         }
 
         function setupDashboardFilters() {
@@ -656,22 +686,27 @@
                 ssSel.innerHTML = '<option value="all">Semua SS</option>' + [...ssSet].map(ss => `<option value="${ss}">${ss}</option>`).join('');
                 if([...ssSet].includes(cur)) ssSel.value = cur;
             }
+            
             const { start, end } = getLast30Days();
             const startIn = document.getElementById('dash-date-start');
             const endIn = document.getElementById('dash-date-end');
             if(startIn && !startIn.value) startIn.value = start;
             if(endIn && !endIn.value) endIn.value = end;
+
+            // Hist Filters
             const histSS = document.getElementById('filter-user');
-            if(histSS) {
+             if(histSS) {
                  const cur = histSS.value;
                  histSS.innerHTML = '<option value="all">Semua SS</option>' + [...ssSet].map(ss => `<option value="${ss}">${ss}</option>`).join('');
                  if([...ssSet].includes(cur)) histSS.value = cur;
                  histSS.addEventListener('change', renderReportsTable);
              }
+            
             const histStart = document.getElementById('hist-date-start');
             const histEnd = document.getElementById('hist-date-end');
             if(histStart && !histStart.value) histStart.value = start;
             if(histEnd && !histEnd.value) histEnd.value = end;
+            
             if(histStart) histStart.addEventListener('change', renderReportsTable);
             if(histEnd) histEnd.addEventListener('change', renderReportsTable);
 
@@ -686,7 +721,7 @@
             document.getElementById('dash-date-end').value = end;
             document.getElementById('dash-filter-ss').value = 'all';
             document.getElementById('dash-filter-service').value = 'all';
-            renderDashboard();
+            setDashType('delivery'); // Reset to default
         }
 
         function renderDashboard() {
@@ -695,28 +730,32 @@
             const end = document.getElementById('dash-date-end').value;
             const fSS = document.getElementById('dash-filter-ss').value;
             const fSvc = document.getElementById('dash-filter-service').value;
-            
+            // Use currentDashType global variable instead of old select
+
             const filteredByDate = allReports.filter(r => {
                 let rDate;
                 if (r.date) rDate = r.date;
                 else if (r.timestamp && r.timestamp.seconds) rDate = new Date(r.timestamp.seconds*1000).toISOString().split('T')[0];
                 else rDate = new Date().toISOString().split('T')[0];
+
                 const inDate = (!start || rDate >= start) && (!end || rDate <= end);
                 const inSS = fSS === 'all' || r.kodeSS === fSS;
-                const inType = globalType === 'all' || r.type === globalType;
+                const inType = r.type === currentDashType; // Strict Filtering
                 const inSvc = fSvc === 'all' || r.details.some(d => d.label === fSvc && d.total > 0);
+                
                 return inDate && inSS && inType && inSvc;
             });
+            
             const filteredForAnnual = allReports.filter(r => {
                 const inSS = fSS === 'all' || r.kodeSS === fSS;
-                const inType = globalType === 'all' || r.type === globalType;
+                const inType = r.type === currentDashType; // Strict Filtering
                 const inSvc = fSvc === 'all' || r.details.some(d => d.label === fSvc && d.total > 0);
                 return inSS && inType && inSvc;
             });
 
-            updateKPIs(filteredByDate, globalType, fSvc);
+            updateKPIs(filteredByDate, currentDashType, fSvc);
             processCharts(filteredByDate, filteredForAnnual, fSvc, start, end); 
-            processBreakdowns(filteredByDate, fSvc, globalType); 
+            processBreakdowns(filteredByDate, fSvc, currentDashType); 
             processFeedback(filteredByDate, fSvc);
         }
 
@@ -729,6 +768,7 @@
                 });
             });
             const pct = total > 0 ? (ok/total*100).toFixed(1) : 0;
+            
             document.getElementById('kpi-val-total').textContent = total.toLocaleString('id-ID');
             document.getElementById('kpi-val-ok').textContent = ok.toLocaleString('id-ID');
             document.getElementById('kpi-badge-ok').textContent = pct.toLocaleString('id-ID') + '%';
@@ -736,6 +776,7 @@
             document.getElementById('kpi-val-mbh').textContent = mbh.toLocaleString('id-ID');
             document.getElementById('kpi-val-miss').textContent = miss.toLocaleString('id-ID');
             document.getElementById('kpi-val-claim').textContent = claim.toLocaleString('id-ID');
+
             const isPickup = filterType === 'pickup';
             document.getElementById('kpi-card-claim').style.display = isPickup ? 'none' : 'flex';
         }
@@ -773,7 +814,17 @@
                 options: { 
                     layout: { padding: { top: 20 } },
                     responsive:true, maintainAspectRatio:false, 
-                    plugins:{ legend:{display:false}, datalabels: { color: (context) => context.dataset.type === 'line' ? '#FF9500' : '#1e293b', anchor: (context) => context.dataset.type === 'line' ? 'start' : 'end', align: (context) => context.dataset.type === 'line' ? 'top' : 'top', offset: (context) => context.dataset.type === 'line' ? 4 : -5, font: { weight: 'bold', size: 10 }, formatter: (val) => val > 0 ? val.toLocaleString('id-ID') : '' } }, 
+                    plugins:{ 
+                        legend:{display:false},
+                        datalabels: {
+                            color: (context) => context.dataset.type === 'line' ? '#FF9500' : '#1e293b', 
+                            anchor: (context) => context.dataset.type === 'line' ? 'start' : 'end',
+                            align: (context) => context.dataset.type === 'line' ? 'top' : 'top', 
+                            offset: (context) => context.dataset.type === 'line' ? 4 : -5,
+                            font: { weight: 'bold', size: 10 },
+                            formatter: (val) => val > 0 ? val.toLocaleString('id-ID') : ''
+                        }
+                    }, 
                     scales:{ y:{display:false}, y1:{display:false, min:0, max:100}, x:{grid:{display:false}} } 
                 }
             });
@@ -781,11 +832,13 @@
             const days = {};
             const sDate = new Date(startDate);
             const eDate = new Date(endDate);
+            
             for(let d = new Date(sDate); d <= eDate; d.setDate(d.getDate() + 1)) {
                 const k = d.toISOString().split('T')[0];
                 const label = d.getDate() + '/' + (d.getMonth()+1);
                 days[k] = { label: label, total:0, ok:0 };
             }
+            
             dataByDate.forEach(r => { 
                 const dateStr = r.date || (r.timestamp ? new Date(r.timestamp.seconds*1000).toISOString().split('T')[0] : '');
                 if(days[dateStr]) { 
@@ -795,6 +848,7 @@
                     }); 
                 } 
             });
+            
             const sortedKeys = Object.keys(days).sort();
             const lblD = sortedKeys.map(k=>days[k].label);
             const datD_Vol = sortedKeys.map(k=>days[k].total);
@@ -807,7 +861,17 @@
                 options: { 
                     layout: { padding: { top: 20 } },
                     responsive:true, maintainAspectRatio:false, 
-                    plugins:{ legend:{display:false}, datalabels: { color: (context) => context.dataset.type === 'line' ? '#007AFF' : '#1e293b', anchor: (context) => context.dataset.type === 'line' ? 'start' : 'end', align: (context) => context.dataset.type === 'line' ? 'top' : 'top', offset: (context) => context.dataset.type === 'line' ? 4 : -5, font: { weight: 'bold', size: 9 }, formatter: (val) => val > 0 ? val.toLocaleString('id-ID') : '' } }, 
+                    plugins:{ 
+                        legend:{display:false},
+                        datalabels: {
+                            color: (context) => context.dataset.type === 'line' ? '#007AFF' : '#1e293b', 
+                            anchor: (context) => context.dataset.type === 'line' ? 'start' : 'end',
+                            align: (context) => context.dataset.type === 'line' ? 'top' : 'top', 
+                            offset: (context) => context.dataset.type === 'line' ? 4 : -5,
+                            font: { weight: 'bold', size: 9 },
+                            formatter: (val) => val > 0 ? val.toLocaleString('id-ID') : ''
+                        }
+                    }, 
                     scales:{ y:{display:false}, y1:{display:false, min:0, max:100}, x:{grid:{display:false}} } 
                 }
             });
@@ -837,11 +901,19 @@
             const renderRow = (label, d, isStaging = false) => {
                 const sla = d.total > 0 ? (d.ok / d.total * 100) : 0;
                 const slaColor = getSLAColor(sla, d.type);
+                
+                // --- NEW: Staging SS Big, PIC Small ---
                 let labelHTML = label;
                 if(isStaging) {
-                    const isRed = (sla < 96.3 && d.type !== 'pickup') || (sla < 95 && d.type === 'pickup');
-                    // SS 3x larger (text-3xl)
-                    labelHTML = `<div class="flex flex-col"><span class="font-bold text-slate-800 text-3xl">${d.ss}</span><span class="text-[9px] text-slate-500 uppercase">${d.pic}</span>${isRed ? '<span class="text-[9px] text-red-500 font-bold mt-1"><i class="fa-solid fa-triangle-exclamation"></i> Warning</span>' : ''}</div>`;
+                    const isRed = (sla < 96.3 && d.type !== 'pickup') || (sla < 95 && d.type === 'pickup'); // Logic Red
+                    
+                    // SS 2x/3x larger (text-2xl) vs PIC (text-[10px])
+                    labelHTML = `
+                        <div class="flex flex-col gap-0.5">
+                            <span class="font-bold text-slate-800 text-2xl tracking-tight leading-none">${d.ss}</span>
+                            <span class="text-[10px] text-slate-400 font-medium uppercase truncate w-24">${d.pic}</span>
+                            ${isRed ? '<span class="text-[9px] text-red-500 font-bold mt-1"><i class="fa-solid fa-triangle-exclamation"></i> Warning</span>' : ''}
+                        </div>`;
                 }
 
                 return `<tr class="hover:bg-black/5 border-b border-black/5">
@@ -859,9 +931,11 @@
             const renderFooter = (list) => {
                 let t=0, o=0, i=0, mb=0, m=0, c=0;
                 list.forEach(x => { t+=x.total; o+=x.ok; i+=x.inp; mb+=x.mbh; m+=x.miss; c+=x.claim; });
+                
                 const avgPct = t > 0 ? (o / t * 100) : 0;
                 const avgColor = getSLAColor(avgPct, filterType);
-                return `<tr class="bg-blue-100/50 font-bold text-blue-900 border-t-2 border-blue-200">
+
+                return `<tr class="bg-slate-200/50 font-bold text-slate-800 border-t-2 border-slate-300">
                     <td class="p-3 pl-4">TOTAL</td>
                     <td class="p-3 col-metric">${t.toLocaleString('id-ID')}</td>
                     <td class="p-3 col-metric">${o.toLocaleString('id-ID')}</td>
@@ -879,6 +953,7 @@
                 elSvc.innerHTML = listSvc.map(item => renderRow(item.label, item, false)).join('');
                 document.getElementById('foot-breakdown-service').innerHTML = renderFooter(listSvc);
             }
+
             const listStg = Object.values(byStaging).sort((a,b)=>b.total - a.total);
             const elStg = document.getElementById('body-breakdown-staging');
             if (elStg) {
@@ -887,23 +962,315 @@
             }
         }
 
+        function getSLAColor(pct, type) {
+            let color = 'bg-[#FF3B30]';
+            if(type === 'pickup') { if(pct > 95) color = 'bg-[#34C759]'; else if(pct >= 93) color = 'bg-[#FF9500]'; } 
+            else { if(pct > 96.3) color = 'bg-[#34C759]'; else if(pct >= 95) color = 'bg-[#FF9500]'; }
+            return color;
+        }
+
+        // --- NEW: Feedback Logic (Deduplicate strings) ---
         function processFeedback(data, filterSvc) {
-            const feedSetInt = new Set();
-            const feedSetExt = new Set();
+            // Use Objects to store text as Key and count as Value
+            const feedInt = {}; 
+            const feedExt = {}; 
+            let totInt = 0, totExt = 0;
+            
             data.forEach(r => { 
                 r.details?.forEach(d => {
                     if (filterSvc !== 'all' && d.label !== filterSvc) return;
-                    if(d.feed_int && d.feed_int.trim() !== '-' && d.feed_int.trim() !== '') feedSetInt.add(`[${d.label}] ${d.feed_int}`);
-                    if(d.feed_ext && d.feed_ext.trim() !== '-' && d.feed_ext.trim() !== '') feedSetExt.add(`[${d.label}] ${d.feed_ext}`);
+                    
+                    if(d.total_int > 0) totInt += d.total_int;
+                    if(d.feed_int && d.feed_int.trim() !== '-' && d.feed_int.trim() !== '') { 
+                        const t = d.feed_int.trim();
+                        // Store lowercase key for check, but original text for display if needed (simplified here)
+                        const key = t.toLowerCase();
+                        feedInt[key] = { text: t, count: (feedInt[key]?.count || 0) + d.total_int };
+                    }
+                    
+                    if(d.total_ext > 0) totExt += d.total_ext;
+                    if(d.feed_ext && d.feed_ext.trim() !== '-' && d.feed_ext.trim() !== '') { 
+                        const t = d.feed_ext.trim();
+                        const key = t.toLowerCase();
+                        feedExt[key] = { text: t, count: (feedExt[key]?.count || 0) + d.total_ext };
+                    }
                 });
             });
-            const render = (set) => [...set].map(txt => `<li class="flex justify-between border-b border-black/5 pb-1"><span class="text-slate-600 w-full text-xs">${txt}</span></li>`).join('') || '<li class="text-slate-400 italic text-xs">Kosong</li>';
-            document.getElementById('feedback-list-int').innerHTML = render(feedSetInt);
-            document.getElementById('feedback-list-ext').innerHTML = render(feedSetExt);
+            
+            document.getElementById('feedback-total-int').textContent = totInt;
+            document.getElementById('feedback-total-ext').textContent = totExt;
+            
+            // Render unique list with small count
+            const render = (obj) => Object.values(obj).map(item => `
+                <li class="flex justify-between items-start border-b border-black/5 pb-2 last:border-0">
+                    <span class="capitalize text-slate-700 text-xs mr-2 leading-tight">${item.text}</span>
+                    <span class="font-mono text-[10px] text-slate-400 bg-slate-100 px-1.5 rounded-md shrink-0 mt-0.5">${item.count}</span>
+                </li>
+            `).join('') || '<li class="text-slate-400 italic text-xs">Kosong</li>';
+            
+            document.getElementById('feedback-list-int').innerHTML = render(feedInt);
+            document.getElementById('feedback-list-ext').innerHTML = render(feedExt);
         }
 
-        // ... Form Setup (same as before) ...
+        function setupReportForm() {
+            document.getElementById('input-date').valueAsDate = new Date();
+            const isCoord = currentUser.role === 'coordinator';
+            document.getElementById('admin-user-select-container').classList.toggle('hidden', !isCoord);
+            document.getElementById('input-pic-name').readOnly = !isCoord; 
+            
+            if(isCoord) populateAdminUserSelect();
+            else {
+                document.getElementById('input-pic-name').value = currentUser.name;
+                document.getElementById('input-pic-id').value = currentUser.id;
+                document.getElementById('input-kode-ss').value = currentUser.kodeSS || '-';
+            }
+        }
+        function populateAdminUserSelect() {
+            const sel = document.getElementById('input-admin-select-user');
+            sel.innerHTML = '<option value="">-- Pilih --</option>';
+            allUsers.filter(u=>u.username!=='admin' && u.status!=='inactive').forEach(u => sel.innerHTML += `<option value="${u.id}">${u.name} (${u.kodeSS||'-'})</option>`);
+        }
+        window.updateReporterInfo = () => {
+            const uid = document.getElementById('input-admin-select-user').value;
+            if(!uid) return;
+            const u = allUsers.find(x=>x.id===uid);
+            document.getElementById('input-pic-name').value = u.name;
+            document.getElementById('input-kode-ss').value = u.kodeSS || '-';
+            document.getElementById('input-pic-id').value = u.id;
+        }
+
+        window.toggleReportForm = (show) => {
+            if(show) {
+                document.getElementById('view-reports-list').classList.add('hidden');
+                document.getElementById('view-reports-form').classList.remove('hidden');
+                renderInputTable();
+            } else {
+                document.getElementById('view-reports-form').classList.add('hidden');
+                document.getElementById('view-reports-list').classList.remove('hidden');
+            }
+        }
+
+        window.selectReportType = (type) => {
+            document.getElementById('input-type').value = type;
+            const btnDel = document.getElementById('btn-type-delivery');
+            const btnPick = document.getElementById('btn-type-pickup');
+            
+            if(type === 'delivery') {
+                btnDel.classList.remove('text-slate-500');
+                btnDel.classList.add('bg-blue-50', 'text-[#007AFF]', 'border-blue-200'); 
+                btnPick.classList.add('text-slate-500');
+                btnPick.classList.remove('bg-orange-50', 'text-[#FF9500]', 'border-orange-200');
+            } else {
+                btnPick.classList.remove('text-slate-500');
+                btnPick.classList.add('bg-orange-50', 'text-[#FF9500]', 'border-orange-200'); 
+                btnDel.classList.add('text-slate-500');
+                btnDel.classList.remove('bg-blue-50', 'text-[#007AFF]', 'border-blue-200');
+            }
+            renderInputTable();
+        }
+
+        window.formatNumberInput = (input) => {
+            let val = input.value.replace(/\D/g, ''); 
+            if (val) {
+                val = parseInt(val, 10).toLocaleString('id-ID'); 
+            }
+            input.value = val;
+        }
+
+        window.renderInputTable = () => {
+            const isDel = document.getElementById('input-type').value === 'delivery';
+            let head = `<tr>
+                <th class="p-3 border-b border-white/10 w-24">Layanan</th>
+                <th class="p-3 border-b border-white/10 bg-blue-50 text-blue-600 w-20">Total</th>
+                <th class="p-3 border-b border-white/10 w-20">OK</th>
+                <th class="p-3 border-b border-white/10 text-xs text-slate-300 w-20">P</th>
+                <th class="p-3 border-b border-white/10 text-xs text-slate-300 w-20">M</th>
+                <th class="p-3 border-b border-white/10 text-xs text-red-400 w-20">Mis</th>
+                ${isDel?'<th class="p-3 border-b border-white/10 text-xs w-20">Clm</th>':''}
+                <th class="p-3 border-b border-white/10 border-l border-slate-600 pl-2 text-xs w-20">In</th>
+                <th class="p-3 border-b border-white/10 text-xs w-auto">Ket</th>
+                <th class="p-3 border-b border-white/10 text-xs w-16">Ex</th>
+                <th class="p-3 border-b border-white/10 text-xs w-auto">Ket</th>
+            </tr>`;
+            document.getElementById('table-header').innerHTML = head;
+            let body = '';
+            ROW_LABELS.forEach((lbl, i) => {
+                const rid = `row-${i}`;
+                body += `<tr data-label="${lbl}" class="border-b border-slate-100 last:border-0">
+                    <td class="p-2 font-bold text-slate-600 text-xs bg-slate-50/50">${lbl}</td>
+                    <td class="p-2 total-cell input-cell w-20"><input type="text" id="${rid}-total" readonly value="0"></td>
+                    <td class="p-2 input-cell w-20"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
+                    <td class="p-2 input-cell w-20"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
+                    <td class="p-2 input-cell w-20"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
+                    <td class="p-2 input-cell w-20"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>
+                    ${isDel ? `<td class="p-2 input-cell w-20"><input type="text" class="sla-input" data-row="${rid}" oninput="formatNumberInput(this); calcRow('${rid}')"></td>` : ''}
+                    <td class="p-2 input-cell w-20 border-l pl-2"><input type="text" oninput="formatNumberInput(this)"></td>
+                    <td class="p-2 w-auto"><input type="text" class="w-full text-xs bg-transparent border-b border-slate-200 outline-none"></td>
+                    <td class="p-2 input-cell w-20"><input type="text" oninput="formatNumberInput(this)"></td>
+                    <td class="p-2 w-auto"><input type="text" class="w-full text-xs bg-transparent border-b border-slate-200 outline-none"></td>
+                </tr>`;
+            });
+            document.getElementById('table-body').innerHTML = body;
+        }
+
+        window.calcRow = (rid) => {
+            let tot = 0;
+            document.querySelectorAll(`input.sla-input[data-row="${rid}"]`).forEach(i => {
+                const val = parseInt(i.value.replace(/\./g, '')) || 0;
+                tot += val;
+            });
+            document.getElementById(`${rid}-total`).value = tot.toLocaleString('id-ID');
+        }
+
+        document.getElementById('report-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-report');
+            const editId = document.getElementById('report-id-hidden').value;
+            const date = document.getElementById('input-date').value;
+            const type = document.getElementById('input-type').value;
+            const picId = document.getElementById('input-pic-id').value;
+            const picName = document.getElementById('input-pic-name').value;
+            const kodeSS = document.getElementById('input-kode-ss').value;
+
+            if(!picId || !date) return showNotification("Identitas/Tanggal kosong", "error");
+            if(!editId) {
+                const qDup = query(collection(db,'artifacts', appId, 'public', 'data', 'reports'), where('reporterId','==',picId), where('date','==',date), where('type','==',type));
+                const dupSnap = await getDocs(qDup);
+                if(!dupSnap.empty) return showNotification(`Laporan ${type} tanggal ${date} sudah ada!`, "error");
+            }
+            
+            let gTotal = 0; 
+            const details = [];
+            
+            document.querySelectorAll('#table-body tr').forEach(tr => {
+                const inps = tr.querySelectorAll('input'); 
+                const isDel = type === 'delivery';
+                
+                const getVal = (idx) => {
+                    if (!inps[idx]) return 0;
+                    return parseInt(inps[idx].value.replace(/\./g, '')) || 0;
+                };
+                const getStr = (idx) => inps[idx] ? inps[idx].value : '';
+
+                const tot = getVal(0);
+                gTotal += tot;
+                
+                details.push({
+                    label: tr.getAttribute('data-label'),
+                    total: tot, 
+                    ok: getVal(1), 
+                    inprogress: getVal(2), 
+                    mbh: getVal(3), 
+                    missed: getVal(4),
+                    claimed: isDel ? getVal(5) : 0,
+                    
+                    total_int: isDel ? getVal(6) : getVal(5), 
+                    feed_int: isDel ? getStr(7) : getStr(6),
+                    
+                    total_ext: isDel ? getVal(8) : getVal(7), 
+                    feed_ext: isDel ? getStr(9) : getStr(8)
+                });
+            });
+            
+            btn.disabled = true; 
+            const originalContent = btn.innerHTML; 
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Loading...';
+            
+            try {
+                const payload = { date, type, reporterName: picName, reporterId: picId, kodeSS, grandTotalVolume: gTotal, details, timestamp: serverTimestamp() };
+                if(editId) { 
+                    await updateDoc(doc(db,'artifacts', appId, 'public', 'data', 'reports', editId), payload); 
+                    showNotification("Data diperbarui!"); 
+                    btn.innerHTML = originalContent;
+                    window.cancelEditMode(); 
+                    toggleReportForm(false);
+                }
+                else { 
+                    await addDoc(collection(db,'artifacts', appId, 'public', 'data', 'reports'), payload); 
+                    showNotification("Laporan tersimpan!"); 
+                    btn.innerHTML = originalContent;
+                    document.getElementById('report-form').reset(); 
+                    setupReportForm(); 
+                    renderInputTable(); 
+                    toggleReportForm(false);
+                }
+            } catch(e) { 
+                console.error(e); 
+                showNotification("Gagal menyimpan", "error"); 
+                btn.innerHTML = originalContent;
+            }
+            btn.disabled = false; 
+        });
+
+        window.requestEditReport = (id) => { 
+            if(currentUser.role==='coordinator') {
+                loadReportToForm(id); 
+            } else {
+                openAuthModal('editReport', id); 
+            }
+        }
+        window.requestDeleteReport = (id) => { if(currentUser.role==='coordinator') openConfirmDelete(id); else openAuthModal('deleteReport', id); }
         
+        function loadReportToForm(id) {
+            const r = allReports.find(x => x.id === id); if(!r) return;
+            toggleReportForm(true);
+            document.getElementById('report-id-hidden').value = r.id;
+            document.getElementById('input-date').value = r.date;
+            selectReportType(r.type);
+            if(currentUser.role === 'coordinator') { document.getElementById('input-admin-select-user').value = r.reporterId; updateReporterInfo(); }
+            document.getElementById('edit-mode-indicator').classList.remove('hidden');
+            document.getElementById('btn-submit-text').textContent = "Update Laporan";
+            const rows = document.querySelectorAll('#table-body tr');
+            r.details?.forEach(d => {
+                rows.forEach(tr => {
+                    if(tr.getAttribute('data-label') === d.label) {
+                        const inps = tr.querySelectorAll('input'); 
+                        const isDel = r.type === 'delivery';
+                        const setVal = (idx, val) => { if(inps[idx]) inps[idx].value = val ? val.toLocaleString('id-ID') : ''; };
+                        const setStr = (idx, val) => { if(inps[idx]) inps[idx].value = val || ''; }
+                        setVal(1, d.ok); setVal(2, d.inprogress); setVal(3, d.mbh); setVal(4, d.missed);
+                        if(isDel) setVal(5, d.claimed);
+                        const off = isDel ? 6 : 5;
+                        setVal(off, d.total_int); setStr(off+1, d.feed_int); setVal(off+2, d.total_ext); setStr(off+3, d.feed_ext);
+                        calcRow(tr.querySelector('.sla-input').getAttribute('data-row'));
+                    }
+                })
+            });
+            document.getElementById('view-reports-form').scrollIntoView({behavior: 'smooth'});
+        }
+        window.cancelEditMode = () => {
+            document.getElementById('report-form').reset();
+            document.getElementById('report-id-hidden').value = '';
+            document.getElementById('edit-mode-indicator').classList.add('hidden');
+            selectReportType('delivery');
+            const btnText = document.getElementById('btn-submit-text');
+            if (btnText) {
+                btnText.textContent = "Simpan Laporan";
+            }
+            setupReportForm(); renderInputTable();
+        }
+
+        function listenToReports() {
+            if(!auth.currentUser) return;
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'reports'));
+            reportsUnsubscribe = onSnapshot(q, (s) => { 
+                let rawDocs = s.docs.map(d=>({id:d.id, ...d.data()}));
+                rawDocs.sort((a,b) => {
+                    const dateA = new Date(a.date);
+                    const dateB = new Date(b.date);
+                    return dateB - dateA;
+                });
+                allReports = rawDocs;
+                renderDashboard(); setupDashboardFilters(); renderReportsTable(); updateFilterUser(); 
+            }, (error) => console.error("Reports listener error", error));
+        }
+        function listenToUsers() {
+            if(!auth.currentUser) return;
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'users'), (s) => { 
+                allUsers = s.docs.map(d=>({id:d.id, ...d.data()})); renderUsersTable(); if(currentUser.role === 'coordinator') populateAdminUserSelect(); 
+            }, (error) => console.error("Users listener error", error));
+        }
+
         function renderReportsTable() {
             const fUser = document.getElementById('filter-user') ? document.getElementById('filter-user').value : 'all';
             const fStart = document.getElementById('hist-date-start') ? document.getElementById('hist-date-start').value : '';
@@ -912,22 +1279,28 @@
             let d = allReports.filter(r => {
                 let matchUser = fUser === 'all' || r.kodeSS === fUser || r.reporterName === fUser;
                 let matchDate = true;
-                if(fStart && fEnd) { matchDate = r.date >= fStart && r.date <= fEnd; }
+                if(fStart && fEnd) {
+                    matchDate = r.date >= fStart && r.date <= fEnd;
+                }
                 return matchUser && matchDate;
             });
             
             document.getElementById('reports-table-body').innerHTML = d.map(r => {
                 const date = r.date ? new Date(r.date).toLocaleDateString('id-ID') : '-';
+                
                 let detailsHTML = '<div class="space-y-1">';
                 let hasDetails = false;
-                let feedbacks = new Set(); 
+                
+                // --- NEW: Collect Feedbacks Deduplicated ---
+                const uniqueFeedInt = new Set();
+                const uniqueFeedExt = new Set();
 
                 r.details?.forEach(d => {
                     if(d.total > 0) {
                         hasDetails = true;
                         const sla = d.total > 0 ? (d.ok / d.total * 100).toFixed(1) : 0;
                         const slaColor = getSLAColor(sla, r.type);
-                        
+
                         detailsHTML += `
                         <div class="grid grid-cols-12 gap-1 text-[10px] items-center border-b border-dashed border-slate-100 pb-0.5 last:border-0">
                             <div class="col-span-2 font-bold text-slate-700 truncate" title="${d.label}">${d.label}</div>
@@ -940,15 +1313,22 @@
                             <div class="col-span-2 text-right font-mono text-purple-500 font-bold">${d.claimed > 0 ? d.claimed.toLocaleString('id-ID') : '-'}</div>
                         </div>`;
 
-                        if(d.feed_int && d.feed_int !== '-') feedbacks.add(`[In]: ${d.feed_int}`);
-                        if(d.feed_ext && d.feed_ext !== '-') feedbacks.add(`[Ex]: ${d.feed_ext}`);
+                        if(d.feed_int && d.feed_int.trim() && d.feed_int !== '-') uniqueFeedInt.add(d.feed_int.trim());
+                        if(d.feed_ext && d.feed_ext.trim() && d.feed_ext !== '-') uniqueFeedExt.add(d.feed_ext.trim());
                     }
                 });
                 detailsHTML += '</div>';
                 
                 const miniHeader = `
-                <div class="grid grid-cols-12 gap-1 text-[9px] font-bold text-blue-900 border-b border-slate-200 pb-1 mb-1 bg-blue-100/30">
-                    <div class="col-span-2">Svc</div><div class="col-span-2 text-right">Tot</div><div class="col-span-1 text-right">OK</div><div class="col-span-2 text-center">%SLA</div><div class="col-span-1 text-right">Prg</div><div class="col-span-1 text-right">MBH</div><div class="col-span-1 text-right">Mss</div><div class="col-span-2 text-right">Clm</div>
+                <div class="grid grid-cols-12 gap-1 text-[9px] font-bold text-slate-400 border-b border-slate-200 pb-1 mb-1">
+                    <div class="col-span-2">Svc</div>
+                    <div class="col-span-2 text-right">Tot</div>
+                    <div class="col-span-1 text-right">OK</div>
+                    <div class="col-span-2 text-center">%SLA</div>
+                    <div class="col-span-1 text-right">Prg</div>
+                    <div class="col-span-1 text-right">MBH</div>
+                    <div class="col-span-1 text-right">Mss</div>
+                    <div class="col-span-2 text-right">Clm</div>
                 </div>`;
 
                 if (!hasDetails) detailsHTML = '<span class="text-slate-400 italic text-[10px]">Tidak ada data volume</span>';
@@ -960,15 +1340,18 @@
                 let showButtons = false;
                 if(currentUser.role === 'coordinator') showButtons = true;
                 else if(currentUser.role === 'leader' && r.reporterId === currentUser.id) showButtons = true;
-                if(currentUser.role === 'visitor') showButtons = false;
 
-                const fbArray = Array.from(feedbacks);
+                // --- NEW: Combine Feedbacks for Table Display ---
+                const feedbackLines = [];
+                uniqueFeedInt.forEach(txt => feedbackLines.push(`<span class="text-blue-600 font-bold text-[9px]">[In] :</span> ${txt}`));
+                uniqueFeedExt.forEach(txt => feedbackLines.push(`<span class="text-orange-600 font-bold text-[9px]">[Ex] :</span> ${txt}`));
 
+                // --- NEW: SS Code Big, PIC Small ---
                 return `<tr class="border-b border-black/5 last:border-0 align-top hover:bg-slate-50/50 transition-colors">
                     <td class="p-3 text-[10px] font-mono text-slate-500 font-medium">${date}</td>
                     <td class="p-3">
-                         <div class="text-3xl font-bold text-slate-800">${r.kodeSS||'-'}</div>
-                        <div class="text-[9px] text-slate-500 font-mono font-bold mt-1 uppercase tracking-wide bg-slate-100 inline-block px-1 rounded">${r.reporterName}</div>
+                         <div class="font-bold text-slate-800 text-xl tracking-tight leading-none mb-1">${r.kodeSS||'-'}</div>
+                        <div class="text-[10px] text-slate-400 font-medium uppercase truncate w-24">${r.reporterName}</div>
                     </td>
                     <td class="p-3">
                         <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border ${r.type==='delivery'?'bg-blue-50 text-blue-600 border-blue-100':'bg-orange-50 text-orange-600 border-orange-100'}">${r.type.substr(0,3)}</span>
@@ -977,7 +1360,7 @@
                     <td class="p-3 text-center text-xs font-bold text-blue-600">${totInt > 0 ? totInt.toLocaleString('id-ID') : '-'}</td>
                     <td class="p-3 text-center text-xs font-bold text-orange-600">${totExt > 0 ? totExt.toLocaleString('id-ID') : '-'}</td>
                     <td class="p-3 text-[10px] text-slate-600 leading-tight">
-                        ${fbArray.length > 0 ? fbArray.join('<br>') : '<span class="text-slate-300 italic">-</span>'}
+                        ${feedbackLines.length > 0 ? feedbackLines.join('<br>') : '<span class="text-slate-300 italic">-</span>'}
                     </td>
                     <td class="p-3 text-center">
                         <div class="flex flex-col gap-2 items-center justify-center ${showButtons ? '' : 'hidden'}">
@@ -988,8 +1371,93 @@
                 </tr>`;
             }).join('') || '<tr><td colspan="8" class="p-8 text-center text-slate-400 italic text-xs">Belum ada laporan masuk</td></tr>';
         }
+        
+        function updateFilterUser() {
+            const sel = document.getElementById('filter-user'); 
+            if(!sel) return;
+            const cur = sel.value;
+            const ssList = [...new Set(allReports.map(r=>r.kodeSS).filter(Boolean))].sort();
+            sel.innerHTML = '<option value="all">Semua SS</option>' + ssList.map(ss => `<option value="${ss}">${ss}</option>`).join('');
+            sel.value = cur;
+        }
 
-        // ... (rest of functions remain largely same) ...
+        window.toggleUserStatus = async (id, currentStatus) => {
+            const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+            try { await updateDoc(doc(db,'artifacts', appId, 'public', 'data', 'users', id), {status: newStatus}); showNotification("Status diubah"); } catch(e) { showNotification("Gagal", "error"); }
+        }
+        function renderUsersTable() {
+            const tbody = document.getElementById('users-table-body');
+            if (allUsers.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400 italic">Kosong</td></tr>`; return; }
+            tbody.innerHTML = allUsers.map(u => {
+                const isActive = u.status !== 'inactive';
+                const toggleBtn = (u.username !== 'admin' && u.id !== currentUser.id)
+                    ? `<button onclick="toggleUserStatus('${u.id}', '${isActive?'active':'inactive'}')" class="relative inline-flex items-center h-5 rounded-full w-9 transition-colors focus:outline-none ${isActive ? 'bg-[#34C759]' : 'bg-slate-300'}"><span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform shadow-sm ${isActive ? 'translate-x-4' : 'translate-x-0.5'}"></span></button>`
+                    : `<span class="text-[9px] text-slate-300 font-bold bg-slate-100 px-1 rounded">LOCKED</span>`;
+                return `<tr class="border-b border-black/5 ${!isActive?'opacity-50 grayscale':''}">
+                    <td class="p-4 font-bold text-slate-700">${u.name}<br><span class="text-[10px] text-slate-400 font-normal">ID: ${u.username}</span></td>
+                    <td class="p-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 text-slate-500">${u.role}</span></td>
+                    <td class="p-4 text-center">${toggleBtn}</td>
+                    <td class="p-4 text-center"><div class="flex justify-center gap-3"><button onclick="editUser('${u.id}')" class="text-blue-500"><i class="fa-solid fa-pen"></i></button>${u.id!==currentUser.id && u.username!=='admin' ? `<button onclick="openDeleteModal('${u.id}', '${u.username}')" class="text-red-400"><i class="fa-solid fa-trash"></i></button>` : ''}</div></td>
+                </tr>`;
+            }).join('');
+        }
+
+        window.editUser = (id) => {
+            const u = allUsers.find(x=>x.id===id); if(!u) return;
+            document.getElementById('edit-user-id').value = u.id; document.getElementById('new-role').value = u.role;
+            document.getElementById('new-account-status').value = u.status || 'active'; document.getElementById('new-name').value = u.name;
+            document.getElementById('new-username').value = u.username; document.getElementById('new-password').value = u.password;
+            document.getElementById('new-kode-ss').value = u.kodeSS||''; document.getElementById('new-kota').value = u.kotaArea||'';
+            const isAdm = u.username === 'admin';
+            document.getElementById('new-username').readOnly = isAdm; document.getElementById('new-role').disabled = isAdm; document.getElementById('new-account-status').disabled = isAdm;
+            toggleFormFields(); document.getElementById('modal-title').textContent = "Edit User"; document.getElementById('modal-add-user').classList.remove('hidden');
+        }
+        window.prepareAddUser = () => { 
+            document.getElementById('add-user-form').reset(); document.getElementById('edit-user-id').value=''; 
+            document.getElementById('new-role').disabled = false; document.getElementById('new-username').readOnly = false;
+            document.getElementById('new-account-status').disabled = false; document.getElementById('modal-title').textContent = "User Baru";
+            document.getElementById('modal-add-user').classList.remove('hidden'); 
+        }
+        window.closeAddUserModal = () => document.getElementById('modal-add-user').classList.add('hidden');
+        window.toggleFormFields = () => { const r = document.getElementById('new-role').value; document.getElementById('leader-fields').classList.toggle('hidden', r==='coordinator'); }
+        
+        document.getElementById('add-user-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const uid = document.getElementById('edit-user-id').value;
+            const roleEl = document.getElementById('new-role'); const statusEl = document.getElementById('new-account-status');
+            const roleVal = roleEl.disabled ? 'coordinator' : roleEl.value; const statusVal = statusEl.disabled ? 'active' : statusEl.value;
+            const rawUsername = document.getElementById('new-username').value;
+            const cleanUsername = rawUsername.trim().toLowerCase();
+            const cleanPassword = document.getElementById('new-password').value.trim();
+            if (!/^\d+$/.test(cleanUsername) && cleanUsername !== 'admin') { showNotification("ID harus berupa angka!", "error"); return; }
+            if (cleanPassword.length < 6) { showNotification("Password minimal 6 karakter!", "error"); return; }
+            const data = { role: roleVal, name: document.getElementById('new-name').value, username: cleanUsername, password: cleanPassword, kodeSS: document.getElementById('new-kode-ss').value, kotaArea: document.getElementById('new-kota').value, status: statusVal };
+            if(!uid) data.createdAt = serverTimestamp();
+            try { 
+                if(!uid) {
+                    const qCheck = query(collection(db, 'artifacts', appId, 'public', 'data', 'users'), where("username", "==", cleanUsername));
+                    const snapCheck = await getDocs(qCheck);
+                    if(!snapCheck.empty) { showNotification("ID sudah dipakai!", "error"); return; }
+                }
+                if(uid) await updateDoc(doc(db,'artifacts', appId, 'public', 'data', 'users', uid), data); else await addDoc(collection(db,'artifacts', appId, 'public', 'data', 'users'), data); showNotification("Tersimpan!"); closeAddUserModal(); 
+            } catch(e) { showNotification("Gagal", "error"); }
+        });
+
+        window.openAuthModal = (action, id) => { targetId = id; pendingAction = action; document.getElementById('auth-code-input').value=''; document.getElementById('modal-auth-code').classList.remove('hidden'); setTimeout(() => document.getElementById('auth-code-input').focus(), 100); }
+        window.closeAuthModal = () => document.getElementById('modal-auth-code').classList.add('hidden');
+        window.verifyAuthCode = () => { if(document.getElementById('auth-code-input').value === currentAdminCode) { closeAuthModal(); if(pendingAction === 'deleteReport') openConfirmDelete(targetId); if(pendingAction === 'editReport') loadReportToForm(targetId); } else showNotification("Kode Salah", "error"); }
+        function openConfirmDelete(id, username) { targetId = id; pendingAction = username ? 'deleteUser' : 'deleteReport'; document.getElementById('delete-confirmation-text').textContent = username ? `Hapus user ${username}?` : "Hapus laporan ini?"; document.getElementById('modal-confirm-delete').classList.remove('hidden'); }
+        window.openDeleteModal = openConfirmDelete; window.closeDeleteModal = () => document.getElementById('modal-confirm-delete').classList.add('hidden');
+        window.executeDelete = async () => { try { if(pendingAction === 'deleteReport') await deleteDoc(doc(db,'artifacts', appId, 'public', 'data', 'reports', targetId)); if(pendingAction === 'deleteUser') await deleteDoc(doc(db,'artifacts', appId, 'public', 'data', 'users', targetId)); showNotification("Dihapus."); closeDeleteModal(); } catch(e) { showNotification("Gagal", "error"); } }
+
+        window.showTab = (t) => {
+            if (t === 'settings' && currentUser && currentUser.role !== 'coordinator') { showNotification("Akses ditolak!", "error"); return; }
+            const tabs = ['dashboard', 'reports', 'settings'];
+            tabs.forEach(x => { document.getElementById('tab-' + x).classList.add('hidden'); document.getElementById('nav-' + x).classList.remove('nav-active'); });
+            document.getElementById('tab-' + t).classList.remove('hidden'); document.getElementById('nav-' + t).classList.add('nav-active');
+        }
+
+        switchLoginTab('user');
     </script>
 </body>
 </html>
