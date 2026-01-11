@@ -67,16 +67,19 @@
         .kpi-card:hover { transform: translateY(-2px); }
         .col-metric { width: 11%; text-align: right; }
         
-        /* Table Header Custom Style */
+        /* Table Header Custom Style - Updated for Sticky Support */
         .table-header-custom {
-            background-color: #1e293b; /* Slate 800 */
+            /* Background moved to th to ensure sticky opacity */
             color: white;
             font-weight: 600;
             text-transform: uppercase;
             font-size: 0.75rem;
             letter-spacing: 0.05em;
         }
-        .table-header-custom th { border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .table-header-custom th { 
+            background-color: #1e293b; /* Slate 800 */
+            border-bottom: 2px solid rgba(255,255,255,0.1); 
+        }
         
         /* Toggle Switch Style */
         .type-toggle-btn.active { background-color: #007AFF; color: white; box-shadow: 0 2px 5px rgba(0,122,255,0.3); }
@@ -195,28 +198,7 @@
                     </div>
                 </div>
 
-                <!-- Charts Area (Moved Up to include Filter Toggle) -->
-                <div class="space-y-6">
-                    <div class="glass-panel p-6 md:p-8 rounded-[32px] h-[400px] flex flex-col relative">
-                        <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
-                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                <i class="fa-regular fa-calendar text-blue-500"></i> Tren Tahunan
-                            </h3>
-                            <!-- New Global Type Toggle -->
-                            <div class="flex bg-slate-100 p-1 rounded-xl w-max">
-                                <button onclick="setDashType('delivery')" id="dash-toggle-delivery" class="type-toggle-btn active px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
-                                    <i class="fa-solid fa-truck"></i> Delivery
-                                </button>
-                                <button onclick="setDashType('pickup')" id="dash-toggle-pickup" class="type-toggle-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
-                                    <i class="fa-solid fa-box-open"></i> Pickup
-                                </button>
-                            </div>
-                        </div>
-                        <div class="flex-1 w-full relative"><canvas id="chartAnnual"></canvas></div>
-                    </div>
-                </div>
-
-                <!-- KPI CARDS GRID -->
+                <!-- KPI CARDS GRID (Moved Up) -->
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative">
                         <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-layer-group"></i></div>
@@ -242,6 +224,27 @@
                     <div class="glass-panel p-4 rounded-3xl kpi-card flex flex-col justify-between h-32 relative" id="kpi-card-claim">
                         <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-2"><i class="fa-solid fa-file-invoice-dollar"></i></div>
                         <div><p class="text-xs font-bold text-slate-400 uppercase">Claim</p><h3 id="kpi-val-claim" class="text-2xl font-bold text-slate-800">0</h3></div>
+                    </div>
+                </div>
+
+                <!-- Charts Area (Moved Up to include Filter Toggle) -->
+                <div class="space-y-6">
+                    <div class="glass-panel p-6 md:p-8 rounded-[32px] h-[400px] flex flex-col relative">
+                        <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fa-regular fa-calendar text-blue-500"></i> Tren Tahunan
+                            </h3>
+                            <!-- New Global Type Toggle -->
+                            <div class="flex bg-slate-100 p-1 rounded-xl w-max">
+                                <button onclick="setDashType('delivery')" id="dash-toggle-delivery" class="type-toggle-btn active px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-truck"></i> Delivery
+                                </button>
+                                <button onclick="setDashType('pickup')" id="dash-toggle-pickup" class="type-toggle-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-box-open"></i> Pickup
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex-1 w-full relative"><canvas id="chartAnnual"></canvas></div>
                     </div>
                 </div>
 
@@ -348,9 +351,10 @@
                             </button>
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
+                    <!-- UPDATE: Max Height for Sticky Table & Sticky Thead -->
+                    <div class="overflow-auto max-h-[70vh] relative">
                         <table class="w-full text-left border-collapse">
-                            <thead class="table-header-custom">
+                            <thead class="table-header-custom sticky top-0 z-20 shadow-md">
                                 <tr>
                                     <th class="p-3 w-24">Tgl</th>
                                     <th class="p-3 w-32">Identitas</th>
@@ -910,23 +914,24 @@
                     // SS smaller (text-lg), Warning inline
                     labelHTML = `
                         <div class="flex flex-col">
-                            <span class="font-bold text-slate-800 text-lg tracking-tight leading-none">${d.ss}</span>
-                            <div class="flex items-center gap-1 mt-0.5">
-                                <span class="text-[10px] text-slate-400 font-medium uppercase truncate max-w-[70px]">${d.pic}</span>
-                                ${isRed ? '<span class="text-[9px] text-red-500 font-bold whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation"></i> Warn</span>' : ''}
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-slate-800 text-lg tracking-tight leading-none">${d.ss}</span>
+                                ${isRed ? '<i class="fa-solid fa-triangle-exclamation text-red-500 text-xs animate-pulse" title="Warning: Low SLA"></i>' : ''}
                             </div>
+                            <span class="text-[10px] text-slate-400 font-medium uppercase mt-0.5">${d.pic}</span>
                         </div>`;
                 }
 
-                return `<tr class="hover:bg-black/5 border-b border-black/5">
-                    <td class="p-3 pl-4 font-bold text-slate-700">${labelHTML}</td>
-                    <td class="p-3 col-metric font-bold text-slate-800">${d.total.toLocaleString('id-ID')}</td>
-                    <td class="p-3 col-metric font-medium text-slate-600">${d.ok.toLocaleString('id-ID')}</td>
-                    <td class="p-3 col-metric text-center"><div class="${slaColor} text-[10px] text-white font-bold px-2 py-0.5 rounded-full inline-block">${sla.toLocaleString('id-ID', {maximumFractionDigits:1})}%</div></td>
-                    <td class="p-3 col-metric text-slate-500">${d.inp.toLocaleString('id-ID')}</td>
-                    <td class="p-3 col-metric text-orange-500">${d.mbh.toLocaleString('id-ID')}</td>
-                    <td class="p-3 col-metric text-red-500 font-bold">${d.miss.toLocaleString('id-ID')}</td>
-                    <td class="p-3 col-metric pr-4 text-purple-600 font-medium ${showClaim?'':'hidden'}">${d.claim.toLocaleString('id-ID')}</td>
+                // Add h-14 to maintain consistent height
+                return `<tr class="hover:bg-black/5 border-b border-black/5 h-14">
+                    <td class="p-3 pl-4 font-bold text-slate-700 align-middle">${labelHTML}</td>
+                    <td class="p-3 col-metric font-bold text-slate-800 align-middle">${d.total.toLocaleString('id-ID')}</td>
+                    <td class="p-3 col-metric font-medium text-slate-600 align-middle">${d.ok.toLocaleString('id-ID')}</td>
+                    <td class="p-3 col-metric text-center align-middle"><div class="${slaColor} text-[10px] text-white font-bold px-2 py-0.5 rounded-full inline-block">${sla.toLocaleString('id-ID', {maximumFractionDigits:1})}%</div></td>
+                    <td class="p-3 col-metric text-slate-500 align-middle">${d.inp.toLocaleString('id-ID')}</td>
+                    <td class="p-3 col-metric text-orange-500 align-middle">${d.mbh.toLocaleString('id-ID')}</td>
+                    <td class="p-3 col-metric text-red-500 font-bold align-middle">${d.miss.toLocaleString('id-ID')}</td>
+                    <td class="p-3 col-metric pr-4 text-purple-600 font-medium ${showClaim?'':'hidden'} align-middle">${d.claim.toLocaleString('id-ID')}</td>
                 </tr>`;
             };
 
@@ -1173,6 +1178,11 @@
                     feed_ext: isDel ? getStr(9) : getStr(8)
                 });
             });
+
+            // --- Validation: Check if Total > 0 ---
+            if (gTotal === 0) {
+                return showNotification("Mohon isi minimal satu layanan (Total > 0)", "error");
+            }
             
             btn.disabled = true; 
             const originalContent = btn.innerHTML; 
@@ -1350,10 +1360,10 @@
 
                 // --- NEW: SS Code Smaller & PIC Small ---
                 return `<tr class="border-b border-black/5 last:border-0 align-top hover:bg-slate-50/50 transition-colors">
-                    <td class="p-3 text-[10px] font-mono text-slate-500 font-medium">${date}</td>
+                    <td class="p-3 text-[10px] font-mono text-slate-500 font-bold">${date}</td>
                     <td class="p-3">
                          <div class="font-bold text-slate-800 text-lg tracking-tight leading-none">${r.kodeSS||'-'}</div>
-                        <div class="text-[10px] text-slate-400 font-medium uppercase truncate w-24 mt-0.5">${r.reporterName}</div>
+                        <div class="text-[10px] text-slate-400 font-medium uppercase mt-0.5">${r.reporterName}</div>
                     </td>
                     <td class="p-3">
                         <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border ${r.type==='delivery'?'bg-blue-50 text-blue-600 border-blue-100':'bg-orange-50 text-orange-600 border-orange-100'}">${r.type.substr(0,3)}</span>
