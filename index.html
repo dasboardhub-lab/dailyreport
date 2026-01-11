@@ -30,6 +30,9 @@
                     boxShadow: {
                         'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
                         'ios': '0 4px 24px rgba(0,0,0,0.06)'
+                    },
+                    animation: {
+                        'bounce-short': 'bounce 0.5s ease-in-out 1.5'
                     }
                 }
             }
@@ -57,7 +60,9 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .animate-scale-in { animation: scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        .animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes pop { 0% { opacity: 0; transform: scale(0.5); } 100% { opacity: 1; transform: scale(1); } }
         .nav-active { background: #007AFF; color: white !important; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); }
         .nav-active i { color: white !important; }
         .nav-item:hover:not(.nav-active) { background: rgba(0,0,0,0.05); }
@@ -67,9 +72,8 @@
         .kpi-card:hover { transform: translateY(-2px); }
         .col-metric { width: 11%; text-align: right; }
         
-        /* Table Header Custom Style - Updated for Sticky Support */
+        /* Table Header Custom Style - Sticky Support */
         .table-header-custom {
-            /* Background moved to th to ensure sticky opacity */
             color: white;
             font-weight: 600;
             text-transform: uppercase;
@@ -77,7 +81,7 @@
             letter-spacing: 0.05em;
         }
         .table-header-custom th { 
-            background-color: #1e293b; /* Slate 800 */
+            background-color: #1e293b; 
             border-bottom: 2px solid rgba(255,255,255,0.1); 
         }
         
@@ -87,6 +91,20 @@
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col">
+
+    <!-- --- GLOBAL LOADER ANIMATION --- -->
+    <div id="global-loader" class="fixed inset-0 z-[60] bg-black/30 backdrop-blur-sm flex items-center justify-center hidden transition-opacity duration-300">
+        <div class="bg-white/90 p-6 rounded-[24px] shadow-2xl flex flex-col items-center animate-pop backdrop-blur-md border border-white/50">
+            <div class="relative w-16 h-16 mb-4">
+                <div class="absolute inset-0 rounded-full border-4 border-slate-100"></div>
+                <div class="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <i class="fa-solid fa-paper-plane text-blue-500 text-lg animate-pulse"></i>
+                </div>
+            </div>
+            <p id="loader-text" class="text-sm font-bold text-slate-600 tracking-wide">Memproses...</p>
+        </div>
+    </div>
 
     <!-- --- LOGIN PAGE --- -->
     <div id="login-page" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 w-full h-full bg-black/40 backdrop-blur-md">
@@ -481,7 +499,8 @@
         </div>
     </div>
 
-    <div id="toast-container" class="fixed top-24 right-1/2 translate-x-1/2 md:translate-x-0 md:right-6 z-[100] flex flex-col gap-2 w-max max-w-[90%]"></div>
+    <!-- UPDATE: Toast Container Centered -->
+    <div id="toast-container" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] flex flex-col gap-2 items-center w-max max-w-[90%] pointer-events-none"></div>
 
     <!-- JAVASCRIPT LOGIC -->
     <script type="module">
@@ -523,10 +542,18 @@
 
         function showNotification(msg, type='success') {
             const div = document.createElement('div');
-            div.className = `glass-panel px-4 py-3 rounded-full shadow-lg text-xs font-bold flex items-center gap-2 animate-scale-in text-slate-800 border-l-4 ${type==='success'?'border-green-500':'border-red-500'}`;
-            div.innerHTML = `<i class="fa-solid ${type==='success'?'fa-check text-green-500':'fa-xmark text-red-500'}"></i> ${msg}`;
+            // Added animate-pop and shadow-2xl for better center visibility
+            div.className = `glass-panel px-6 py-4 rounded-2xl shadow-2xl text-sm font-bold flex items-center gap-3 animate-pop text-slate-800 border-l-4 ${type==='success'?'border-green-500':'border-red-500'} pointer-events-auto min-w-[280px] justify-center bg-white/95 backdrop-blur-xl`;
+            div.innerHTML = `<i class="fa-solid ${type==='success'?'fa-circle-check text-green-500 text-xl':'fa-circle-xmark text-red-500 text-xl'}"></i> <span>${msg}</span>`;
             document.getElementById('toast-container').appendChild(div);
-            setTimeout(()=>div.remove(),3000);
+            
+            // Auto remove with fade out
+            setTimeout(() => {
+                div.style.transition = 'opacity 0.3s, transform 0.3s';
+                div.style.opacity = '0';
+                div.style.transform = 'scale(0.9)';
+                setTimeout(() => div.remove(), 300);
+            }, 2500);
         }
         window.showNotification = showNotification;
 
@@ -547,6 +574,17 @@
             }
         }
 
+        function showGlobalLoader(show, text="Memproses...") {
+            const el = document.getElementById('global-loader');
+            const txt = document.getElementById('loader-text');
+            if(show) {
+                txt.textContent = text;
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const type = document.getElementById('login-type').value;
@@ -554,11 +592,15 @@
             const p = document.getElementById('password').value.trim();
             const errEl = document.getElementById('login-error');
             
+            // Show Loader for Login
+            showGlobalLoader(true, "Masuk...");
+
             try {
                 if (!auth.currentUser) await initAuth();
                 const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'users'), where("username", "==", u));
                 const snap = await getDocs(q);
                 
+                let success = false;
                 if(!snap.empty) {
                     const data = snap.docs[0].data();
                     if(data.password !== p) throw new Error("Password salah.");
@@ -566,7 +608,7 @@
                     if(type === 'admin' && u !== 'admin') throw new Error("Bukan akun Admin.");
                     if(type === 'user' && u === 'admin') throw new Error("Gunakan tab Admin.");
                     currentUser = { id: snap.docs[0].id, ...data };
-                    finishLogin();
+                    success = true;
                 } else {
                     if(type==='admin' && u==='admin' && p==='TAB123') {
                         // Cek apakah sudah ada admin lain (role coordinator)
@@ -577,15 +619,28 @@
                             const newAdm = {name:"Super Admin", username:"admin", password:"TAB123", role:"coordinator", status:"active", createdAt:serverTimestamp()};
                             const ref = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), newAdm);
                             currentUser = {id:ref.id, ...newAdm};
-                            finishLogin();
+                            success = true;
                         } else {
                             throw new Error("Username tidak ditemukan.");
                         }
                     } else throw new Error("Username tidak ditemukan.");
                 }
+
+                if(success) {
+                    // Artificial delay for animation smoothness
+                    setTimeout(() => {
+                        showGlobalLoader(false);
+                        finishLogin();
+                    }, 800);
+                }
+
             } catch(err) {
+                showGlobalLoader(false);
                 errEl.querySelector('span').textContent = err.message;
                 errEl.classList.remove('hidden');
+                // Shake animation on error
+                document.querySelector('.glass-panel').classList.add('animate-bounce-short');
+                setTimeout(()=> document.querySelector('.glass-panel').classList.remove('animate-bounce-short'), 500);
             }
         });
 
@@ -1185,33 +1240,40 @@
             }
             
             btn.disabled = true; 
-            const originalContent = btn.innerHTML; 
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Loading...';
+            // Show Loader for Submit
+            showGlobalLoader(true, "Menyimpan Data...");
             
             try {
                 const payload = { date, type, reporterName: picName, reporterId: picId, kodeSS, grandTotalVolume: gTotal, details, timestamp: serverTimestamp() };
                 if(editId) { 
                     await updateDoc(doc(db,'artifacts', appId, 'public', 'data', 'reports', editId), payload); 
-                    showNotification("Data diperbarui!"); 
-                    btn.innerHTML = originalContent;
-                    window.cancelEditMode(); 
-                    toggleReportForm(false);
+                    // Add artificial delay for better UX
+                    setTimeout(() => {
+                        showGlobalLoader(false);
+                        showNotification("Data diperbarui!"); 
+                        btn.disabled = false;
+                        window.cancelEditMode(); 
+                        toggleReportForm(false);
+                    }, 600);
                 }
                 else { 
                     await addDoc(collection(db,'artifacts', appId, 'public', 'data', 'reports'), payload); 
-                    showNotification("Laporan tersimpan!"); 
-                    btn.innerHTML = originalContent;
-                    document.getElementById('report-form').reset(); 
-                    setupReportForm(); 
-                    renderInputTable(); 
-                    toggleReportForm(false);
+                    setTimeout(() => {
+                        showGlobalLoader(false);
+                        showNotification("Laporan tersimpan!"); 
+                        btn.disabled = false;
+                        document.getElementById('report-form').reset(); 
+                        setupReportForm(); 
+                        renderInputTable(); 
+                        toggleReportForm(false);
+                    }, 600);
                 }
             } catch(e) { 
                 console.error(e); 
+                showGlobalLoader(false);
                 showNotification("Gagal menyimpan", "error"); 
-                btn.innerHTML = originalContent;
+                btn.disabled = false; 
             }
-            btn.disabled = false; 
         });
 
         window.requestEditReport = (id) => { 
