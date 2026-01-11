@@ -907,12 +907,14 @@
                 if(isStaging) {
                     const isRed = (sla < 96.3 && d.type !== 'pickup') || (sla < 95 && d.type === 'pickup'); // Logic Red
                     
-                    // SS 2x/3x larger (text-2xl) vs PIC (text-[10px])
+                    // SS smaller (text-lg), Warning inline
                     labelHTML = `
-                        <div class="flex flex-col gap-0.5">
-                            <span class="font-bold text-slate-800 text-2xl tracking-tight leading-none">${d.ss}</span>
-                            <span class="text-[10px] text-slate-400 font-medium uppercase truncate w-24">${d.pic}</span>
-                            ${isRed ? '<span class="text-[9px] text-red-500 font-bold mt-1"><i class="fa-solid fa-triangle-exclamation"></i> Warning</span>' : ''}
+                        <div class="flex flex-col">
+                            <span class="font-bold text-slate-800 text-lg tracking-tight leading-none">${d.ss}</span>
+                            <div class="flex items-center gap-1 mt-0.5">
+                                <span class="text-[10px] text-slate-400 font-medium uppercase truncate max-w-[70px]">${d.pic}</span>
+                                ${isRed ? '<span class="text-[9px] text-red-500 font-bold whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation"></i> Warn</span>' : ''}
+                            </div>
                         </div>`;
                 }
 
@@ -1346,12 +1348,12 @@
                 uniqueFeedInt.forEach(txt => feedbackLines.push(`<span class="text-blue-600 font-bold text-[9px]">[In] :</span> ${txt}`));
                 uniqueFeedExt.forEach(txt => feedbackLines.push(`<span class="text-orange-600 font-bold text-[9px]">[Ex] :</span> ${txt}`));
 
-                // --- NEW: SS Code Big, PIC Small ---
+                // --- NEW: SS Code Smaller & PIC Small ---
                 return `<tr class="border-b border-black/5 last:border-0 align-top hover:bg-slate-50/50 transition-colors">
                     <td class="p-3 text-[10px] font-mono text-slate-500 font-medium">${date}</td>
                     <td class="p-3">
-                         <div class="font-bold text-slate-800 text-xl tracking-tight leading-none mb-1">${r.kodeSS||'-'}</div>
-                        <div class="text-[10px] text-slate-400 font-medium uppercase truncate w-24">${r.reporterName}</div>
+                         <div class="font-bold text-slate-800 text-lg tracking-tight leading-none">${r.kodeSS||'-'}</div>
+                        <div class="text-[10px] text-slate-400 font-medium uppercase truncate w-24 mt-0.5">${r.reporterName}</div>
                     </td>
                     <td class="p-3">
                         <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border ${r.type==='delivery'?'bg-blue-50 text-blue-600 border-blue-100':'bg-orange-50 text-orange-600 border-orange-100'}">${r.type.substr(0,3)}</span>
