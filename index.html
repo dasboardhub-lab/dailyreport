@@ -646,14 +646,92 @@
             <!-- 3. SETTINGS TAB -->
             <div id="tab-settings" class="hidden space-y-6">
                 <!-- Settings Content ... -->
-                <div class="glass-panel p-8 rounded-[32px] flex flex-col md:flex-row gap-6 items-end shadow-soft">
-                    <div class="w-full">
-                        <h3 class="text-lg font-bold text-[#1D1D1F] mb-1">Global Configuration</h3>
-                        <p class="text-xs text-gray-400 mb-4">Pengaturan keamanan aplikasi.</p>
+                <div class="glass-panel p-8 rounded-[32px] flex flex-col gap-6 shadow-soft">
+                    <h3 class="text-lg font-bold text-[#1D1D1F]">Global Configuration</h3>
+                    
+                    <!-- Admin Code -->
+                    <div>
                         <label class="text-xs font-bold text-gray-500 uppercase ml-1">Admin Passcode</label>
                         <input type="text" id="setting-admin-code" class="ios-input w-full mt-1 text-center font-mono tracking-[4px] text-lg font-bold text-[#1D1D1F]" placeholder="••••••">
                     </div>
-                    <button onclick="saveGlobalSettings()" class="bg-[#1D1D1F] text-white font-bold py-3 px-8 rounded-xl text-sm w-full md:w-auto hover:scale-105 transition-transform">Save Changes</button>
+
+                    <div class="h-px bg-gray-200 w-full"></div>
+
+                    <!-- SLA Config -->
+                    <div>
+                        <h4 class="text-sm font-bold text-[#1D1D1F] mb-4 flex items-center gap-2"><i class="fa-solid fa-sliders text-blue-500"></i> SLA Threshold Configuration</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Delivery Config -->
+                            <div class="bg-blue-50/50 p-5 rounded-2xl border border-blue-100">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                                    <p class="text-xs font-bold text-blue-600 uppercase tracking-wider">Delivery</p>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-3 h-3 rounded-full bg-[#34C759]"></div>
+                                            <span class="text-xs font-bold text-gray-500">Target (Green) >=</span>
+                                        </div>
+                                        <div class="relative">
+                                            <input type="number" step="0.1" id="sla-del-green" class="ios-input w-20 text-center py-1.5 px-1 text-xs font-bold bg-white">
+                                            <span class="absolute right-2 top-1.5 text-[10px] text-gray-400 font-bold">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-3 h-3 rounded-full bg-[#FF9500]"></div>
+                                            <span class="text-xs font-bold text-gray-500">Warning (Orange) >=</span>
+                                        </div>
+                                        <div class="relative">
+                                            <input type="number" step="0.1" id="sla-del-orange" class="ios-input w-20 text-center py-1.5 px-1 text-xs font-bold bg-white">
+                                            <span class="absolute right-2 top-1.5 text-[10px] text-gray-400 font-bold">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-[10px] text-red-400 font-medium text-right mt-1 italic">
+                                        *Below Warning is Red
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pickup Config -->
+                            <div class="bg-orange-50/50 p-5 rounded-2xl border border-orange-100">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <div class="w-2 h-2 rounded-full bg-orange-500"></div>
+                                    <p class="text-xs font-bold text-orange-600 uppercase tracking-wider">Pickup</p>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-3 h-3 rounded-full bg-[#34C759]"></div>
+                                            <span class="text-xs font-bold text-gray-500">Target (Green) >=</span>
+                                        </div>
+                                        <div class="relative">
+                                            <input type="number" step="0.1" id="sla-pick-green" class="ios-input w-20 text-center py-1.5 px-1 text-xs font-bold bg-white">
+                                            <span class="absolute right-2 top-1.5 text-[10px] text-gray-400 font-bold">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-3 h-3 rounded-full bg-[#FF9500]"></div>
+                                            <span class="text-xs font-bold text-gray-500">Warning (Orange) >=</span>
+                                        </div>
+                                        <div class="relative">
+                                            <input type="number" step="0.1" id="sla-pick-orange" class="ios-input w-20 text-center py-1.5 px-1 text-xs font-bold bg-white">
+                                            <span class="absolute right-2 top-1.5 text-[10px] text-gray-400 font-bold">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-[10px] text-red-400 font-medium text-right mt-1 italic">
+                                        *Below Warning is Red
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="saveGlobalSettings()" class="bg-[#1D1D1F] text-white font-bold py-3.5 px-8 rounded-xl text-sm w-full md:w-auto hover:scale-105 transition-transform self-end shadow-lg">
+                        Save Configuration
+                    </button>
                 </div>
                 
                 <div class="glass-panel rounded-[32px] overflow-hidden flex flex-col shadow-soft mt-6">
@@ -724,6 +802,12 @@
         const ROW_LABELS = ['REG', 'ECO', 'ND', 'SD/SDS', 'BIG'];
         let reportsUnsubscribe = null, usersUnsubscribe = null;
         let currentDashType = 'delivery'; 
+        
+        // --- SLA CONFIG (Default Values) ---
+        let currentSLAConfig = {
+            delivery: { green: 96.3, orange: 95.0 },
+            pickup: { green: 95.0, orange: 93.0 }
+        };
 
         const initAuth = async () => {
             try {
@@ -946,15 +1030,49 @@
             if(!auth.currentUser) return;
             const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'globalConfig'));
             if(snap.exists()) {
-                currentAdminCode = snap.data().adminCode || "123456";
+                const data = snap.data();
+                currentAdminCode = data.adminCode || "123456";
+                // Load SLA Config if exists
+                if(data.slaConfig) currentSLAConfig = data.slaConfig;
+                
                 const inp = document.getElementById('setting-admin-code'); if(inp) inp.value = currentAdminCode;
-            } else { setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'globalConfig'), {adminCode: "123456"}); }
+                // Populate Inputs
+                document.getElementById('sla-del-green').value = currentSLAConfig.delivery.green;
+                document.getElementById('sla-del-orange').value = currentSLAConfig.delivery.orange;
+                document.getElementById('sla-pick-green').value = currentSLAConfig.pickup.green;
+                document.getElementById('sla-pick-orange').value = currentSLAConfig.pickup.orange;
+            } else { 
+                setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'globalConfig'), {
+                    adminCode: "123456", 
+                    slaConfig: currentSLAConfig
+                }); 
+            }
         }
         window.saveGlobalSettings = async () => {
             const code = document.getElementById('setting-admin-code').value.trim();
+            const dg = parseFloat(document.getElementById('sla-del-green').value);
+            const do_val = parseFloat(document.getElementById('sla-del-orange').value);
+            const pg = parseFloat(document.getElementById('sla-pick-green').value);
+            const po = parseFloat(document.getElementById('sla-pick-orange').value);
+
             if(!code) return showNotification("Kode kosong", "error");
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'globalConfig'), {adminCode: code}, {merge:true});
-            currentAdminCode = code; showNotification("Settings Saved!");
+            if(isNaN(dg) || isNaN(do_val) || isNaN(pg) || isNaN(po)) return showNotification("SLA Values Invalid", "error");
+
+            const newSLAConfig = {
+                delivery: { green: dg, orange: do_val },
+                pickup: { green: pg, orange: po }
+            };
+
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'globalConfig'), {
+                adminCode: code,
+                slaConfig: newSLAConfig
+            }, {merge:true});
+            
+            currentAdminCode = code;
+            currentSLAConfig = newSLAConfig;
+            
+            showNotification("Settings Saved!");
+            renderDashboard(); // Re-render to reflect new colors immediately
         }
 
         function getLast30Days() {
@@ -1201,7 +1319,8 @@
                 const slaColor = getSLAColor(sla, d.type);
                 let labelHTML = label;
                 if(isStaging) {
-                    const isRed = (sla < 96.3 && d.type !== 'pickup') || (sla < 95 && d.type === 'pickup');
+                    const threshold = (d.type === 'pickup') ? currentSLAConfig.pickup.green : currentSLAConfig.delivery.green;
+                    const isRed = (sla < threshold);
                     labelHTML = `<div class="flex flex-col"><div class="flex items-center gap-2"><span class="font-bold text-[#1D1D1F] text-sm tracking-tight">${d.ss}</span>${isRed ? '<i class="fa-solid fa-circle-exclamation text-red-500 text-[10px] animate-pulse"></i>' : ''}</div><span class="text-[10px] text-gray-400 font-medium uppercase">${d.pic}</span></div>`;
                 }
 
@@ -1248,10 +1367,14 @@
             }
         }
 
+        // --- DYNAMIC SLA COLOR LOGIC ---
         function getSLAColor(pct, type) {
-            if(type === 'pickup') { if(pct > 95) return 'bg-[#34C759]'; else if(pct >= 93) return 'bg-[#FF9500]'; } 
-            else { if(pct > 96.3) return 'bg-[#34C759]'; else if(pct >= 95) return 'bg-[#FF9500]'; }
-            return 'bg-[#FF3B30]';
+            // Get config based on type (delivery/pickup)
+            const config = (type === 'pickup') ? currentSLAConfig.pickup : currentSLAConfig.delivery;
+            
+            if (pct >= config.green) return 'bg-[#34C759]'; // Green
+            else if (pct >= config.orange) return 'bg-[#FF9500]'; // Orange/Warning
+            return 'bg-[#FF3B30]'; // Red
         }
 
         function processFeedback(data, filterSvc) {
